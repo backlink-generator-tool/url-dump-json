@@ -15,9 +15,9 @@ A public JSON dataset containing a randomized list of URLs for testing backlink 
 ## 📂 JSON File Name
 
 **Filename:**  
-[url/pinterest-urls/pin-1.json](https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-urls/pin-1.json)
-[url/pinterest-urls/pin-2.json](https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-urls/pin-2.json)
-[url/pinterest-urls/pin-3.json](https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-urls/pin-3.json)
+- [url/pinterest-urls/pin-1.json](https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-urls/pin-1.json)
+- [url/pinterest-urls/pin-2.json](https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-urls/pin-2.json)
+- [url/pinterest-urls/pin-3.json](https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-urls/pin-3.json)
 
 ## 🔄 Example JSON Format
 ```json
