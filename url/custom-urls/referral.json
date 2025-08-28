@@ -56,9 +56,9 @@
     "https://connect.gala.com/referrals?r=6208e741d2be6c7234446e99",
     "https://connect.gala.com/tokens/all?r=6208e741d2be6c7234446e99",
     "https://connect.gala.com/swap?r=6208e741d2be6c7234446e99",
-    "https://connect.gala.com/create?ot=GALA|Unit|none|none?r=6208e741d2be6c7234446e99",
+    "https://connect.gala.com/create?ot=GALA|Unit|none|none&r=6208e741d2be6c7234446e99",
     "https://connect.gala.com/send?r=6208e741d2be6c7234446e99",
     "https://connect.gala.com/receive?r=6208e741d2be6c7234446e99",
-    "https://connect.gala.com/bridge/ethereum/galachain?r=6208e741d2be6c7234446e99",
+    "https://connect.gala.com/bridge/ethereum/galachain&r=6208e741d2be6c7234446e99",
     "https://connect.gala.com/wrap?r=6208e741d2be6c7234446e99"
 ]
