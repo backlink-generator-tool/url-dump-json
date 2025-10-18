@@ -1,6 +1,4 @@
 [
-    "https://web.archive.org/save/{{NOPROTOCOL_URL}}",
-    "https://web.archive.org/save/{{NOSUBDOMAIN_URL}}",
     "https://web.archive.org/save/{{URL}}",
     "https://web.archive.org/web/{{URL}}",
     "https://web.archive.org/web/*/{{URL}}",
