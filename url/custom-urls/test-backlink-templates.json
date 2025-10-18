@@ -1,4 +1,4 @@
-{{
+[
     "https://web.archive.org/save/{{URL}}",
     "https://web.archive.org/web/{{URL}}",
     "https://web.archive.org/web/*/{{URL}}",
@@ -24,4 +24,4 @@
     "https://archive.ph/{{ENCODE_URL}}",
     "https://archive.is/{{ENCODE_URL}}",
     "http://image.thum.io/get/prefetch/{{URL}}"
-}}
+]
