@@ -1,0 +1,77 @@
+<div id="iframeContainer"></div>
+
+<script>
+
+const exchangeLinks = [
+    "https://aibacklinkgenerator.blogspot.com/",
+  	"https://turbolinkbooster.blogspot.com/",
+  	"https://waybackmachineblog.blogspot.com/",
+  	"https://turbobacklinker.blogspot.com/",
+  	"https://archivepagenow.blogspot.com/",
+  	"https://arquivoportuguese.blogspot.com/",
+  	"https://the-wayback-machine.blogspot.com/",
+  	"https://archivewebpagesinstantly.blogspot.com/",
+  	"https://archiveanyurlinstantly.blogspot.com/",
+  	"https://pingmyweb.blogspot.com/",
+  	"https://upordowntool.blogspot.com/",
+  	"https://upordowncheck.blogspot.com/",
+  	"https://livesitemonitor.blogspot.com/",
+  	"https://pingpeek.blogspot.com/",
+  	"https://uptimepeek.blogspot.com/",
+  	"https://upordownnow.blogspot.com/",
+  	"https://pingpeekchecker.blogspot.com/",
+  	"https://isitupnow.blogspot.com/",
+  	"https://updowncheck.blogspot.com/",
+  	"https://isiteup.blogspot.com/",
+  	"https://iswebalive.blogspot.com/",
+  	"https://webstatuschecker.blogspot.com/",
+  	"https://uptimecheckr.blogspot.com/",
+  	"https://isitreachable.blogspot.com/",
+  	"https://upordownwebsitecheck.blogspot.com/",
+  	"https://checkifonline.blogspot.com/",
+  	"https://upordownrealtime.blogspot.com/",
+  	"https://sitepingtool.blogspot.com/",
+  	"https://upstatuscheck.blogspot.com/",
+  	"https://sitepingmonitor.blogspot.com/",
+  	"https://pingstatusnow.blogspot.com/",
+  	"https://isitupcheck.blogspot.com/",
+  	"https://statusfetch.blogspot.com/",
+  	"https://upchecktool.blogspot.com/",
+  	"https://webalivecheck.blogspot.com/",
+  	"https://quickseobuilder.blogspot.com/",
+  	"https://rankboostlink.blogspot.com/"
+];
+  
+function randomURL(array) {
+    if (!Array.isArray(array) || array.length === 0) return "";
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
+}
+  
+async function main() {
+    const iframeContainer = document.getElementById("iframeContainer");
+
+    // Create 3 iframes (visible) that refresh every 60s with new archive URL
+    for (let i = 0; i < 4; i++) {
+        const iframe = document.createElement("iframe");
+        iframe.name = "hiddenFrame" + i;
+        iframe.classList.add("hidden-iframe");
+        iframe.style.width = "100%";
+        iframe.style.height = "300px";
+        iframe.src = randomURL(exchangeLinks);
+
+        iframeContainer.appendChild(iframe);
+
+        // update iframe src every 60 seconds
+        setInterval(() => {
+            iframe.src = randomURL(exchangeLinks);
+        }, 60000);
+    }
+}
+
+// run
+main();
+  
+  
+  
+</script>
