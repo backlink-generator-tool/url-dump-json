@@ -1,0 +1,452 @@
+<div id="iframeContainer"></div>
+
+<script type="text/javascript">
+//<![CDATA[
+  
+  
+// Multiplication array (array of arrays with archive URLs)
+const archiveURLs = [
+    [
+        "https://web.archive.org/save/{{URL}}"
+    ],
+    [
+        "https://archive.today/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url={{ENCODE_URL}}"
+    ],
+    [
+        "https://cachedview.nl/#{{URL}}"
+    ],
+    [
+        "https://web.archive.org/save/https://chat.openai.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chat.openai.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://chatgpt.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chatgpt.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://www.chatgpt.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://www.chatgpt.com/?q={{ENCODE_URL}}",
+      
+        "https://web.archive.org/save/https://chat.openai.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chat.openai.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://chatgpt.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chatgpt.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://www.chatgpt.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://www.chatgpt.com/?hints=search&q={{ENCODE_URL}}"
+    ],
+    [
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+      
+      	"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}"
+    ]
+];
+  
+function addAndShuffleParams(inputUrl) {
+    try {
+        const url = new URL(inputUrl);
+
+        // Extract parameters into an array of "key=value"
+        const paramsArray = [];
+        for (const [key, value] of url.searchParams.entries()) {
+            paramsArray.push(`${key}=${value !== undefined ? value : ""}`);
+        }
+
+        // Add your fixed parameter
+        //paramsArray.push("referralCode=6208e741d2be6c7234446e99");
+        //paramsArray.push("r=6208e741d2be6c7234446e99");
+
+        // Remove duplicates
+        const uniqueParams = [...new Set(paramsArray)];
+
+        // Shuffle parameters
+        for (let i = uniqueParams.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [uniqueParams[i], uniqueParams[j]] = [uniqueParams[j], uniqueParams[i]];
+        }
+
+        // Manually rebuild query string
+        const queryString = uniqueParams.join("&");
+
+        // Construct final URL (always inserts ? if needed)
+        return url.origin + url.pathname + (queryString ? "?" + queryString : "");
+    } catch (e) {
+        console.error("Invalid URL:", inputUrl);
+        return inputUrl;
+    }
+}
+
+
+// Simple URL check (basic regex)
+function isValidURL(url) {
+    const pattern = /^https?:\/\/[^\s]+$/i;
+    return pattern.test(url);
+}
+
+// Get random URL from random sub-array, retry until valid
+function getRandomArchiveURL() {
+    while (true) {
+        // pick random sub-array
+        const randomArray = archiveURLs[Math.floor(Math.random() * archiveURLs.length)];
+
+        if (!Array.isArray(randomArray) || randomArray.length === 0) continue;
+
+        // pick random URL inside it
+        const url = randomArray[Math.floor(Math.random() * randomArray.length)];
+
+        // validate and return
+        if (isValidURL(url)) {
+            return url;
+        }
+    }
+}
+
+function normalizeURL(url) {
+    if (typeof url !== "string") return "";
+
+    // Replace multiple slashes with a single slash, except after "http(s):"
+    return url.replace(/([^:]\/)\/+/g, "$1");
+}
+
+  
+
+const pinterestPaths = [
+ 	"615656211566717661",
+  	"615656211564500126",
+  	"615656211564500024",
+  	"615656211564499846",
+  	"615656211564499702",
+  	"615656211564499573",
+  	"615656211564472019",
+  	"615656211564471936",
+  	"615656211564499452",
+  	"615656211564472049",
+  	"615656211564471900",
+  	"615656211564471848",
+  	"615656211564471675",
+  	"615656211564471742",
+  	"615656211564471611",
+  	"615656211564471401",
+  	"615656211564471332",
+  	"615656211564471262",
+  	"615656211564471096",
+  	"615656211564470865",
+  	"615656211564470828",
+  	"615656211564470774",
+  	"615656211564470701",
+  	"615656211564470743",
+  	"615656211564470735",
+  	"615656211557717383",
+  	"615656211557825566",
+  	"615656211566717661",
+  	"615656211557717198",
+  	"615656211557717177",
+  	"615656211557716563",
+  	"615656211550972104",
+  	"692569248951677917",
+  	"615656211558143551",
+  	"615656211558176742",
+  	"615656211558176765",
+  	"615656211558143692",
+  	"615656211558069894",
+  	"615656211558069897",
+  	"615656211557924394",
+  	"615656211557924419",
+  	"615656211557924614",
+  	"615656211557924624",
+  	"615656211557924640",
+  	"615656211557924594",
+  	"615656211557924631",
+  	"615656211557924609",
+  	"615656211557924405",
+  	"615656211557924621",
+  	"615656211557924374",
+  	"615656211557922708",
+  	"615656211557924153",
+  	"615656211557922452",
+  	"615656211557922653",
+  	"333477547413877699",
+  	"626141154435564105",
+  	"151433606211623695",
+  	"243687029828822412",
+  	"615656211557922640",
+  	"615656211557922647",
+  	"615656211557826356",
+  	"615656211557904825",
+  	"615656211557904836",
+  	"615656211557826099",
+  	"615656211557904433",
+  	"615656211557827533",
+  	"615656211557757161",
+  	"615656211557827451",
+  	"615656211558177532",
+  	"615656211558174065",
+  	"615656211558174153",
+  	"615656211558174121",
+  	"615656211558174478",
+  	"615656211564471900",
+  	"615656211558174140",
+  	"615656211558174188",
+  	"615656211558069503",
+  	"615656211558069508",
+  	"615656211558069493",
+  	"615656211557757292",
+  	"615656211558279913",
+  	"615656211558174969",
+  	"615656211558279899",
+  	"615656211557906263",
+  	"615656211557756847",
+  	"615656211558104674",
+  	"615656211558150581",
+  	"615656211558174684",
+  	"615656211558150601",
+  	"615656211558150552",
+  	"615656211558174266",
+  	"615656211557906823",
+  	"615656211557906808",
+  	"615656211558261375",
+  	"615656211557924956",
+  	"615656211557924951",
+  	"615656211557924332",
+  	"615656211557905429"
+];
+  
+const pinterestURLs = [
+	"https://www.pinterest.com/pin/",
+    "https://www.pinterest.at/pin/",
+    "https://www.pinterest.be/pin/",
+    "https://www.pinterest.ca/pin/",
+    "https://www.pinterest.cl/pin/",
+    "https://www.pinterest.co/pin/",
+    "https://www.pinterest.dk/pin/",
+    "https://www.pinterest.ec/pin/",
+    "https://www.pinterest.fr/pin/",
+    "https://www.pinterest.de/pin/",
+    "https://www.pinterest.hu/pin/",
+    "https://www.pinterest.in/pin/",
+    "https://www.pinterest.id/pin/",
+    "https://www.pinterest.ie/pin/",
+    "https://www.pinterest.it/pin/",
+    "https://www.pinterest.jp/pin/",
+    "https://www.pinterest.mx/pin/",
+    "https://www.pinterest.nl/pin/",
+    "https://www.pinterest.pe/pin/",
+    "https://www.pinterest.nz/pin/",
+    "https://www.pinterest.pt/pin/",
+    "https://www.pinterest.ph/pin/",
+    "https://www.pinterest.ru/pin/",
+    "https://www.pinterest.kr/pin/",
+    "https://www.pinterest.se/pin/",
+    "https://www.pinterest.es/pin/",
+    "https://www.pinterest.ch/pin/",
+    "https://www.pinterest.tw/pin/",
+    "https://www.pinterest.uk/pin/",
+    "https://www.pinterest.th/pin/",
+    "https://www.pinterest.vn/pin/",
+    "https://www.pinterest.co.uk/pin/",
+    "https://www.pinterest.co.kr/pin/",
+    "https://www.pinterest.com.au/pin/",
+    "https://www.pinterest.com.mx/pin/",
+    "https://ar.pinterest.com/pin/",
+    "https://uk.pinterest.com/pin/",
+    "https://fr.pinterest.com/pin/",
+    "https://de.pinterest.com/pin/",
+    "https://es.pinterest.com/pin/",
+    "https://it.pinterest.com/pin/",
+    "https://au.pinterest.com/pin/",
+    "https://dk.pinterest.com/pin/",
+    "https://pt.pinterest.com/pin/",
+    "https://ru.pinterest.com/pin/",
+    "https://jp.pinterest.com/pin/",
+    "https://cl.pinterest.com/pin/",
+    "https://co.pinterest.com/pin/",
+    "https://nl.pinterest.com/pin/",
+    "https://in.pinterest.com/pin/",
+    "https://kr.pinterest.com/pin/"
+];
+
+const fetchURLs = [
+    "https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-1.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-2.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-3.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-4.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-5.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-6.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-7.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-8.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-9.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-10.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-11.json"
+];
+  
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+async function updateDefaultURLs() {
+    shuffle(fetchURLs);
+
+    for (const url of fetchURLs) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+            const data = await response.json();
+
+            if (Array.isArray(data)) {
+                if (data.length > 0) {
+                    console.log("✅ Successfully loaded new URLs from:", url);
+                    
+                    // Replace contents of defaultURLs
+                    pinterestPaths.length = 0;
+                    pinterestPaths.push(...data);
+
+                    //console.log("Updated defaultURLs:", defaultURLs);
+                    //console.log("Updated extraSecondURLs:", extraSecondURLs);
+                    return;
+                } else {
+                    console.warn(`⚠️ Loaded from ${url}, but received empty array. Skipping...`);
+                }
+            } else {
+                console.warn(`⚠️ Loaded from ${url}, but response is not a valid array. Skipping...`);
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to load from ${url}:`, error.message);
+        }
+    }
+
+    console.log("⚠️ All fetch attempts failed or returned empty. Using default defaultURLs.");
+}
+
+function randomURL(array) {
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
+}
+
+//addAndShuffleParams()
+function generateArchiveURL() {
+  	const saveUrl = randomURL(pinterestURLs) + randomURL(pinterestPaths);
+    return normalizeURL(getRandomArchiveURL()
+        .replace(/{{URL}}/g, saveUrl)
+        .replace(/{{ENCODE_URL}}/g, encodeURIComponent(saveUrl)));
+}
+
+async function main() {
+    await updateDefaultURLs(); // ⏳ wait for URLs to load first
+
+    const iframeContainer = document.getElementById("iframeContainer");
+
+    // Now, create 10 hidden iframes
+    for (let i = 0; i < 6; i++) {
+
+        const archiveURL = generateArchiveURL();
+
+        const iframe = document.createElement("iframe");
+        iframe.name = "hiddenFrame" + i;
+        iframe.classList.add("hidden-iframe");
+        iframe.style.width = "100%";
+        iframe.style.height = "300px";
+        //iframe.style.display = "none";
+        iframe.src = archiveURL;
+
+        iframeContainer.appendChild(iframe);
+
+        // Update iframe src every 60 seconds
+        setInterval(() => {
+            const newURL = generateArchiveURL();
+            iframe.src = newURL;
+        }, 60000);
+    }
+}
+
+// 🚀 Run when page loads
+main();
+
+//]]>
+</script>
