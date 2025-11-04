@@ -1,0 +1,318 @@
+<div id="iframeContainer"></div>
+
+<script type="text/javascript">
+//<![CDATA[
+  
+  
+// Multiplication array (array of arrays with archive URLs)
+const archiveURLs = [
+    [
+        "https://web.archive.org/save/{{URL}}"
+    ],
+    [
+        "https://archive.today/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url={{ENCODE_URL}}"
+    ],
+    [
+        "https://cachedview.nl/#{{URL}}"
+    ],
+    [
+        "https://web.archive.org/save/https://chat.openai.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chat.openai.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://chatgpt.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chatgpt.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://www.chatgpt.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://www.chatgpt.com/?q={{ENCODE_URL}}",
+      
+        "https://web.archive.org/save/https://chat.openai.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chat.openai.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://chatgpt.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chatgpt.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://www.chatgpt.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://www.chatgpt.com/?hints=search&q={{ENCODE_URL}}"
+    ],
+    [
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+      
+      	"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}"
+    ]
+];
+
+// Simple URL check (basic regex)
+function isValidURL(url) {
+    const pattern = /^https?:\/\/[^\s]+$/i;
+    return pattern.test(url);
+}
+
+// Get random URL from random sub-array, retry until valid
+function getRandomArchiveURL() {
+    while (true) {
+        // pick random sub-array
+        const randomArray = archiveURLs[Math.floor(Math.random() * archiveURLs.length)];
+
+        if (!Array.isArray(randomArray) || randomArray.length === 0) continue;
+
+        // pick random URL inside it
+        const url = randomArray[Math.floor(Math.random() * randomArray.length)];
+
+        // validate and return
+        if (isValidURL(url)) {
+            return url;
+        }
+    }
+}
+
+function randomURL() {
+    const index = Math.floor(Math.random() * archiveURLs.length);
+    return archiveURLs[index];
+}
+  
+
+const pinterestPaths = [
+ 	"seekersofdecay/",
+  	"seekersofdecay/regan-vest/",
+  	"abandoned-machine/"
+];
+  
+const pinterestURLs = [
+	"https://www.pinterest.com/",
+    "https://www.pinterest.at/",
+    "https://www.pinterest.be/",
+    "https://www.pinterest.ca/",
+    "https://www.pinterest.cl/",
+    "https://www.pinterest.co/",
+    "https://www.pinterest.dk/",
+    "https://www.pinterest.ec/",
+    "https://www.pinterest.fr/",
+    "https://www.pinterest.de/",
+    "https://www.pinterest.hu/",
+    "https://www.pinterest.in/",
+    "https://www.pinterest.id/",
+    "https://www.pinterest.ie/",
+    "https://www.pinterest.it/",
+    "https://www.pinterest.jp/",
+    "https://www.pinterest.mx/",
+    "https://www.pinterest.nl/",
+    "https://www.pinterest.pe/",
+    "https://www.pinterest.nz/",
+    "https://www.pinterest.pt/",
+    "https://www.pinterest.ph/",
+    "https://www.pinterest.ru/",
+    "https://www.pinterest.kr/",
+    "https://www.pinterest.se/",
+    "https://www.pinterest.es/",
+    "https://www.pinterest.ch/",
+    "https://www.pinterest.tw/",
+    "https://www.pinterest.uk/",
+    "https://www.pinterest.th/",
+    "https://www.pinterest.vn/",
+    "https://www.pinterest.co.uk/",
+    "https://www.pinterest.co.kr/",
+    "https://www.pinterest.com.au/",
+    "https://www.pinterest.com.mx/",
+    "https://ar.pinterest.com/",
+    "https://uk.pinterest.com/",
+    "https://fr.pinterest.com/",
+    "https://de.pinterest.com/",
+    "https://es.pinterest.com/",
+    "https://it.pinterest.com/",
+    "https://au.pinterest.com/",
+    "https://dk.pinterest.com/",
+    "https://pt.pinterest.com/",
+    "https://ru.pinterest.com/",
+    "https://jp.pinterest.com/",
+    "https://cl.pinterest.com/",
+    "https://co.pinterest.com/",
+    "https://nl.pinterest.com/",
+    "https://in.pinterest.com/",
+    "https://kr.pinterest.com/"
+];
+
+const fetchURLs = [
+    //"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest.json"
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-1.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-2.json"
+];
+  
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+async function updateDefaultURLs() {
+    shuffle(fetchURLs);
+
+    for (const url of fetchURLs) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+            const data = await response.json();
+
+            if (Array.isArray(data)) {
+                if (data.length > 0) {
+                    console.log("✅ Successfully loaded new URLs from:", url);
+                    
+                    // Replace contents of defaultURLs
+                    pinterestPaths.length = 0;
+                    pinterestPaths.push(...data);
+
+                    //console.log("Updated defaultURLs:", defaultURLs);
+                    //console.log("Updated extraSecondURLs:", extraSecondURLs);
+                    return;
+                } else {
+                    console.warn(`⚠️ Loaded from ${url}, but received empty array. Skipping...`);
+                }
+            } else {
+                console.warn(`⚠️ Loaded from ${url}, but response is not a valid array. Skipping...`);
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to load from ${url}:`, error.message);
+        }
+    }
+
+    console.log("⚠️ All fetch attempts failed or returned empty. Using default defaultURLs.");
+}
+
+function randomURL(array) {
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
+}
+
+function normalizeURL(url) {
+    if (typeof url !== "string") return "";
+
+    // Replace multiple slashes with a single slash, except after "http(s):"
+    return url.replace(/([^:]\/)\/+/g, "$1");
+}
+  
+function generateArchiveURL() {
+  	const saveUrl = randomURL(pinterestURLs) + randomURL(pinterestPaths);
+  	
+    return normalizeURL(getRandomArchiveURL()
+        .replace(/{{URL}}/g, saveUrl)
+        .replace(/{{ENCODE_URL}}/g, encodeURIComponent(saveUrl)));
+}
+
+async function main() {
+    await updateDefaultURLs(); // ⏳ wait for URLs to load first
+
+    const iframeContainer = document.getElementById("iframeContainer");
+
+    // Now, create 6 hidden iframes
+    for (let i = 0; i < 6; i++) {
+
+        const archiveURL = generateArchiveURL();
+
+        const iframe = document.createElement("iframe");
+        iframe.name = "hiddenFrame" + i;
+        iframe.classList.add("hidden-iframe");
+        iframe.style.width = "100%";
+        iframe.style.height = "300px";
+        //iframe.style.display = "none";
+        iframe.src = archiveURL;
+
+        iframeContainer.appendChild(iframe);
+
+        // Update iframe src every 60 seconds
+        setInterval(() => {
+            const newURL = generateArchiveURL();
+            iframe.src = newURL;
+        }, 60000);
+    }
+}
+
+// 🚀 Run when page loads
+main();
+
+//]]>
+</script>
