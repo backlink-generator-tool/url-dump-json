@@ -645,7 +645,9 @@ const extraSecondURLs = [
   
 
 const fetchURLs = [
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json"
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json",
+	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/referral.json",
+	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/seekers-of-decay.json"
 ];
 
 const secondURLs = [...mainURLs, ...extraSecondURLs];
@@ -675,7 +677,7 @@ async function updateDefaultURLs() {
 
                     //console.log("Updated defaultURLs:", defaultURLs);
                     //console.log("Updated extraSecondURLs:", extraSecondURLs);
-                    return;
+                    //return;
                 } else {
                     console.warn(`⚠️ Loaded from ${url}, but received empty array. Skipping...`);
                 }
