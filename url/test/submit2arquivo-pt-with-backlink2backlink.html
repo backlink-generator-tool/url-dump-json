@@ -1,4 +1,4 @@
-<!--
+<!-- -->
 <link href='https://trafficgenerator.github.io/api/custom-frame-styles.css' rel='stylesheet'/>
 
 <div id="container">
@@ -11,7 +11,7 @@
         window.location.href = "https://www.followlike.net/?r=19384926";
       });
 </script>
--->
+<!-- -->
 
 <!----------------------------------------------------------------------------------------->
 
@@ -20,586 +20,54 @@
 <script type="text/javascript">
 //<![CDATA[
 /*
-  Enhanced version of submit2arquivo-pt-with-backlink2backlink.html
-  - Deduplicate + fair merge + limit for secondURLs
-  - Persist to IndexedDB -> localStorage -> memory fallback
-  - Persistent cursors for cycling through lists
-  - getNextPair() returns `main + "?" + second`
+  Enhanced version:
+   - main URLs are fetched from the provided mainFetchURLs list (same behavior as extraSecondURLs)
+   - second URLs built from extraSecondURLs + fetchURLs (as previously)
+   - no duplicates, persistent with safe fallbacks (IDB -> localStorage -> memory)
+   - round-robin merge across sources up to MAX_*_ITEMS
+   - provides getNextMain(), getNextSecond(), getNextPair()
 */
 
-/* -------------------- Your original arrays (kept intact) -------------------- */
-const mainURLs = [
-"https://seoquickbacklink.blogspot.com/",
-        "https://linkboosttool.blogspot.com/",
-        "https://seobacklinkboosters.blogspot.com/",
-        "https://linkbuilderzone.blogspot.com/",
-        "https://oneclickbacklinks.blogspot.com/",
-        "https://quicklinkseo.blogspot.com/",
-        "https://boostbacklinkspro.blogspot.com/",
-        "https://seobacklinkprotool.blogspot.com/",
-        "https://linkrankpro.blogspot.com/",
-        "https://probacklinkgen.blogspot.com/",
-        "https://linkpowerbuilder.blogspot.com/",
-        "https://boostbacklinksfree.blogspot.com/",
-        "https://seoboostpanel.blogspot.com/",
-        "https://turboindexbot.blogspot.com/",
-        "https://fastbacklinkbuilder.blogspot.com/",
-        "https://instantbacklinkbuilder.blogspot.com/",
-        "https://easybacklinklab.blogspot.com/",
-        "https://rankboostertool.blogspot.com/",
-        "https://rankrocketbacklinks.blogspot.com/",
-        "https://pingmysitenow.blogspot.com/",
-        "https://linkbuildermaster.blogspot.com/",
-        "https://linkbuildermachine.blogspot.com/",
-        "https://clicktobacklink.blogspot.com/",
-        "https://backlinkrampage.blogspot.com/",
-        "https://backlinkfleet.blogspot.com/",
-        "https://autolinkvelocity.blogspot.com/",
-        "https://backlinkpowerhouse.blogspot.com/",
-        "https://rapidbacklinker.blogspot.com/",
-        "https://one-click-backlinks.blogspot.com/",
-        "https://ultimatebacklinktool.blogspot.com/",
-        "https://rapidseobacklinks.blogspot.com/",
-        "https://backlinkbuilderhub.blogspot.com/",
-        "https://instantseolinks.blogspot.com/",
-        "https://seobacklinkcreator.blogspot.com/",
-        "https://linkindexsurge.blogspot.com/",
-        "https://index-boost-tool.blogspot.com/",
-        "https://smartbacklinkpro.blogspot.com/",
-        "https://upvotestrategy.blogspot.com/",
-        "https://crawltrigger.blogspot.com/",
-        "https://crawltrigger.blogspot.com/",
-        "https://prolinkbuildertool.blogspot.com/",
-        "https://maxseobacklinks.blogspot.com/",
-        "https://autolinkgenie.blogspot.com/",
-        "https://crawlboosttool.blogspot.com/",
-        "https://linksurgelab.blogspot.com/",
-        "https://rankfueltool.blogspot.com/",
-        "https://linkacceleratortool.blogspot.com/",
-        "https://linkpingtool.blogspot.com/",
-        "https://instantseoboost.blogspot.com/",
-        "https://auto-backlink-booster.blogspot.com/",
-        "https://crawlfuel.blogspot.com/",
-        "https://backlinkrapidfire.blogspot.com/",
-        "https://backlinkboost360.blogspot.com/",
-        "https://quickseoblaster.blogspot.com/",
-        "https://smartbacklinkbot.blogspot.com/",
-        "https://oneclick-backlinks.blogspot.com/",
-        "https://probacklinktoolbox.blogspot.com/",
-        "https://linkgrowthmachine.blogspot.com/",
-        "https://seobacklinkmachine.blogspot.com/",
-        "https://autolinkboosters.blogspot.com/",
-        "https://seobacklinkauto.blogspot.com/",
-        "https://trafficlinkgenerator.blogspot.com/",
-        "https://fastbacklinkcreator.blogspot.com/",
-        "https://seoignitertools.blogspot.com/",
-        "https://seobacklinkdrive.blogspot.com/",
-        "https://indexlinkbooster.blogspot.com/",
-        "https://pingindexboost.blogspot.com/",
-        "https://instantbacklinktool.blogspot.com/",
-        "https://instantseobacklinker.blogspot.com/",
-        "https://linkbuilderonline.blogspot.com/",
-        "https://seobacklinkzone.blogspot.com/",
-        "https://linkindexertool.blogspot.com/",
-        "https://seobursttools.blogspot.com/",
-        "https://indexfuelpro.blogspot.com/",
-        "https://linkbuilderengine.blogspot.com/",
-        "https://autolinkbuildertool.blogspot.com/",
-        "https://seobacklinkpulse.blogspot.com/",
-        "https://pingandboost.blogspot.com/",
-        "https://backlinkblastertool.blogspot.com/",
-        "https://seobacklinklauncher.blogspot.com/",
-        "https://seoboostlinker.blogspot.com/",
-        "https://linksprinterseo.blogspot.com/",
-        "https://linkrise360.blogspot.com/",
-        "https://backlinkfueler.blogspot.com/",
-        "https://backlinkmaximizer.blogspot.com/",
-        "https://backlinkmasterbuilder.blogspot.com/",
-        "https://autolinkbooster.blogspot.com/",
-        "https://linkindexbooster.blogspot.com/",
-        "https://webrankfuel.blogspot.com/",
-        "https://seoquicklinks.blogspot.com/",
-        "https://linkrushpro.blogspot.com/",
-        "https://linkboostingtool.blogspot.com/",
-        "https://seobacklinkforge.blogspot.com/",
-        "https://zerocostbacklinks.blogspot.com/",
-        "https://powerlinkcreator.blogspot.com/",
-        "https://seofirelinks.blogspot.com/",
-        "https://autobacklinkbooster.blogspot.com/",
-        "https://seobacklinkbot.blogspot.com/",
-        "https://linkflowboost.blogspot.com/",
-        "https://backlinkwizardtool.blogspot.com/",
-        "https://pingandrank.blogspot.com/",
-        "https://instantbacklinksnow.blogspot.com/",
-        "https://index-my--links.blogspot.com/",
-        "https://seoautolinker.blogspot.com/",
-        "https://fastbacklinkmaker.blogspot.com/",
-        "https://hyperlinkbooster.blogspot.com/",
-        "https://backlinkfirestorm.blogspot.com/",
-        "https://autolinkblast.blogspot.com/",
-        "https://seobacklinkcloud.blogspot.com/",
-        "https://crawlboostseo.blogspot.com/",
-        "https://linkstacker.blogspot.com/",
-        "https://backlinkboostonline.blogspot.com/",
-        "https://linkgenieseo.blogspot.com/",
-        "https://linkvelocitytool.blogspot.com/",
-        "https://linkboosterplus.blogspot.com/",
-        "https://linkpinggenerator.blogspot.com/",
-        "https://fastbacklinkengine.blogspot.com/",
-        "https://linkgenprotool.blogspot.com/",
-        "https://boostmybacklinks.blogspot.com/",
-        "https://index-my-site-fast.blogspot.com/",
-        "https://linkbuilderstudio.blogspot.com/",
-        "https://backlinkblasterpro.blogspot.com/",
-        "https://autobacklinktools.blogspot.com/",
-        "https://quicklinkbuilder.blogspot.com/",
-        "https://backlinkpowertool.blogspot.com/",
-        "https://autobacklinkdrive.blogspot.com/",
-        "https://seobacklinkengine.blogspot.com/",
-        "https://linksurgeseo.blogspot.com/",
-        "https://indexboosttools.blogspot.com/",
-        "https://linkpowerup.blogspot.com/",
-        "https://seorocketlinks.blogspot.com/",
-        "https://backlinkbotonline.blogspot.com/",
-        "https://smartlinkpinger.blogspot.com/",
-        "https://backlinkblitz.blogspot.com/",
-        "https://rankboosterbacklinks.blogspot.com/",
-        "https://backlinkxpress.blogspot.com/",
-        "https://backlinkbotforge.blogspot.com/",
-        "https://seolinkforge.blogspot.com/",
-        "https://backlinkpowerhub.blogspot.com/",
-        "https://trafficpingtools.blogspot.com/",
-        "https://linkfuelseo.blogspot.com/",
-        "https://autolinkpinger.blogspot.com/",
-        "https://linksurgeengine.blogspot.com/",
-        "https://smartlinkbooster.blogspot.com/",
-        "https://seobacklinkhacker.blogspot.com/",
-        "https://hyperbacklinkgen.blogspot.com/",
-        "https://maxbacklinktool.blogspot.com/",
-        "https://instantbacklinktools.blogspot.com/",
-        "https://seolinkautomator.blogspot.com/",
-        "https://pingbacklinksnow.blogspot.com/",
-        "https://quickrankbacklinks.blogspot.com/",
-        "https://smartseolinks.blogspot.com/",
-        "https://linkpowerboost.blogspot.com/",
-        "https://autobacklinklab.blogspot.com/",
-        "https://boostbacklinksnow.blogspot.com/",
-        "https://backlinkturbo.blogspot.com/",
-        "https://rapidlinkbooster.blogspot.com/",
-        "https://autobacklinkmachine.blogspot.com/",
-        "https://quickranklinks.blogspot.com/",
-        "https://linkfuelgenerator.blogspot.com/",
-        "https://ranklinksfast.blogspot.com/",
-        "https://linkbuilderonlinetool.blogspot.com/",
-        "https://backlinkpulse.blogspot.com/",
-        "https://seobacklinkfunnel.blogspot.com/",
-        "https://turbobacklinkstool.blogspot.com/",
-        "https://linkbuilderprotool.blogspot.com/",
-        "https://smartbacklinkmaker.blogspot.com/",
-        "https://backlinkautogen.blogspot.com/",
-        "https://seobacklinkbuildertool.blogspot.com/",
-        "https://backlinkcreatorx.blogspot.com/",
-        "https://freebacklinkwizard.blogspot.com/",
-        "https://smartbacklinktools.blogspot.com/",
-        "https://autobacklinkgen.blogspot.com/",
-        "https://instantlinkmaker.blogspot.com/",
-        "https://mybacklinkbuilder.blogspot.com/",
-        "https://backlinkprotool.blogspot.com/",
-        "https://smartbacklinkbuilder.blogspot.com/",
-        "https://freelinkbuildertool.blogspot.com/",
-        "https://backlinkboosterfree.blogspot.com/",
-        "https://easybacklinkgenerator.blogspot.com/",
-        "https://onlinebacklinkcreator.blogspot.com/",
-        "https://freebacklinkgeneratorpro.blogspot.com/",
-        "https://turbobacklinkmaker.blogspot.com/",
-        "https://backlinkfactoryonline.blogspot.com/",
-        "https://backlinkboosttool.blogspot.com/",
-        "https://powerbacklinkmaker.blogspot.com/",
-        "https://quickbacklinkcreator.blogspot.com/",
-        "https://backlinkgeneratorhub.blogspot.com/",
-        "https://backlinktoolbox.blogspot.com/",
-        "https://backlinkmakerhub.blogspot.com/",
-        "https://instantbacklinkgenerator.blogspot.com/",
-        "https://freelinkbuilderlab.blogspot.com/",
-        "https://backlinkninjatool.blogspot.com/",
-        "https://generatorbacklinks.blogspot.com/",
-        "https://freebacklinkgeneratorblog.blogspot.com/",
-        "https://quickbacklinkmaker.blogspot.com/",
-        "https://backlinksmiths.blogspot.com/",
-        "https://mybacklinkgenerator.blogspot.com/",
-        "https://autobacklinkmaker.blogspot.com/",
-        "https://trustedbacklinkmaker.blogspot.com/",
-        "https://backlinktoolboxonline.blogspot.com/",
-        "https://backlinklabtools.blogspot.com/",
-        "https://rapidbacklinkbuilder.blogspot.com/",
-        "https://backlinkforgeonline.blogspot.com/",
-        "https://ultimatebacklinkgenerator.blogspot.com/",
-        "https://backlinkbuilderpro.blogspot.com/",
-        "https://backlinktoolboxfree.blogspot.com/",
-        "https://backlinkgeneratorlab.blogspot.com/",
-        "https://backlinkwizardfree.blogspot.com/",
-        "https://backlinkgenpro.blogspot.com/",
-        "https://buildmybacklinks.blogspot.com/",
-        "https://backlinkmakernet.blogspot.com/",
-        "https://backlinkbuilderlab.blogspot.com/",
-        "https://ultimatebacklinkmaker.blogspot.com/",
-        "https://freebacklinkmakeronline.blogspot.com/",
-        "https://superbacklinkmaker.blogspot.com/",
-        "https://simplebacklinkmaker.blogspot.com/",
-        "https://seo-backlinkgenerator.blogspot.com/",
-        "https://unlimitedbacklinkgenerator.blogspot.com/",
-        "https://powerfulbacklinkgenerator.blogspot.com/",
-        "https://instantseo-backlinks.blogspot.com/",
-        "https://automaticbacklinkgenerator.blogspot.com/",
-        "https://onlinebacklinkbuilder.blogspot.com/",
-        "https://seo-backlinktool.blogspot.com/",
-        "https://linkboostgenerator.blogspot.com/",
-        "https://probacklinktool.blogspot.com/",
-        "https://rankbacklinkmaker.blogspot.com/",
-        "https://backlinkhero.blogspot.com/",
-        "https://freeoneclickbacklink.blogspot.com/",
-        "https://powerbacklinkbuilder.blogspot.com/",
-        "https://smartlinkcreator.blogspot.com/",
-        "https://freebacklinktoolonline.blogspot.com/",
-        "https://freelinkgeneratortool.blogspot.com/",
-        "https://backlinkcreatorpro.blogspot.com/",
-        "https://autoseogenerator.blogspot.com/",
-        "https://backlinkbuilderonline.blogspot.com/",
-        "https://autobacklinkcreator.blogspot.com/",
-        "https://backlinkmakeronline.blogspot.com/",
-        "https://freeseobacklinkmaker.blogspot.com/",
-        "https://backlinkcreator360.blogspot.com/",
-        "https://megabacklinktool.blogspot.com/",
-        "https://quickseobuilder.blogspot.com/",
-        "https://fastlinkbuilder.blogspot.com/",
-        "https://mybacklinktool.blogspot.com/",
-        "https://probacklinkmaker.blogspot.com/",
-        "https://backlinkmagictool.blogspot.com/",
-        "https://easylinkbuilder.blogspot.com/",
-        "https://turbobacklinkgenerator.blogspot.com/",
-        "https://webbacklinktool.blogspot.com/",
-        "https://rankboostbacklinks.blogspot.com/",
-        "https://superbacklinkbuilder.blogspot.com/",
-        "https://bestbacklinkmakertool.blogspot.com/",
-        "https://oneclickbacklinkmaker.blogspot.com/",
-        "https://globalbacklinkmaker.blogspot.com/",
-        "https://powerbacklinkgenerator.blogspot.com/",
-        "https://oneclickbacklinkgenerator.blogspot.com/",
-        "https://probacklinkbuilder.blogspot.com/",
-        "https://freebacklinkengine.blogspot.com/",
-        "https://linkbuilder360.blogspot.com/",
-        "https://backlinkprotools.blogspot.com/",
-        "https://freeseobacklinker.blogspot.com/",
-        "https://linkgrowgenerator.blogspot.com/",
-        "https://backlinkprobuilder.blogspot.com/",
-        "https://easylinkmaker.blogspot.com/",
-        "https://linkgenmaster.blogspot.com/",
-        "https://backlinkprolab.blogspot.com/",
-        "https://freelinkforge.blogspot.com/",
-        "https://linkcreatorzone.blogspot.com/",
-        "https://rapidbacklinkgen.blogspot.com/",
-        "https://backlinkseobuilder.blogspot.com/",
-        "https://freelinkmachine.blogspot.com/",
-        "https://backlinkcloudtool.blogspot.com/",
-        "https://ranklinkbuilder.blogspot.com/",
-        "https://linkboostlab.blogspot.com/",
-        "https://quickseobacklinks.blogspot.com/",
-        "https://backlinkgalaxy.blogspot.com/",
-        "https://linkpowergenerator.blogspot.com/",
-        "https://seopingtool.blogspot.com/",
-        "https://instantseobacklinks.blogspot.com/",
-        "https://quickseoping.blogspot.com/",
-        "https://rapidbacklinkcreator.blogspot.com/",
-        "https://linkbuilderexpress.blogspot.com/",
-        "https://smartbacklinktool.blogspot.com/",
-        "https://seobacklinkping.blogspot.com/",
-        "https://linkbuilderfast.blogspot.com/",
-        "https://free-backlink-builder.blogspot.com/",
-        "https://auto-backlink-tool.blogspot.com/",
-        "https://online-link-builder.blogspot.com/",
-        "https://seo-ping-tool.blogspot.com/",
-        "https://generate-backlinks-fast.blogspot.com/",
-        "https://google-rank-booster.blogspot.com/",
-        "https://instant-backlink-generator.blogspot.com/",
-        "https://free-high-quality-backlinks.blogspot.com/",
-        "https://backlink-automation-tool.blogspot.com/",
-        "https://backlink-maker-online.blogspot.com/",
-        "https://free-link-builder.blogspot.com/",
-        "https://backlink-generator-pro.blogspot.com/",
-        "https://online-seo-link-builder.blogspot.com/",
-        "https://fast-seo-backlinks.blogspot.com/",
-        "https://auto-seo-links.blogspot.com/",
-        "https://backlink-ping-tool.blogspot.com/",
-        "https://seo-traffic-boost.blogspot.com/",
-        "https://one-click-free-backlinks.blogspot.com/",
-        "https://fast-google-backlinks.blogspot.com/",
-        "https://link-builder-automation.blogspot.com/",
-        "https://seo-backlink-boost.blogspot.com/",
-        "https://backlink-generator-online.blogspot.com/",
-        "https://instant-link-builder.blogspot.com/",
-        "https://backlink-generator-fast.blogspot.com/",
-        "https://auto-link-builder.blogspot.com/",
-        "https://high-rank-backlinks.blogspot.com/",
-        "https://backlink-power-tool.blogspot.com/",
-        "https://seo-link-generator.blogspot.com/",
-        "https://superseoboost.blogspot.com/",
-        "https://linkwaveseo.blogspot.com/",
-        "https://backlinkcomposerai.blogspot.com/",
-        "https://backlinkautopilot.blogspot.com/",
-        "https://backlinkmachinex.blogspot.com/",
-        "https://rankkingbacklinks.blogspot.com/",
-        "https://aidofollowgenerator.blogspot.com/",
-        "https://linkwhisperai.blogspot.com/",
-        "https://autorankboost.blogspot.com/",
-        "https://linksurgefree.blogspot.com/",
-        "https://backlinkrocketai.blogspot.com/",
-        "https://aibacklinksurfer.blogspot.com/",
-        "https://backlinkharvest.blogspot.com/",
-        "https://seopulsebacklinks.blogspot.com/",
-        "https://backlinkfiretool.blogspot.com/",
-        "https://seoblazefree.blogspot.com/",
-        "https://backlinkmasonai.blogspot.com/",
-        "https://linkalchemyai.blogspot.com/",
-        "https://instantlinkforge.blogspot.com/",
-        "https://seolinkstudiotool.blogspot.com/",
-        "https://linkstormpro.blogspot.com/",
-        "https://toprankgenerator.blogspot.com/",
-        "https://linkforgeai.blogspot.com/",
-        "https://aidomainlinker.blogspot.com/",
-        "https://backlinkreveal.blogspot.com/",
-        "https://linkturboboost.blogspot.com/",
-        "https://ranknuke.blogspot.com/",
-        "https://backlinksmith.blogspot.com/",
-        "https://backlinkcrafter.blogspot.com/",
-        "https://linkmagnethub.blogspot.com/",
-        "https://rankrocketfree.blogspot.com/",
-        "https://linkvaultfree.blogspot.com/",
-        "https://linkmagmaseo.blogspot.com/",
-        "https://backlinklabpro.blogspot.com/",
-        "https://linkaccelerator.blogspot.com/",
-        "https://daherotools.blogspot.com/",
-        "https://smartranklinks.blogspot.com/",
-        "https://linkhackerai.blogspot.com/",
-        "https://backlinkpulseai.blogspot.com/",
-        "https://backlinkenginefree.blogspot.com/",
-        "https://turbolinkbuilder.blogspot.com/",
-        "https://seomagicbacklinks.blogspot.com/",
-        "https://rankrisetool.blogspot.com/",
-        "https://linksurgeai.blogspot.com/",
-        "https://hyperlinkai.blogspot.com/",
-        "https://linkfactoryfree.blogspot.com/",
-        "https://seolinkautobot.blogspot.com/",
-        "https://smartdaseo.blogspot.com/",
-        "https://autobacklinkmaster.blogspot.com/",
-        "https://aifreelinkfactory.blogspot.com/",
-        "https://linkcraftai.blogspot.com/",
-        "https://linkexplode.blogspot.com/",
-        "https://rankhackertool.blogspot.com/",
-        "https://easyautolinks.blogspot.com/",
-        "https://seolinklauncher.blogspot.com/",
-        "https://linkblastpro.blogspot.com/",
-        "https://rankrushbacklinks.blogspot.com/",
-        "https://backlinkpilotai.blogspot.com/",
-        "https://aiboostlinks.blogspot.com/",
-        "https://linkshocklab.blogspot.com/",
-        "https://click-backlinks.blogspot.com/",
-        "https://linkmeteor.blogspot.com/",
-        "https://rapidseobuilder.blogspot.com/",
-        "https://proranklinks.blogspot.com/",
-        "https://instantrankbooster.blogspot.com/",
-        "https://backlinkninjatools.blogspot.com/",
-        "https://backlinkenginex.blogspot.com/",
-        "https://backlinkaiexpress.blogspot.com/",
-        "https://smartlinksai.blogspot.com/",
-        "https://backlinkshockwave.blogspot.com/",
-        "https://backlinkhype.blogspot.com/",
-        "https://online-link-builder-free.blogspot.com/",
-        "https://linkbuilderinstant.blogspot.com/",
-        "https://linkflowseo.blogspot.com/",
-        "https://boost-my-backlinks.blogspot.com/",
-        "https://backlinkgeniusai.blogspot.com/",
-        "https://backlinkmasterseo.blogspot.com/",
-        "https://freeseolinkbuilder.blogspot.com/",
-        "https://turboseobacklinks.blogspot.com/",
-        "https://maxlinkbooster.blogspot.com/",
-        "https://linkgrowseo.blogspot.com/",
-        "https://quick-backlink-generator.blogspot.com/",
-        "https://backlink-builder-online.blogspot.com/",
-        "https://pro-backlinks.blogspot.com/",
-        "https://linkhustlefree.blogspot.com/",
-        "https://link-boost-lab.blogspot.com/",
-        "https://seochainlinks.blogspot.com/",
-        "https://backlinksurfer.blogspot.com/",
-        "https://linkforgeprofree.blogspot.com/",
-        "https://rankvampire.blogspot.com/",
-        "https://seohypemachine.blogspot.com/",
-        "https://rank-google-backlinks.blogspot.com/",
-        "https://backlink-maker-free.blogspot.com/",
-        "https://linkcannonpro.blogspot.com/",
-        "https://backlinkarena.blogspot.com/",
-        "https://rank-storm.blogspot.com/",
-        "https://aibacklinkmagic.blogspot.com/",
-        "https://autolinkai.blogspot.com/",
-        "https://linkrocketfuel.blogspot.com/",
-        "https://backlinkbombshell.blogspot.com/",
-        "https://linkfrenzyhub.blogspot.com/",
-        "https://searchslammer.blogspot.com/",
-        "https://freebacklinkhack.blogspot.com/",
-        "https://auto-backlink-maker.blogspot.com/",
-        "https://online-backlink-generator.blogspot.com/",
-        "https://web-rank-booster.blogspot.com/",
-        "https://backlinkrisepro.blogspot.com/",
-        "https://backlinkjetpack.blogspot.com/",
-        "https://linkblitzfree.blogspot.com/",
-        "https://authoritylinklab.blogspot.com/",
-        "https://seopingbacklinks.blogspot.com/",
-        "https://backlinkbotfree.blogspot.com/",
-        "https://hyperrank.blogspot.com/",
-        "https://seopowerlinks.blogspot.com/",
-        "https://linklabai.blogspot.com/",
-        "https://neurolinkbuilder.blogspot.com/",
-        "https://backlink-generator-free.blogspot.com/",
-        "https://online-backlink-builder.blogspot.com/",
-        "https://seobacklinkworks.blogspot.com/",
-        "https://linkfaucetfree.blogspot.com/",
-        "https://rankfuelfree.blogspot.com/",
-        "https://linkcrafterseo.blogspot.com/",
-        "https://backlinkgoldmine.blogspot.com/",
-        "https://clickmagnetlinks.blogspot.com/",
-        "https://instantlinksurge.blogspot.com/",
-        "https://backlinkblitzpro.blogspot.com/",
-        "https://rankriot.blogspot.com/",
-        "https://seo-backlink-tool.blogspot.com/",
-        "https://fast-backlink-maker.blogspot.com/",
-        "https://backlinkcandyblog.blogspot.com/",
-        "https://backlinkgenieonline.blogspot.com/",
-        "https://backlinkvortex.blogspot.com/",
-        "https://linkwizardfreetools.blogspot.com/",
-        "https://backlinkzapfree.blogspot.com/",
-        "https://virallinkvault.blogspot.com/",
-        "https://rankexploder.blogspot.com/",
-        "https://rank-higher-google.blogspot.com/",
-        "https://backlink-builder-free.blogspot.com/",
-        "https://linkalchemyfree.blogspot.com/",
-        "https://turbolinkmaker.blogspot.com/",
-        "https://linkbeacontool.blogspot.com/",
-        "https://backlink-factory.blogspot.com/",
-        "https://backlinkcandyfree.blogspot.com/",
-        "https://linkvaultprofree.blogspot.com/",
-        "https://linkdominion.blogspot.com/",
-        "https://backlinkbloggerhub.blogspot.com/",
-        "https://bloggerbacklinkgen.blogspot.com/",
-        "https://ninjabacklinktool.blogspot.com/",
-        "https://backlinkfactoryfree.blogspot.com/",
-        "https://rank-rocket-free.blogspot.com/",
-        "https://backlinkfrenzy.blogspot.com/",
-        "https://freelinkalchemy.blogspot.com/",
-        "https://linkhypefree.blogspot.com/",
-        "https://fastlinkmaker.blogspot.com/",
-        "https://rankboostlinks.blogspot.com/",
-        "https://backlinksurprise.blogspot.com/",
-        "https://linkcandyfactory.blogspot.com/",
-        "https://seoforgefree.blogspot.com/",
-        "https://linkpioneertool.blogspot.com/",
-        "https://backlinkgenfast.blogspot.com/",
-        "https://backlinkzap.blogspot.com/",
-        "https://backlinkboosterx.blogspot.com/",
-        "https://linkpilotfree.blogspot.com/",
-        "https://rankhackertools.blogspot.com/",
-        "https://linkmintseo.blogspot.com/",
-        "https://linkwhaletool.blogspot.com/",
-        "https://backlinksprint.blogspot.com/",
-        "https://linkturbofree.blogspot.com/",
-        "https://linkcandyseo.blogspot.com/",
-        "https://rankhackerpro.blogspot.com/",
-        "https://linkrichesnow.blogspot.com/",
-        "https://traffictitantool.blogspot.com/",
-        "https://rankhackbacklinks.blogspot.com/",
-        "https://linkboosterhq.blogspot.com/",
-        "https://linkmultiplierfree.blogspot.com/",
-        "https://backlinksurferhub.blogspot.com/",
-        "https://backlinkrushhq.blogspot.com/",
-        "https://linktreasuremap.blogspot.com/",
-        "https://explosivelinklab.blogspot.com/",
-        "https://backlinkblastoff.blogspot.com/",
-        "https://linkmightyfree.blogspot.com/",
-        "https://linkrocketlab.blogspot.com/",
-        "https://backlinkgeyserfree.blogspot.com/",
-        "https://ranksurgepro.blogspot.com/",
-        "https://backlinkfusion.blogspot.com/",
-        "https://secretlinkfactory.blogspot.com/",
-        "https://linkcandyexpress.blogspot.com/",
-        "https://backlinkmystery.blogspot.com/",
-        "https://linkfusionfree.blogspot.com/",
-        "https://backlinkpilothub.blogspot.com/",
-        "https://linkmiracletool.blogspot.com/",
-        "https://backlinktyphoon.blogspot.com/",
-        "https://authorityblasttool.blogspot.com/",
-        "https://linklootbox.blogspot.com/",
-        "https://linkelevatorfree.blogspot.com/",
-        "https://backlinksecretlab.blogspot.com/",
-        "https://backlinkbeaconfree.blogspot.com/",
-        "https://linksurgeonfree.blogspot.com/",
-        "https://backlinkcachefree.blogspot.com/",
-        "https://hiddenlinkhack.blogspot.com/",
-        "https://seobacklinkvault.blogspot.com/",
-        "https://backlinkvaultfree.blogspot.com/",
-        "https://linkliftprofree.blogspot.com/",
-        "https://linkvaultseo.blogspot.com/",
-        "https://backlinkboostlab.blogspot.com/",
-        "https://linkrocketfree.blogspot.com/",
-        "https://backlinkexploder.blogspot.com/",
-        "https://linkvaultnow.blogspot.com/",
-        "https://instantlinkhack.blogspot.com/",
-        "https://backlinkhackertool.blogspot.com/",
-        "https://backlinksurgefree.blogspot.com/",
-        "https://backlinkcoachfree.blogspot.com/",
-        "https://linkpulsefree.blogspot.com/",
-        "https://backlinkpilotfree.blogspot.com/",
-        "https://backlinkbounty.blogspot.com/",
-        "https://rankravage.blogspot.com/",
-        "https://linkgeniusfree.blogspot.com/",
-        "https://backlinkexpressfree.blogspot.com/",
-        "https://linkforgefree.blogspot.com/",
-        "https://backlinkcandytool.blogspot.com/",
-        "https://backlinksiren.blogspot.com/",
-        "https://virallinkmachine.blogspot.com/",
-        "https://rankbomb.blogspot.com/",
-        "https://freeoneclickbacklinks.blogspot.com/",
-        "https://backlinkninjafree.blogspot.com/",
-        "https://linkwizardfree.blogspot.com/",
-        "https://backlinksprintfree.blogspot.com/",
-        "https://linksurferfree.blogspot.com/",
-        "https://backlinkninjahq.blogspot.com/",
-        "https://clickstolinks.blogspot.com/"
+/////////////////////// CONFIG ///////////////////////
+const mainSeed = [
+  // optional local seeds for main (kept small or empty)
+  // you can keep your original main list here if you want seeds preserved
+  // "https://seoquickbacklink.blogspot.com/",
 ];
 
-// NOTE: I preserved your original extraSecondURLs and fetchURLs arrays.
-// (If you changed them in future, the script will use the new values.)
 const extraSecondURLs = [
-    "https://smartbacklinkmaker.blogspot.com/",
-    "https://backlinkautogen.blogspot.com/",
-    "https://seobacklinkbuildertool.blogspot.com/",
-    // ... (kept the full original extraSecondURLs list you provided)
-    "https://megabacklinktool.blogspot.com/"
+  "https://smartbacklinkmaker.blogspot.com/",
+  "https://backlinkautogen.blogspot.com/",
+  "https://seobacklinkbuildertool.blogspot.com/",
+  "https://backlinkcreator360.blogspot.com/",
+  "https://megabacklinktool.blogspot.com/"
+  // add or keep your existing second seeds
 ];
 
-const fetchURLs = [
-    "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json",
-    "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/referral.json",
-    "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/seekers-of-decay.json"
+// remote sources for second (unchanged from previous script)
+const fetchSecondSources = [
+  "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json",
+  "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/referral.json",
+  "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/seekers-of-decay.json"
 ];
 
-/* -------------------- Config / storage keys -------------------- */
-const MAX_SECOND_ITEMS = 1000;         // cap for second list
-const DB_NAME = "urlStoreDB_v2";
-const DB_STORE = "urlStore";
-const LS_SECOND_KEY = "secondURLs_mirror_v2";
-const LS_MAIN_KEY = "mainURLs_mirror_v2";
-const CURSOR_MAIN_KEY = "main_cursor_v2";
-const CURSOR_SECOND_KEY = "second_cursor_v2";
+// remote sources for main (you asked these to be fetched same as extraSecondURLs)
+const fetchMainSources = [
+  "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator-domains.json",
+  "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
+];
 
-/* -------------------- IndexedDB helpers -------------------- */
+const MAX_MAIN_ITEMS = 1000;
+const MAX_SECOND_ITEMS = 1000;
+
+const DB_NAME = "urlStoreDB_v3";
+const DB_STORE = "urlStore_v3";
+const LS_MAIN_KEY = "mainURLs_mirror_v3";
+const LS_SECOND_KEY = "secondURLs_mirror_v3";
+const CURSOR_MAIN_KEY = "main_cursor_v3";
+const CURSOR_SECOND_KEY = "second_cursor_v3";
+
+/////////////////////// IDB HELPERS ///////////////////////
 function openDB() {
   return new Promise((resolve, reject) => {
     try {
@@ -642,25 +110,73 @@ async function idbGet(key) {
   });
 }
 
-/* -------------------- Safe storage fallback (IDB -> localStorage -> memory) -------------------- */
+/////////////////////// SAFE STORAGE FALLBACKS ///////////////////////
 let memoryStore = { main: null, second: null };
 let memoryCursorMain = 0;
 let memoryCursorSecond = 0;
 
-async function safeIdbGet(key) {
-  try { return await idbGet(key); } catch (e) { return null; }
-}
-async function safeIdbPut(key, value) {
-  try { await idbPut(key, value); return true; } catch (e) { return false; }
-}
-function safeLsGet(key) {
-  try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
-}
-function safeLsPut(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; }
+async function safeIdbGet(key) { try { return await idbGet(key); } catch (e) { return null; } }
+async function safeIdbPut(key, value) { try { await idbPut(key, value); return true; } catch (e) { return false; } }
+function safeLsGet(key) { try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+function safeLsPut(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; } }
+
+async function saveList(name, arr) {
+  // try IDB first, then LS, else memory
+  const key = (name === "main") ? "main" : "second";
+  if (await safeIdbPut(key, arr)) {
+    if (name === "main") safeLsPut(LS_MAIN_KEY, arr);
+    else safeLsPut(LS_SECOND_KEY, arr);
+    return "idb";
+  }
+  if ((name === "main" ? safeLsPut(LS_MAIN_KEY, arr) : safeLsPut(LS_SECOND_KEY, arr))) {
+    if (name === "main") memoryStore.main = arr;
+    else memoryStore.second = arr;
+    return "localStorage";
+  }
+  if (name === "main") memoryStore.main = arr;
+  else memoryStore.second = arr;
+  return "memory";
 }
 
-/* -------------------- Utility helpers -------------------- */
+async function loadList(name) {
+  if (name === "main") {
+    const db = await safeIdbGet("main");
+    if (Array.isArray(db) && db.length) return db;
+    const ls = safeLsGet(LS_MAIN_KEY);
+    if (Array.isArray(ls) && ls.length) return ls;
+    if (Array.isArray(memoryStore.main) && memoryStore.main.length) return memoryStore.main;
+    return null;
+  } else {
+    const db = await safeIdbGet("second");
+    if (Array.isArray(db) && db.length) return db;
+    const ls = safeLsGet(LS_SECOND_KEY);
+    if (Array.isArray(ls) && ls.length) return ls;
+    if (Array.isArray(memoryStore.second) && memoryStore.second.length) return memoryStore.second;
+    return null;
+  }
+}
+
+/////////////////////// UTILITIES ///////////////////////
+function normalizeArrayFromFetch(data) {
+  // Accept an array directly, or an object containing arrays under common keys
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  if (typeof data === "object") {
+    // common places to look for arrays
+    for (const k of ["urls", "data", "items", "list"]) {
+      if (Array.isArray(data[k])) return data[k];
+    }
+    // otherwise collect string values
+    const arr = [];
+    for (const v of Object.values(data)) {
+      if (typeof v === "string") arr.push(v);
+      else if (Array.isArray(v)) arr.push(...v);
+    }
+    return arr;
+  }
+  return [];
+}
+
 function shuffleInPlace(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -668,162 +184,122 @@ function shuffleInPlace(arr) {
   }
 }
 
-// Round-robin merge: fairness across sources
+// round-robin merge (fairness across sources)
 function roundRobinMerge(perSourceArrays, maxItems) {
   const result = [];
   const sources = perSourceArrays.map(a => a.slice());
-  let progress = true;
-  while (result.length < maxItems && progress) {
-    progress = false;
+  let any = true;
+  while (result.length < maxItems && any) {
+    any = false;
     for (let i = 0; i < sources.length && result.length < maxItems; i++) {
       if (sources[i] && sources[i].length) {
         result.push(sources[i].shift());
-        progress = true;
+        any = true;
       }
     }
   }
   return result;
 }
 
-/* -------------------- Refresh and store lists -------------------- */
-async function refreshAndStoreMain() {
-  // Main is simple: dedupe seed list
-  const finalMain = Array.from(new Set(mainURLs.map(u => (typeof u === "string" ? u.trim() : "")).filter(Boolean)));
-  // Save: try IDB, then LS, else memory
-  if (await safeIdbPut("main", finalMain)) {
-    safeLsPut(LS_MAIN_KEY, finalMain);
-    memoryStore.main = finalMain;
-    console.log(`main: stored ${finalMain.length} (idb)`);
-    return finalMain;
-  }
-  if (safeLsPut(LS_MAIN_KEY, finalMain)) {
-    memoryStore.main = finalMain;
-    console.log(`main: stored ${finalMain.length} (localStorage)`);
-    return finalMain;
-  }
-  memoryStore.main = finalMain;
-  console.log(`main: stored ${finalMain.length} (memory fallback)`);
-  return finalMain;
-}
+/////////////////////// BUILD & PERSIST LISTS ///////////////////////
 
-async function refreshAndStoreSecond() {
-  // Build per-source arrays: treat mainURLs and extraSecondURLs as two sources, then each fetched file is a source
+// fetch sources and return array of per-source arrays (each source deduped)
+async function fetchSources(sourceUrls) {
   const perSource = [];
-  // source 1: mainURLs (so seeds are included in second list too, like original behaviour)
-  perSource.push(Array.from(new Set(mainURLs.map(u => (typeof u === "string" ? u.trim() : "")).filter(Boolean))));
-  // source 2: extraSecondURLs
-  perSource.push(Array.from(new Set(extraSecondURLs.map(u => (typeof u === "string" ? u.trim() : "")).filter(Boolean))));
-
-  // fetch remote arrays and push as sources (preserving fairness)
-  for (const src of fetchURLs) {
+  for (const src of sourceUrls) {
     try {
       const resp = await fetch(src, { cache: "no-store" });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const data = await resp.json();
-      if (!Array.isArray(data)) {
-        console.warn("Expected array from fetch but got:", src);
-        perSource.push([]);
-        continue;
-      }
-      const cleaned = data.map(u => (typeof u === "string" ? u.trim() : "")).filter(Boolean);
-      const uniq = Array.from(new Set(cleaned));
+      const json = await resp.json();
+      const arr = normalizeArrayFromFetch(json)
+        .map(u => (typeof u === "string" ? u.trim() : ""))
+        .filter(Boolean);
+      const uniq = Array.from(new Set(arr));
       shuffleInPlace(uniq);
       perSource.push(uniq);
-      console.log(`Loaded ${uniq.length} unique from ${src}`);
+      console.log(`Loaded ${uniq.length} from ${src}`);
     } catch (err) {
-      console.warn("Failed to load", src, err && err.message ? err.message : err);
-      perSource.push([]);
+      console.warn(`Failed to fetch ${src}:`, err && err.message ? err.message : err);
+      perSource.push([]); // keep slot for fairness
     }
   }
+  return perSource;
+}
 
-  // Now merge fairly up to MAX_SECOND_ITEMS
+async function refreshAndStoreMain() {
+  // Assemble per-source arrays: include mainSeed as first source (if you want)
+  const perSource = [];
+  perSource.push(Array.from(new Set(mainSeed.map(u => (typeof u === "string" ? u.trim() : "")).filter(Boolean))));
+  const fetched = await fetchSources(fetchMainSources);
+  perSource.push(...fetched);
+
+  const merged = roundRobinMerge(perSource, MAX_MAIN_ITEMS);
+  const final = Array.from(new Set(merged)); // global dedupe
+  const storageUsed = await saveList("main", final);
+  console.log(`main: stored ${final.length} URLs (storage: ${storageUsed})`);
+  return final;
+}
+
+async function refreshAndStoreSecond() {
+  // per-source: treat mainSeed as one source? For previous behavior we included main as a source for second.
+  const perSource = [];
+  // include mainSeed as one source (so original seeds appear in second too) and extraSecondURLs
+  perSource.push(Array.from(new Set(mainSeed.map(u => (typeof u === "string" ? u.trim() : "")).filter(Boolean))));
+  perSource.push(Array.from(new Set(extraSecondURLs.map(u => (typeof u === "string" ? u.trim() : "")).filter(Boolean))));
+  // fetch remote sources for second
+  const fetched = await fetchSources(fetchSecondSources);
+  perSource.push(...fetched);
+
   const merged = roundRobinMerge(perSource, MAX_SECOND_ITEMS);
-  const finalSecond = Array.from(new Set(merged)); // global dedupe as safety
-
-  // persist finalSecond
-  if (await safeIdbPut("second", finalSecond)) {
-    safeLsPut(LS_SECOND_KEY, finalSecond);
-    memoryStore.second = finalSecond;
-    console.log(`second: stored ${finalSecond.length} (idb)`);
-    return finalSecond;
-  }
-  if (safeLsPut(LS_SECOND_KEY, finalSecond)) {
-    memoryStore.second = finalSecond;
-    console.log(`second: stored ${finalSecond.length} (localStorage)`);
-    return finalSecond;
-  }
-  memoryStore.second = finalSecond;
-  console.log(`second: stored ${finalSecond.length} (memory fallback)`);
-  return finalSecond;
+  const final = Array.from(new Set(merged));
+  const storageUsed = await saveList("second", final);
+  console.log(`second: stored ${final.length} URLs (storage: ${storageUsed})`);
+  return final;
 }
 
-/* -------------------- Load helpers (try IDB -> LS -> memory) -------------------- */
-async function loadMain() {
-  const fromDb = await safeIdbGet("main");
-  if (Array.isArray(fromDb) && fromDb.length) return fromDb;
-  const fromLs = safeLsGet(LS_MAIN_KEY);
-  if (Array.isArray(fromLs) && fromLs.length) return fromLs;
-  if (Array.isArray(memoryStore.main) && memoryStore.main.length) return memoryStore.main;
-  return null;
-}
-async function loadSecond() {
-  const fromDb = await safeIdbGet("second");
-  if (Array.isArray(fromDb) && fromDb.length) return fromDb;
-  const fromLs = safeLsGet(LS_SECOND_KEY);
-  if (Array.isArray(fromLs) && fromLs.length) return fromLs;
-  if (Array.isArray(memoryStore.second) && memoryStore.second.length) return memoryStore.second;
-  return null;
-}
-
-/* -------------------- Cursor helpers -------------------- */
-function getCursorForKey(cursorKey) {
+/////////////////////// CURSOR HELPERS ///////////////////////
+function getCursor(key) {
   try {
-    const raw = localStorage.getItem(cursorKey);
+    const raw = localStorage.getItem(key);
     if (raw !== null) {
       const n = Number(raw);
       if (!Number.isNaN(n)) return n;
     }
   } catch (e) {
-    // localStorage blocked -> will use memory cursor
+    // localStorage blocked
   }
-  if (cursorKey === CURSOR_MAIN_KEY) return memoryCursorMain || 0;
+  if (key === CURSOR_MAIN_KEY) return memoryCursorMain || 0;
   return memoryCursorSecond || 0;
 }
-function setCursorForKey(cursorKey, n) {
+function setCursor(key, n) {
   try {
-    localStorage.setItem(cursorKey, String(n));
+    localStorage.setItem(key, String(n));
   } catch (e) {
-    if (cursorKey === CURSOR_MAIN_KEY) memoryCursorMain = n;
+    if (key === CURSOR_MAIN_KEY) memoryCursorMain = n;
     else memoryCursorSecond = n;
   }
 }
 
-/* -------------------- Accessor functions -------------------- */
-async function getNextFromList(listLoader, cursorKey) {
-  const list = await listLoader();
+/////////////////////// ACCESSORS ///////////////////////
+async function getNextFrom(name, loaderFunc, cursorKey) {
+  let list = await loaderFunc();
+  if (!Array.isArray(list) || list.length === 0) {
+    // try refreshing if empty
+    if (name === "main") list = await refreshAndStoreMain();
+    else list = await refreshAndStoreSecond();
+  }
   if (!Array.isArray(list) || list.length === 0) return null;
-  let cursor = getCursorForKey(cursorKey);
+  let cursor = getCursor(cursorKey);
   if (cursor >= list.length) cursor = 0;
   const item = list[cursor];
   cursor = (cursor + 1) % list.length;
-  setCursorForKey(cursorKey, cursor);
+  setCursor(cursorKey, cursor);
   return item;
 }
 
-async function getNextMain() {
-  // ensure main is present; if not, refresh and store
-  let main = await loadMain();
-  if (!main || main.length === 0) main = await refreshAndStoreMain();
-  return await getNextFromList(loadMain, CURSOR_MAIN_KEY);
-}
-async function getNextSecond() {
-  // ensure second present; if not, refresh and store
-  let second = await loadSecond();
-  if (!second || second.length === 0) second = await refreshAndStoreSecond();
-  return await getNextFromList(loadSecond, CURSOR_SECOND_KEY);
-}
+async function getNextMain() { return await getNextFrom("main", async () => await loadList("main"), CURSOR_MAIN_KEY); }
+async function getNextSecond() { return await getNextFrom("second", async () => await loadList("second"), CURSOR_SECOND_KEY); }
 
-// Returns "main?second" or null if missing
 async function getNextPair() {
   const main = await getNextMain();
   const second = await getNextSecond();
@@ -831,7 +307,7 @@ async function getNextPair() {
   return `${main}?${second}`;
 }
 
-/* -------------------- Archiving helper -------------------- */
+/////////////////////// ARCHIVING HELPER & WORKERS ///////////////////////
 function archiveWebsite(url, target = "") {
   const form = document.createElement('form');
   form.action = "https://arquivo.pt/services/archivepagenow?l=pt";
@@ -850,13 +326,14 @@ function archiveWebsite(url, target = "") {
   form.remove();
 }
 
-/* -------------------- Orchestration: initialize and start workers -------------------- */
 async function runArchiveWorkers(iframeCount = 6, intervalMs = 60000) {
   const container = document.getElementById("iframeContainer");
 
-  // Ensure lists exist
-  await refreshAndStoreMain();
-  await refreshAndStoreSecond();
+  // ensure lists exist
+  let m = await loadList("main");
+  let s = await loadList("second");
+  if (!m || m.length === 0) m = await refreshAndStoreMain();
+  if (!s || s.length === 0) s = await refreshAndStoreSecond();
 
   for (let i = 0; i < iframeCount; i++) {
     const iframe = document.createElement("iframe");
@@ -866,13 +343,13 @@ async function runArchiveWorkers(iframeCount = 6, intervalMs = 60000) {
     iframe.style.height = "300px";
     container.appendChild(iframe);
 
-    // initial archive (async)
+    // initial archive
     (async () => {
       const pair = await getNextPair();
       if (pair) archiveWebsite(pair, iframe.name);
     })();
 
-    // periodic archival
+    // periodic archive
     setInterval(async () => {
       const pair = await getNextPair();
       if (pair) archiveWebsite(pair, iframe.name);
@@ -880,27 +357,36 @@ async function runArchiveWorkers(iframeCount = 6, intervalMs = 60000) {
   }
 }
 
-/* -------------------- Init -------------------- */
+/////////////////////// INIT ///////////////////////
 (async function init() {
   try {
-    const m = await loadMain();
-    const s = await loadSecond();
+    const m = await loadList("main");
+    const s = await loadList("second");
     if (!m || m.length === 0) await refreshAndStoreMain();
     if (!s || s.length === 0) await refreshAndStoreSecond();
 
     console.log("Initialization complete. Starting archive workers.");
     runArchiveWorkers(6, 60000);
   } catch (e) {
-    console.error("Init failed:", e && e.message ? e.message : e);
-    // Best-effort fallback: try refreshing and running workers (memory fallback will be used if storage blocked)
+    console.error("Init error:", e && e.message ? e.message : e);
+    // try fallback: refresh and run
     try {
       await refreshAndStoreMain();
       await refreshAndStoreSecond();
       runArchiveWorkers(6, 60000);
     } catch (err) {
-      console.error("Fallback startup failed:", err && err.message ? err.message : err);
+      console.error("Fallback init failed:", err && err.message ? err.message : err);
     }
   }
 })();
+
+// Expose helpers to console if you want to test manually
+window._urlTools = {
+  refreshAndStoreMain,
+  refreshAndStoreSecond,
+  getNextMain,
+  getNextSecond,
+  getNextPair
+};
 //]]>
 </script>
