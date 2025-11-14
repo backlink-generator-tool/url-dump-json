@@ -97,8 +97,9 @@ const mainURLs = [
   
 
 const fetchURLs = [
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json"
-];
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json",
+	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/referral.json",
+	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/seekers-of-decay.json"
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -121,10 +122,10 @@ async function updateDefaultURLs() {
                     console.log("✅ Successfully loaded new URLs from:", url);
                     
                     // Replace contents of defaultURLs
-                    mainURLs.length = 0;
+                    //mainURLs.length = 0;
                     mainURLs.push(...data);
 
-                    return;
+                    //return;
                 } else {
                     console.warn(`⚠️ Loaded from ${url}, but received empty array. Skipping...`);
                 }
