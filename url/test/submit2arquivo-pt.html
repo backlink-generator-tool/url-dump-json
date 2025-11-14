@@ -17,196 +17,319 @@
 
 <script type="text/javascript">
 //<![CDATA[
-const mainURLs = [
-"https://smartbacklinkmaker.blogspot.com/",
-        "https://backlinkautogen.blogspot.com/",
-        "https://seobacklinkbuildertool.blogspot.com/",
-        "https://backlinkcreatorx.blogspot.com/",
-        "https://freebacklinkwizard.blogspot.com/",
-        "https://smartbacklinktools.blogspot.com/",
-        "https://autobacklinkgen.blogspot.com/",
-        "https://instantlinkmaker.blogspot.com/",
-        "https://mybacklinkbuilder.blogspot.com/",
-        "https://backlinkprotool.blogspot.com/",
-        "https://smartbacklinkbuilder.blogspot.com/",
-        "https://freelinkbuildertool.blogspot.com/",
-        "https://backlinkboosterfree.blogspot.com/",
-        "https://easybacklinkgenerator.blogspot.com/",
-        "https://onlinebacklinkcreator.blogspot.com/",
-        "https://freebacklinkgeneratorpro.blogspot.com/",
-        "https://turbobacklinkmaker.blogspot.com/",
-        "https://backlinkfactoryonline.blogspot.com/",
-        "https://backlinkboosttool.blogspot.com/",
-        "https://powerbacklinkmaker.blogspot.com/",
-        "https://quickbacklinkcreator.blogspot.com/",
-        "https://backlinkgeneratorhub.blogspot.com/",
-        "https://backlinktoolbox.blogspot.com/",
-        "https://backlinkmakerhub.blogspot.com/",
-        "https://instantbacklinkgenerator.blogspot.com/",
-        "https://freelinkbuilderlab.blogspot.com/",
-        "https://backlinkninjatool.blogspot.com/",
-        "https://generatorbacklinks.blogspot.com/",
-        "https://freebacklinkgeneratorblog.blogspot.com/",
-        "https://quickbacklinkmaker.blogspot.com/",
-        "https://backlinksmiths.blogspot.com/",
-        "https://mybacklinkgenerator.blogspot.com/",
-        "https://autobacklinkmaker.blogspot.com/",
-        "https://trustedbacklinkmaker.blogspot.com/",
-        "https://backlinktoolboxonline.blogspot.com/",
-        "https://backlinklabtools.blogspot.com/",
-        "https://rapidbacklinkbuilder.blogspot.com/",
-        "https://backlinkforgeonline.blogspot.com/",
-        "https://ultimatebacklinkgenerator.blogspot.com/",
-        "https://backlinkbuilderpro.blogspot.com/",
-        "https://backlinktoolboxfree.blogspot.com/",
-        "https://backlinkgeneratorlab.blogspot.com/",
-        "https://backlinkwizardfree.blogspot.com/",
-        "https://backlinkgenpro.blogspot.com/",
-        "https://buildmybacklinks.blogspot.com/",
-        "https://backlinkmakernet.blogspot.com/",
-        "https://backlinkbuilderlab.blogspot.com/",
-        "https://ultimatebacklinkmaker.blogspot.com/",
-        "https://freebacklinkmakeronline.blogspot.com/",
-        "https://superbacklinkmaker.blogspot.com/",
-        "https://simplebacklinkmaker.blogspot.com/",
-        "https://seo-backlinkgenerator.blogspot.com/",
-        "https://unlimitedbacklinkgenerator.blogspot.com/",
-        "https://powerfulbacklinkgenerator.blogspot.com/",
-        "https://instantseo-backlinks.blogspot.com/",
-        "https://automaticbacklinkgenerator.blogspot.com/",
-        "https://onlinebacklinkbuilder.blogspot.com/",
-        "https://seo-backlinktool.blogspot.com/",
-        "https://linkboostgenerator.blogspot.com/",
-        "https://probacklinktool.blogspot.com/",
-        "https://rankbacklinkmaker.blogspot.com/",
-        "https://backlinkhero.blogspot.com/",
-        "https://freeoneclickbacklink.blogspot.com/",
-        "https://powerbacklinkbuilder.blogspot.com/",
-        "https://smartlinkcreator.blogspot.com/",
-        "https://freebacklinktoolonline.blogspot.com/",
-        "https://freelinkgeneratortool.blogspot.com/",
-        "https://backlinkcreatorpro.blogspot.com/",
-        "https://autoseogenerator.blogspot.com/",
-        "https://backlinkbuilderonline.blogspot.com/",
-        "https://autobacklinkcreator.blogspot.com/",
-        "https://backlinkmakeronline.blogspot.com/",
-        "https://freeseobacklinkmaker.blogspot.com/",
-        "https://backlinkcreator360.blogspot.com/",
-        "https://megabacklinktool.blogspot.com/"
+/*
+  Full script: fetch -> dedupe -> fair merge -> persist with safe fallbacks
+  - IndexedDB primary, localStorage secondary, memory final fallback
+  - Persistent cursor when possible; memory cursor otherwise
+  - Round-robin merge across sources up to MAX_ITEMS
+*/
+
+const mainURLsSeed = [
+  "https://smartbacklinkmaker.blogspot.com/",
+  "https://backlinkautogen.blogspot.com/",
+  // ...add more seeds if you want
 ];
-  
 
 const fetchURLs = [
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json",
-	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/referral.json",
-	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/seekers-of-decay.json"
+  "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json",
+  "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/referral.json",
+  "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/seekers-of-decay.json"
+  // add more sources as needed
 ];
 
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
+const MAX_ITEMS = 1000;          // cap total stored URLs
+const DB_NAME = "urlStoreDB_v1";
+const DB_STORE = "mainURLsStore";
+const LS_KEY = "mainURLs_mirror_v1";
+const CURSOR_KEY = "mainURLs_cursor_v1";
 
-async function updateDefaultURLs() {
-    shuffle(fetchURLs);
-
-    for (const url of fetchURLs) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-            const data = await response.json();
-
-            if (Array.isArray(data)) {
-                if (data.length > 0) {
-                    console.log("✅ Successfully loaded new URLs from:", url);
-                    
-                    // Replace contents of defaultURLs
-                    //mainURLs.length = 0;
-                    mainURLs.push(...data);
-
-                    //return;
-                } else {
-                    console.warn(`⚠️ Loaded from ${url}, but received empty array. Skipping...`);
-                }
-            } else {
-                console.warn(`⚠️ Loaded from ${url}, but response is not a valid array. Skipping...`);
-            }
-        } catch (error) {
-            console.warn(`⚠️ Failed to load from ${url}:`, error.message);
-        }
-    }
-
-    console.log("⚠️ All fetch attempts failed or returned empty. Using default defaultURLs.");
-}
-
-function randomURL(array) {
-    const index = Math.floor(Math.random() * array.length);
-    return array[index];
-}
-
-function getRandomURLs() {
-    const url = randomURL(mainURLs);
-    return url;
-}
-
-function extractDomain(url) {
+// ---------- IndexedDB helpers ----------
+function openDB() {
+  return new Promise((resolve, reject) => {
     try {
-        const a = document.createElement('a');
-        a.href = url;
-        return a.hostname;
-    } catch {
-        return url;
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(DB_STORE)) {
+          db.createObjectStore(DB_STORE);
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    } catch (e) {
+      reject(e);
     }
+  });
+}
+async function idbPut(key, value) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    try {
+      const tx = db.transaction(DB_STORE, "readwrite");
+      tx.objectStore(DB_STORE).put(value, key);
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    } catch (e) {
+      rej(e);
+    }
+  });
+}
+async function idbGet(key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    try {
+      const tx = db.transaction(DB_STORE, "readonly");
+      const req = tx.objectStore(DB_STORE).get(key);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    } catch (e) {
+      reject(e);
+    }
+  });
 }
 
+// ---------- Safe storage fallbacks (IDB -> localStorage -> memory) ----------
+let memoryStore = { urls: null };
+let memoryCursor = 0;
+
+async function safeIdbGet(key) {
+  try {
+    return await idbGet(key);
+  } catch (e) {
+    return null;
+  }
+}
+async function safeIdbPut(key, value) {
+  try {
+    await idbPut(key, value);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function safeLsGet(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+function safeLsPut(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function saveURLs(finalArray) {
+  // try IDB
+  if (await safeIdbPut("urls", finalArray)) {
+    safeLsPut(LS_KEY, finalArray); // mirror
+    return "idb";
+  }
+  // try localStorage
+  if (safeLsPut(LS_KEY, finalArray)) {
+    memoryStore.urls = finalArray;
+    return "localStorage";
+  }
+  // memory fallback
+  memoryStore.urls = finalArray;
+  return "memory";
+}
+
+async function loadURLs() {
+  // 1) Try IndexedDB
+  const fromIDB = await safeIdbGet("urls");
+  if (Array.isArray(fromIDB) && fromIDB.length) return fromIDB;
+
+  // 2) Try localStorage
+  const fromLS = safeLsGet(LS_KEY);
+  if (Array.isArray(fromLS) && fromLS.length) return fromLS;
+
+  // 3) memory fallback
+  if (Array.isArray(memoryStore.urls) && memoryStore.urls.length) return memoryStore.urls;
+
+  // nothing stored yet
+  return null;
+}
+
+// ---------- Utilities ----------
+function shuffleInPlace(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// Round-robin merge across per-source arrays (fairness)
+function roundRobinMerge(perSourceArrays, maxItems) {
+  const result = [];
+  const sources = perSourceArrays.map(a => a.slice());
+  let progress = true;
+  while (result.length < maxItems && progress) {
+    progress = false;
+    for (let i = 0; i < sources.length && result.length < maxItems; i++) {
+      if (sources[i] && sources[i].length) {
+        result.push(sources[i].shift());
+        progress = true;
+      }
+    }
+  }
+  return result;
+}
+
+// ---------- Fetch, dedupe, merge, persist ----------
+async function refreshAndStoreURLs() {
+  const perSource = [];
+
+  for (const src of fetchURLs) {
+    try {
+      const resp = await fetch(src, { cache: "no-store" });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      if (!Array.isArray(data)) {
+        console.warn("Source didn't return array:", src);
+        perSource.push([]);
+        continue;
+      }
+      const cleaned = data
+        .map(u => (typeof u === "string" ? u.trim() : ""))
+        .filter(Boolean);
+      const uniq = Array.from(new Set(cleaned));
+      shuffleInPlace(uniq);
+      perSource.push(uniq);
+      console.log(`Loaded ${uniq.length} unique from ${src}`);
+    } catch (err) {
+      console.warn("Failed to load", src, err && err.message ? err.message : err);
+      perSource.push([]); // preserve slot for fairness
+    }
+  }
+
+  // Add seed as a source so seeds get fair share too
+  perSource.unshift(Array.from(new Set(mainURLsSeed)));
+
+  // Merge round-robin up to MAX_ITEMS
+  const merged = roundRobinMerge(perSource, MAX_ITEMS);
+
+  // Global dedupe as safety
+  const final = Array.from(new Set(merged));
+
+  const storageUsed = await saveURLs(final);
+  console.log(`Stored ${final.length} URLs (storage: ${storageUsed})`);
+  return final;
+}
+
+// ---------- Cursor (persistent when possible) ----------
+function getCursor() {
+  // Try localStorage cursor
+  try {
+    const raw = localStorage.getItem(CURSOR_KEY);
+    if (raw !== null) {
+      const n = Number(raw);
+      if (!Number.isNaN(n)) return n;
+    }
+  } catch (e) {
+    // localStorage may be blocked -> use memory
+  }
+  return memoryCursor || 0;
+}
+function setCursor(n) {
+  try {
+    localStorage.setItem(CURSOR_KEY, String(n));
+  } catch (e) {
+    memoryCursor = n;
+  }
+}
+
+// get stored list (tries loadURLs), fallback to fresh fetch if none
+async function getStoredURLsOrRefresh() {
+  const stored = await loadURLs();
+  if (Array.isArray(stored) && stored.length) return stored;
+  return await refreshAndStoreURLs();
+}
+
+// getNextURL cycles through stored list, persists cursor when possible
+async function getNextURL() {
+  const list = await getStoredURLsOrRefresh();
+  if (!list || !list.length) return null;
+  let cursor = getCursor();
+  if (cursor >= list.length) cursor = 0;
+  const url = list[cursor];
+  cursor = (cursor + 1) % list.length;
+  setCursor(cursor);
+  return url;
+}
+
+// ---------- Archiving helper ----------
 function archiveWebsite(url, target = "") {
-    const form = document.createElement('form');
-    form.action = "https://arquivo.pt/services/archivepagenow?l=pt";
-    form.method = "POST";
-    form.target = target;
-    form.style.display = "none";
-	
-    const input = document.createElement('input');
-    input.type = "text";
-    input.name = "url";
-    input.value = url;
+  const form = document.createElement('form');
+  form.action = "https://arquivo.pt/services/archivepagenow?l=pt";
+  form.method = "POST";
+  form.target = target;
+  form.style.display = "none";
 
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-    form.remove();
+  const input = document.createElement('input');
+  input.type = "text";
+  input.name = "url";
+  input.value = url;
+
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+  form.remove();
 }
 
-async function main() {
-    await updateDefaultURLs(); // ⏳ wait for URLs to load first
-  	
-    const iframeContainer = document.getElementById("iframeContainer");
-	
-    // Create 6 hidden iframes and archive automatically
-    for (let i = 0; i < 6; i++) {
-        const iframe = document.createElement("iframe");
-        iframe.name = "hiddenFrame" + i;
-        iframe.classList.add("hidden-iframe");
-        iframe.style.width = "100%";
-        iframe.style.height = "300px";
-        //iframe.style.display = "none";
+// ---------- Worker orchestration ----------
+async function runArchiveWorkers(iframeCount = 6, intervalMs = 60000) {
+  const container = document.getElementById("iframeContainer");
 
-        iframeContainer.appendChild(iframe);
+  // Ensure we have some URLs stored
+  await getStoredURLsOrRefresh();
 
-        const randomURL = getRandomURLs();
-        archiveWebsite(randomURL, iframe.name);
+  for (let i = 0; i < iframeCount; i++) {
+    const iframe = document.createElement("iframe");
+    iframe.name = `hiddenFrame${i}`;
+    iframe.classList.add("hidden-iframe");
+    iframe.style.width = "100%";
+    iframe.style.height = "300px";
+    container.appendChild(iframe);
 
-        setInterval(() => {
-            const randomURL = getRandomURLs();
-            archiveWebsite(randomURL, iframe.name);
-        }, (60000));
+    // initial archive
+    getNextURL().then(u => {
+      if (u) archiveWebsite(u, iframe.name);
+    });
+
+    // periodic archival
+    setInterval(async () => {
+      const url = await getNextURL();
+      if (url) archiveWebsite(url, iframe.name);
+    }, intervalMs);
+  }
+}
+
+// ---------- Initialization ----------
+(async function init() {
+  try {
+    const stored = await loadURLs();
+    if (!stored || stored.length === 0) {
+      await refreshAndStoreURLs();
+    } else {
+      console.log(`Using ${stored.length} URLs from storage`);
     }
-}
-
-// 🚀 Run when page loads
-main();
-
+    runArchiveWorkers(6, 60000);
+  } catch (e) {
+    console.error("Init error:", e && e.message ? e.message : e);
+    // As fallback: try at least to fetch & run workers without persistence
+    try {
+      await refreshAndStoreURLs();
+      runArchiveWorkers(6, 60000);
+    } catch (err) {
+      console.error("Fallback init also failed:", err);
+    }
+  }
+})();
 //]]>
 </script>
