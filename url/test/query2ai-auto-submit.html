@@ -1,330 +1,6 @@
 
-<!----------------------------------------------------------------------------------------->
-
-<div id="iframeContainer"></div>
-
-<script type="text/javascript">
-//<![CDATA[
-/*
-  NOTE / WARNING:
-  This script generates many archive/save URLs and (optionally) loads them in iframes.
-  Please DO NOT use this to automatically mass-submit or spam web archiving services.
-  Automated submissions can violate terms-of-service, trigger rate-limits, or be considered abusive.
-  Consider creating links for manual clicks instead of auto-submitting thousands of requests.
-*/
-
-// Multiplication array (array of arrays with archive URLs)
-const archiveURLs = [
-    [
-        "https://web.archive.org/save/{{QUERY}}"
-    ],
-    [
-        "https://archive.today/submit/?anyway=1&url={{ENCODE_QUERY}}",
-        "https://archive.ph/submit/?anyway=1&url={{ENCODE_QUERY}}",
-        "https://archive.fo/submit/?anyway=1&url={{ENCODE_QUERY}}",
-        "https://archive.vn/submit/?anyway=1&url={{ENCODE_QUERY}}",
-        "https://archive.li/submit/?anyway=1&url={{ENCODE_QUERY}}",
-        "https://archive.md/submit/?anyway=1&url={{ENCODE_QUERY}}"
-    ]
-];
-  
-const chatURLs = [
-    [
-        	"https://chat.openai.com/?q={{ENCODE_QUERY}}",
-        	"http://chat.openai.com/?q={{ENCODE_QUERY}}",
-        	"https://chatgpt.com/?q={{ENCODE_QUERY}}",
-        	"http://chatgpt.com/?q={{ENCODE_QUERY}}",
-        	"http://www.chatgpt.com/?q={{ENCODE_QUERY}}",
-        	"https://www.chatgpt.com/?q={{ENCODE_QUERY}}",
-          
-        	"https://chat.openai.com/?hints=search&q={{ENCODE_QUERY}}",
-        	"http://chat.openai.com/?hints=search&q={{ENCODE_QUERY}}",
-        	"https://chatgpt.com/?hints=search&q={{ENCODE_QUERY}}",
-        	"http://chatgpt.com/?hints=search&q={{ENCODE_QUERY}}",
-        	"http://www.chatgpt.com/?hints=search&q={{ENCODE_QUERY}}",
-        	"https://www.chatgpt.com/?hints=search&q={{ENCODE_QUERY}}"
-    ],
-    [
-          "https://grok.com/?q={{ENCODE_QUERY}}",
-          "https://www.grok.com/?q={{ENCODE_QUERY}}",
-          "http://grok.com/?q={{ENCODE_QUERY}}",
-          "http://www.grok.com/?q={{ENCODE_QUERY}}"
-    ],
-    [
-          "https://www.google.ac/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ad/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ae/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.al/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.am/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.as/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.at/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.az/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ba/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.be/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.bf/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.bg/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.bi/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.bj/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.bs/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.bt/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.by/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ca/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.cat/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.cc/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.cd/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.cf/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.cg/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ch/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ci/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.cl/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.cm/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.bw/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.ck/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.cr/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.id/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.il/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.in/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.jp/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.ke/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.kr/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.ls/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.ma/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.mz/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.nz/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.th/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.tz/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.ug/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.uk/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.uz/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.ve/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.vi/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.za/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.zm/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.co.zw/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.af/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.ag/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.ai/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.ar/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.au/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.bd/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.bh/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.bn/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.bo/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.br/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.bz/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.co/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.cu/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.cy/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.do/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.ec/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.eg/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.et/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.fj/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.gh/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.gi/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.gt/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.hk/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.jm/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.kh/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.kw/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.lb/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.ly/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.mm/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.mt/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.mx/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.my/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.na/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.nf/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.ng/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.ni/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.np/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.om/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.pa/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.pe/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.pg/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.ph/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.pk/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.pr/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.py/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.qa/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.sa/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.sb/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.sg/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.sl/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.sv/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.tj/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.tn/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.tr/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.tw/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.ua/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.uy/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.vc/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com.vn/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.com/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.cv/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.cz/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.de/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.dj/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.dk/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.dm/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.dz/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ee/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.es/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.fi/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.fm/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.fr/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ga/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ge/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.gg/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.gl/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.gm/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.gp/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.gr/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.gy/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.hn/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.hr/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ht/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.hu/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ie/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.im/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.iq/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.is/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.it/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.je/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.jo/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.jp/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.kg/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ki/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.kz/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.la/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.li/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.lk/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.lt/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.lu/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.lv/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.md/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.me/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.mg/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.mk/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ml/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.mn/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ms/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.mu/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.mv/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.mw/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ne/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.nl/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.no/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.nr/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.nu/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.pl/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.pn/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ps/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.pt/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ro/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.rs/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ru/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.rw/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.sc/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.se/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.sh/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.si/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.sk/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.sm/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.sn/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.so/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.st/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.td/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.tg/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.tk/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.tl/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.tm/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.tn/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.to/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.tt/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.us/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.vg/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.vu/search?q={{ENCODE_QUERY}}&udm=50",
-          "https://www.google.ws/search?q={{ENCODE_QUERY}}&udm=50"
-    ],
-    [
-          "https://www.perplexity.ai/search/?q={{ENCODE_QUERY}}",
-          "https://www.perplexity.ai/?q={{ENCODE_QUERY}}"
-    ]
-];
-
-// Basic URL check
-function isValidURL(url) {
-    const pattern = /^https?:\/\/[^\s]+$/i;
-    return pattern.test(url);
-}
-
-// Get a random URL from archiveURLs; limit attempts to avoid infinite loops
-function getRandomArchiveURL(maxAttempts = 20) {
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const randomArray = archiveURLs[Math.floor(Math.random() * archiveURLs.length)];
-        if (!Array.isArray(randomArray) || randomArray.length === 0) continue;
-        const url = randomArray[Math.floor(Math.random() * randomArray.length)];
-        if (isValidURL(url)) return url;
-    }
-    console.warn("getRandomArchiveURL: failed to find valid URL after attempts");
-    return archiveURLs[0] && archiveURLs[0][0] ? archiveURLs[0][0] : "";
-}
-
-function normalizeURL(url) {
-    if (typeof url !== "string") return "";
-    // Replace multiple slashes with a single slash, except after "http(s):"
-    return url.replace(/([^:]\/)\/+/g, "$1");
-}
-
-function randomURL(array) {
-    if (!Array.isArray(array) || array.length === 0) return "";
-    const index = Math.floor(Math.random() * array.length);
-    return array[index];
-}
-
-function getUrlParamValue(urlString, key) {
-  try {
-    const u = new URL(urlString);
-    return u.searchParams.get(key);
-  } catch (error) {
-    // not a "normal" URL that the URL constructor can parse (or other issue)
-    return null;
-  }
-}
-
-// Try to extract embedded target URL from archive URL (common patterns)
-function extractEmbeddedTarget(archiveUrl) {
-    if (!archiveUrl) return null;
-
-    // 1) look for query param like url=... (encoded)
-    const keysToTry = ['url', 'u', 'target'];
-    for (const k of keysToTry) {
-        const val = getUrlParamValue(archiveUrl, k);
-        if (val) {
-            try { return decodeURIComponent(val); } catch { return val; }
-        }
-    }
-
-    // 2) common pattern: /save/<embedded-url> or /submit/...url=<encoded>
-    // try to capture http(s)://... at end of the path
-    const m = archiveUrl.match(/(https?:\/\/.+)$/);
-    if (m) {
-        try { return decodeURIComponent(m[1]); } catch { return m[1]; }
-    }
-
-    return null;
-}
-
-function extractDomain(url) {
-    try {
-        const a = document.createElement('a');
-        a.href = url;
-        return a.hostname || url;
-    } catch {
-        return url;
-    }
-}
+<div id="stealthIFrameContainer"></div>
+<script>
 
 // --- Data used to build targets (kept from your original)
 const searchQueries = [
@@ -1225,117 +901,405 @@ const searchQueries = [
   "Quick post maker tool: {{LINK}}",
   "Easy generator for posts: {{LINK}}"
 ];
-
-const mainURLs = [
-    "https://seoquickbacklink.blogspot.com/",
-    "https://linkboosttool.blogspot.com/",
-    "https://seobacklinkboosters.blogspot.com/",
-    "https://linkbuilderzone.blogspot.com/",
-    "https://oneclickbacklinks.blogspot.com/"
-    // trimmed for brevity — you can add the rest back if you want
+  
+const chatURLs = [
+    [
+        	"https://chat.openai.com/?q={{ENCODE_QUERY}}",
+        	"http://chat.openai.com/?q={{ENCODE_QUERY}}",
+        	"https://chatgpt.com/?q={{ENCODE_QUERY}}",
+        	"http://chatgpt.com/?q={{ENCODE_QUERY}}",
+        	"http://www.chatgpt.com/?q={{ENCODE_QUERY}}",
+        	"https://www.chatgpt.com/?q={{ENCODE_QUERY}}",
+          
+        	"https://chat.openai.com/?hints=search&q={{ENCODE_QUERY}}",
+        	"http://chat.openai.com/?hints=search&q={{ENCODE_QUERY}}",
+        	"https://chatgpt.com/?hints=search&q={{ENCODE_QUERY}}",
+        	"http://chatgpt.com/?hints=search&q={{ENCODE_QUERY}}",
+        	"http://www.chatgpt.com/?hints=search&q={{ENCODE_QUERY}}",
+        	"https://www.chatgpt.com/?hints=search&q={{ENCODE_QUERY}}"
+    ],
+    [
+          "https://grok.com/?q={{ENCODE_QUERY}}",
+          "https://www.grok.com/?q={{ENCODE_QUERY}}",
+          "http://grok.com/?q={{ENCODE_QUERY}}",
+          "http://www.grok.com/?q={{ENCODE_QUERY}}"
+    ],
+    [
+          "https://www.google.ac/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ad/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ae/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.al/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.am/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.as/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.at/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.az/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ba/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.be/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.bf/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.bg/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.bi/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.bj/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.bs/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.bt/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.by/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ca/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.cat/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.cc/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.cd/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.cf/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.cg/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ch/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ci/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.cl/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.cm/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.bw/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.ck/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.cr/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.id/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.il/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.in/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.jp/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.ke/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.kr/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.ls/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.ma/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.mz/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.nz/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.th/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.tz/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.ug/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.uk/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.uz/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.ve/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.vi/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.za/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.zm/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.co.zw/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.af/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.ag/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.ai/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.ar/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.au/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.bd/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.bh/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.bn/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.bo/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.br/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.bz/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.co/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.cu/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.cy/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.do/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.ec/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.eg/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.et/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.fj/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.gh/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.gi/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.gt/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.hk/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.jm/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.kh/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.kw/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.lb/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.ly/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.mm/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.mt/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.mx/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.my/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.na/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.nf/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.ng/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.ni/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.np/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.om/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.pa/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.pe/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.pg/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.ph/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.pk/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.pr/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.py/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.qa/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.sa/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.sb/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.sg/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.sl/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.sv/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.tj/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.tn/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.tr/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.tw/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.ua/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.uy/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.vc/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com.vn/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.com/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.cv/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.cz/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.de/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.dj/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.dk/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.dm/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.dz/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ee/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.es/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.fi/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.fm/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.fr/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ga/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ge/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.gg/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.gl/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.gm/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.gp/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.gr/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.gy/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.hn/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.hr/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ht/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.hu/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ie/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.im/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.iq/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.is/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.it/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.je/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.jo/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.jp/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.kg/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ki/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.kz/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.la/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.li/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.lk/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.lt/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.lu/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.lv/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.md/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.me/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.mg/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.mk/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ml/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.mn/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ms/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.mu/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.mv/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.mw/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ne/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.nl/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.no/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.nr/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.nu/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.pl/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.pn/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ps/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.pt/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ro/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.rs/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ru/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.rw/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.sc/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.se/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.sh/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.si/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.sk/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.sm/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.sn/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.so/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.st/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.td/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.tg/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.tk/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.tl/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.tm/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.tn/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.to/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.tt/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.us/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.vg/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.vu/search?q={{ENCODE_QUERY}}&udm=50",
+          "https://www.google.ws/search?q={{ENCODE_QUERY}}&udm=50"
+    ],
+    [
+          "https://www.perplexity.ai/search/?q={{ENCODE_QUERY}}",
+          "https://www.perplexity.ai/?q={{ENCODE_QUERY}}"
+    ]
 ];
 
+
+  
+// ------------------------------
+// Config
+// ------------------------------
+
+// These URLs will be replaced by updateDefaultURLs()
+const sumitUrlsToArchiveURLs = [
+    "https://smartbacklinkmaker.blogspot.com/"
+];
+
+// JSON sources for URL lists
 const fetchURLs = [
-    "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/referral.json",
-    "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/seekers-of-decay.json",
-    "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json",
-    "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-profile.json"
-    // kept short here
+    //"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator-domains.json"
+    "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
 ];
 
-async function updateDefaultURLs() {
-    // shuffle fetchURLs and try to load fallback URLs (keeps original behaviour)
-    const shuffled = fetchURLs.slice();
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
+// Wayback Machine POST endpoint
+const WAYBACK_SAVE_ENDPOINT = "https://web.archive.org/save";
 
-    for (const url of shuffled) {
+// How many iframes to use
+const IFRAME_COUNT = 4;
+
+// Delay between submissions per iframe (ms) – 3 minutes
+const SUBMIT_INTERVAL = 180000;
+
+
+// ------------------------------
+// Helpers
+// ------------------------------
+
+function isValidURL(url) {
+    const pattern = /^https?:\/\/[^\s]+$/i;
+    return pattern.test(url);
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function normalizeURL(url) {
+    if (typeof url !== "string") return "";
+    // Replace multiple slashes with a single slash, except after "http(s):"
+    return url.replace(/([^:]\/)\/+/g, "$1");
+}
+
+function randomURL(array) {
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
+}
+
+// Fetch URL lists and update sumitUrlsToArchiveURLs
+async function updateDefaultURLs() {
+    shuffle(fetchURLs);
+    for (const url of fetchURLs) {
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
             const data = await response.json();
             if (Array.isArray(data) && data.length > 0) {
                 console.log("✅ Successfully loaded new URLs from:", url);
-                mainURLs.length = 0;
-                mainURLs.push(...data);
+                sumitUrlsToArchiveURLs.length = 0;
+                sumitUrlsToArchiveURLs.push(...data);
                 return;
-            } else {
-                console.warn(`⚠️ Loaded from ${url}, but response not an array or empty. Skipping.`);
             }
         } catch (error) {
             console.warn(`⚠️ Failed to load from ${url}:`, error.message);
         }
     }
-
-    console.log("⚠️ All fetch attempts failed or returned empty. Using default mainURLs.");
+    console.warn("⚠️ Using fallback URLs in sumitUrlsToArchiveURLs");
 }
 
-/*
-function generateArchiveURL() {
-    // choose a base target (site) -> maybe inject a search query
-    let combined = randomURL(mainURLs) || "";
-  
-    let searchQuerie = randomURL(searchQueries) || "";
-    
-    combined = searchQuerie.replace(/{{LINK}}/g, combined);
+// Build the target URL that will be sent to Wayback Machine
+// (keeps your old "url1 ? url2" combo logic – change if you want only single URLs)
+function generateTargetURL() {
+    if (!sumitUrlsToArchiveURLs.length) return "";
 
-    const template = getRandomArchiveURL();
-    const replaced = template
-        .replace(/{{QUERY}}/g, combined)
-        .replace(/{{ENCODE_QUERY}}/g, encodeURIComponent(combined || ""));
+    const url1 = randomURL(sumitUrlsToArchiveURLs);
+    const url2 = randomURL(sumitUrlsToArchiveURLs);
 
-    return normalizeURL(replaced);
-}
-*/
-  
-    
-    //const randomChatURLsArray = archiveURLs[Math.floor(Math.random() * archiveURLs.length)];
-    
-function generateArchiveURL() {
-    // choose a base target (site) -> maybe inject a search query
-    let url = randomURL(mainURLs) || "";
+    // Combine as before; if you only want url1, change to `return normalizeURL(url1);`
+    //const combined = url1 + "?" + url2;
+    //return normalizeURL(combined);
+
+    const url = url1 + "?" + url2;
+
     let searchQuerie = randomURL(searchQueries) || "";
-    
     let prompt = searchQuerie.replace(/{{LINK}}/g, url);
-  
-  const randomChatURLsArray = chatURLs[Math.floor(Math.random() * chatURLs.length)];
+
+    const randomChatURLsArray = chatURLs[Math.floor(Math.random() * chatURLs.length)];
     const chatURL = randomURL(randomChatURLsArray).replace(/{{QUERY}}/g, prompt)
         .replace(/{{ENCODE_QUERY}}/g, encodeURIComponent(prompt || ""));
   
-    const archiveURL = getRandomArchiveURL()
-        .replace(/{{QUERY}}/g, chatURL)
-        .replace(/{{ENCODE_QUERY}}/g, encodeURIComponent(chatURL || ""));
-
-    return normalizeURL(archiveURL);
+    return normalizeURL(chatURL);
 }
 
-async function main() {
-    await updateDefaultURLs();
 
-    const iframeContainer = document.getElementById("iframeContainer");
+// ------------------------------
+// Wayback POST via iframe
+// ------------------------------
 
-    // Create 3 iframes (visible) that refresh every 60s with new archive URL
-    const IFRAME_COUNT = 6;
-    for (let i = 0; i < IFRAME_COUNT; i++) {
-        const iframe = document.createElement("iframe");
-        iframe.name = "hiddenFrame" + i;
-        iframe.classList.add("hidden-iframe");
-        iframe.style.width = "100%";
-        iframe.style.height = "300px";
-        iframe.src = generateArchiveURL();
-
-        iframeContainer.appendChild(iframe);
-
-        // update iframe src every 60 seconds
-        setInterval(() => {
-            iframe.src = generateArchiveURL();
-        }, 60000);
+// Submit a single URL to Wayback Machine in the given iframe using POST
+function submitToWaybackInFrame(iframe) {
+    const targetUrl = generateTargetURL();
+    if (!targetUrl || !isValidURL(targetUrl)) {
+        console.warn("⚠️ Skipping invalid URL:", targetUrl);
+        return;
     }
+
+    // Create a hidden form that posts to Wayback and targets this iframe
+    const form = document.createElement("form");
+    form.style.display = "none";
+    form.target = iframe.name;
+    form.method = "POST";
+    form.action = WAYBACK_SAVE_ENDPOINT;
+    form.className = "web-save-form";
+    form.id = "";
+    form.name = "wwmform_save";
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.className = "form-control web-save-url-input web_input web_text";
+    input.id = "";
+    input.name = "url";
+    input.value = targetUrl;
+
+    form.appendChild(input);
+    document.body.appendChild(form);
+
+    // Submit the form – this loads the Wayback "save" page inside the iframe
+    form.submit();
+
+    // Cleanup
+    form.parentNode.removeChild(form);
+
+    console.log("📨 Submitted to Wayback:", targetUrl, "in iframe:", iframe.name);
 }
 
-// run
-main();
-//]]>
+const iframeContainer = document.getElementById("stealthIFrameContainer");
+
+// Create a hidden iframe and set up periodic submissions
+function createIframe(i) {
+    const iframe = document.createElement("iframe");
+    iframe.name = "hiddenFrame" + i;
+    iframe.classList.add("hidden-iframe");
+    iframe.style.width = "100%";
+    iframe.style.height = "300px";
+
+    // Optional: initial about:blank; Wayback will load after first POST
+    iframe.src = "about:blank";
+
+    iframeContainer.appendChild(iframe);
+
+    // First submission immediately
+    submitToWaybackInFrame(iframe);
+
+    // Then repeat every 3 minutes
+    setInterval(() => {
+        submitToWaybackInFrame(iframe);
+    }, SUBMIT_INTERVAL);
+}
+
+
+// ------------------------------
+// Start
+// ------------------------------
+
+updateDefaultURLs().then(() => {
+    for (let i = 0; i < IFRAME_COUNT; i++) {
+        createIframe(i);
+    }
+});
 </script>
