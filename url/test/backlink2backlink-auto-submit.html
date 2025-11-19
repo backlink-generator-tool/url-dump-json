@@ -1,0 +1,165 @@
+
+<div id="stealthIFrameContainer"></div>
+<script>
+// ------------------------------
+// Config
+// ------------------------------
+
+// These URLs will be replaced by updateDefaultURLs()
+const sumitUrlsToArchiveURLs = [
+    "https://smartbacklinkmaker.blogspot.com/"
+];
+
+// JSON sources for URL lists
+const fetchURLs = [
+    "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator-domains.json"
+];
+
+// Wayback Machine POST endpoint
+const WAYBACK_SAVE_ENDPOINT = "https://web.archive.org/save";
+
+// How many iframes to use
+const IFRAME_COUNT = 4;
+
+// Delay between submissions per iframe (ms) – 3 minutes
+const SUBMIT_INTERVAL = 180000;
+
+
+// ------------------------------
+// Helpers
+// ------------------------------
+
+function isValidURL(url) {
+    const pattern = /^https?:\/\/[^\s]+$/i;
+    return pattern.test(url);
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function normalizeURL(url) {
+    if (typeof url !== "string") return "";
+    // Replace multiple slashes with a single slash, except after "http(s):"
+    return url.replace(/([^:]\/)\/+/g, "$1");
+}
+
+function randomURL(array) {
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
+}
+
+// Fetch URL lists and update sumitUrlsToArchiveURLs
+async function updateDefaultURLs() {
+    shuffle(fetchURLs);
+    for (const url of fetchURLs) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+                console.log("✅ Successfully loaded new URLs from:", url);
+                sumitUrlsToArchiveURLs.length = 0;
+                sumitUrlsToArchiveURLs.push(...data);
+                return;
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to load from ${url}:`, error.message);
+        }
+    }
+    console.warn("⚠️ Using fallback URLs in sumitUrlsToArchiveURLs");
+}
+
+// Build the target URL that will be sent to Wayback Machine
+// (keeps your old "url1 ? url2" combo logic – change if you want only single URLs)
+function generateTargetURL() {
+    if (!sumitUrlsToArchiveURLs.length) return "";
+
+    const url1 = randomURL(sumitUrlsToArchiveURLs);
+    const url2 = randomURL(sumitUrlsToArchiveURLs);
+
+    // Combine as before; if you only want url1, change to `return normalizeURL(url1);`
+    const combined = url1 + "?" + url2;
+    return normalizeURL(combined);
+}
+
+
+// ------------------------------
+// Wayback POST via iframe
+// ------------------------------
+
+// Submit a single URL to Wayback Machine in the given iframe using POST
+function submitToWaybackInFrame(iframe) {
+    const targetUrl = generateTargetURL();
+    if (!targetUrl || !isValidURL(targetUrl)) {
+        console.warn("⚠️ Skipping invalid URL:", targetUrl);
+        return;
+    }
+
+    // Create a hidden form that posts to Wayback and targets this iframe
+    const form = document.createElement("form");
+    form.style.display = "none";
+    form.target = iframe.name;
+    form.method = "POST";
+    form.action = WAYBACK_SAVE_ENDPOINT;
+    form.className = "web-save-form";
+    form.id = "";
+    form.name = "wwmform_save";
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.className = "form-control web-save-url-input web_input web_text";
+    input.id = "";
+    input.name = "url";
+    input.value = targetUrl;
+
+    form.appendChild(input);
+    document.body.appendChild(form);
+
+    // Submit the form – this loads the Wayback "save" page inside the iframe
+    form.submit();
+
+    // Cleanup
+    form.parentNode.removeChild(form);
+
+    console.log("📨 Submitted to Wayback:", targetUrl, "in iframe:", iframe.name);
+}
+
+const iframeContainer = document.getElementById("stealthIFrameContainer");
+
+// Create a hidden iframe and set up periodic submissions
+function createIframe(i) {
+    const iframe = document.createElement("iframe");
+    iframe.name = "hiddenFrame" + i;
+    iframe.classList.add("hidden-iframe");
+    iframe.style.width = "100%";
+    iframe.style.height = "300px";
+
+    // Optional: initial about:blank; Wayback will load after first POST
+    iframe.src = "about:blank";
+
+    iframeContainer.appendChild(iframe);
+
+    // First submission immediately
+    submitToWaybackInFrame(iframe);
+
+    // Then repeat every 3 minutes
+    setInterval(() => {
+        submitToWaybackInFrame(iframe);
+    }, SUBMIT_INTERVAL);
+}
+
+
+// ------------------------------
+// Start
+// ------------------------------
+
+updateDefaultURLs().then(() => {
+    for (let i = 0; i < IFRAME_COUNT; i++) {
+        createIframe(i);
+    }
+});
+</script>
