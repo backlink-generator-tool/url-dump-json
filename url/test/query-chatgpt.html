@@ -11,6 +11,7 @@
       });
 </script>
 
+
 <!----------------------------------------------------------------------------------------->
 
 <div id="iframeContainer"></div>
@@ -43,6 +44,7 @@ const archiveURLs = [
 ];
   
 const chatURLs = [
+    [
   	"https://chat.openai.com/?q={{ENCODE_QUERY}}",
   	"http://chat.openai.com/?q={{ENCODE_QUERY}}",
   	"https://chatgpt.com/?q={{ENCODE_QUERY}}",
@@ -56,13 +58,16 @@ const chatURLs = [
   	"http://chatgpt.com/?hints=search&q={{ENCODE_QUERY}}",
   	"http://www.chatgpt.com/?hints=search&q={{ENCODE_QUERY}}",
   	"https://www.chatgpt.com/?hints=search&q={{ENCODE_QUERY}}",
+    ],
+    [
 
     "https://grok.com/?q={{ENCODE_QUERY}}",
     "https://www.grok.com/?q={{ENCODE_QUERY}}",
     "http://grok.com/?q={{ENCODE_QUERY}}",
     "http://www.grok.com/?q={{ENCODE_QUERY}}",
-  
- 	  "https://www.google.ac/search?q={{ENCODE_QUERY}}&udm=50",
+    ],
+    [
+    "https://www.google.ac/search?q={{ENCODE_QUERY}}&udm=50",
     "https://www.google.ad/search?q={{ENCODE_QUERY}}&udm=50",
     "https://www.google.ae/search?q={{ENCODE_QUERY}}&udm=50",
     "https://www.google.al/search?q={{ENCODE_QUERY}}&udm=50",
@@ -257,6 +262,7 @@ const chatURLs = [
     "https://www.google.vg/search?q={{ENCODE_QUERY}}&udm=50",
     "https://www.google.vu/search?q={{ENCODE_QUERY}}&udm=50",
     "https://www.google.ws/search?q={{ENCODE_QUERY}}&udm=50"
+    ]
 ];
 
 // Basic URL check
@@ -1296,6 +1302,9 @@ function generateArchiveURL() {
 }
 */
   
+    
+    //const randomChatURLsArray = archiveURLs[Math.floor(Math.random() * archiveURLs.length)];
+    
 function generateArchiveURL() {
     // choose a base target (site) -> maybe inject a search query
     let url = randomURL(mainURLs) || "";
@@ -1303,7 +1312,8 @@ function generateArchiveURL() {
     
     let prompt = searchQuerie.replace(/{{LINK}}/g, url);
   
-    const chatURL = randomURL(chatURLs).replace(/{{QUERY}}/g, prompt)
+  const randomChatURLsArray = chatURLs[Math.floor(Math.random() * chatURLs.length)];
+    const chatURL = randomURL(randomChatURLsArray).replace(/{{QUERY}}/g, prompt)
         .replace(/{{ENCODE_QUERY}}/g, encodeURIComponent(prompt || ""));
   
     const archiveURL = getRandomArchiveURL()
@@ -1319,7 +1329,7 @@ async function main() {
     const iframeContainer = document.getElementById("iframeContainer");
 
     // Create 3 iframes (visible) that refresh every 60s with new archive URL
-    const IFRAME_COUNT = 6;
+    const IFRAME_COUNT = 4;
     for (let i = 0; i < IFRAME_COUNT; i++) {
         const iframe = document.createElement("iframe");
         iframe.name = "hiddenFrame" + i;
@@ -1341,3 +1351,4 @@ async function main() {
 main();
 //]]>
 </script>
+
