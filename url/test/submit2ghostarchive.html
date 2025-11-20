@@ -2,7 +2,7 @@
 async function redirectToGhostArchiveWithRandomUrl() {
   try {
     // Use the RAW GitHub URL (not the /blob/... one)
-    const jsonUrl = "https://raw.githubusercontent.com/backlink-generator-tool/url-dump-json/main/url/custom-urls/referral.json";
+    const jsonUrl = "https://raw.githubusercontent.com/backlink-generator-tool/url-dump-json/main/url/custom-urls/submit2ghostarchive.json";
 
     const res = await fetch(jsonUrl);
     if (!res.ok) throw new Error("Failed to fetch JSON: " + res.status);
