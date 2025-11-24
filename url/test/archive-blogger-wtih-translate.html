@@ -37,8 +37,8 @@ const archiveURLs = [
 ];
 
 const googleTranslateUrls = [
-	"https://translate.google.com/translate?sl=auto&tl={{LANGUAGE_CODES}}&hl=en-US&u=https://{{SUBDIRECTORY}}.blogspot.com/&client=webapp",
-	"https://{{SUBDIRECTORY}}-blogspot-com.translate.goog/?_x_tr_sl=auto&_x_tr_tl={{LANGUAGE_CODES}}&_x_tr_hl=en-US&_x_tr_pto=wapp"
+	"https://translate.google.com/translate?sl=auto&tl={{LANGUAGE_CODES}}&hl=en-US&u=https://{{SUBDOMAIN}}.blogspot.com/&client=webapp",
+	"https://{{SUBDOMAIN}}-blogspot-com.translate.goog/?_x_tr_sl=auto&_x_tr_tl={{LANGUAGE_CODES}}&_x_tr_hl=en-US&_x_tr_pto=wapp"
 ];
 
 const languageCodes = [
@@ -522,14 +522,22 @@ function buildUrl(templateUrl, inputUrl) {
     });
 }
 
+function getSubdomain(url) {
+  const hostname = new URL(url).hostname;          // linkboosttool.blogspot.com
+  const parts = hostname.split('.');               // ["linkboosttool", "blogspot", "com"]
+
+  // return first part only (the subdomain)
+  return parts.length > 2 ? parts[0] : null;
+}
 
 function generateArchiveURL() {
 	const languageCode  = randomURL(languageCodes);
 	const translateUrl  = randomURL(googleTranslateUrls).replace(/{{LANGUAGE_CODES}}/g, languageCode)
 	
     const url = randomURL(sumitUrlsToArchiveURLs);
-
-	const submitUrl = buildUrl(translateUrl, url);
+	const subdomain = getSubdomain(url);
+	
+	const submitUrl = translateUrl.replace(/{{SUBDOMAIN}}/g, subdomain);
 
     return buildUrl(getRandomArchiveURL(), submitUrl);
 }
