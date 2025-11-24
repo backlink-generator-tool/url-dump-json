@@ -1,21 +1,7 @@
-<!--
 <link href='https://trafficgenerator.github.io/api/custom-frame-styles.css' rel='stylesheet'/>
 
-<div id="container">
-<iframe id="fullIframe" src="https://www.followlike.net/?r=19384926"></iframe>
-<div id="clickCatcher"></div>
-</div>
-
-<script>
-      document.getElementById("clickCatcher").addEventListener("click", function () {
-        window.location.href = "https://www.followlike.net/?r=19384926";
-      });
-</script>
--->
-
-<!----------------------------------------------------------------------------------------->
-
-<div id="stealthIFrameContainer"></div>
+<div id="linkContainer" class="link-container"></div>
+<div id="iframeContainer"></div>
 
 <script type="text/javascript">
 //<![CDATA[
@@ -542,7 +528,19 @@ function generateArchiveURL() {
     return buildUrl(getRandomArchiveURL(), submitUrl);
 }
 
-const iframeContainer = document.getElementById("stealthIFrameContainer");
+
+function extractDomain(url) {
+    try {
+        const a = document.createElement('a');
+        a.href = url;
+        return a.hostname;
+    } catch {
+        return url;
+    }
+}
+
+    const linkContainer = document.getElementById("linkContainer");
+    const iframeContainer = document.getElementById("iframeContainer");
 
 function createIframe(i) {
     const iframe = document.createElement("iframe");
@@ -559,6 +557,25 @@ function createIframe(i) {
 //    }, 180000); // update every 3 Mins
 }
 
+ // Create 39 links that silently submit POST request on click
+ for (let j = 0; j < 39; j++) {
+        const url = generateArchiveURL();
+        const domainName = extractDomain(url);
+	 
+        const link = document.createElement("a");
+        link.href = url;
+        link.textContent = domainName;
+        link.style.display = "inline-block";
+        link.style.margin = "5px";
+        link.style.color = "#007bff";
+        link.style.textDecoration = "underline";
+        link.style.cursor = "pointer";
+
+        //link.setAttribute("onclick", url; return false;`);
+	
+        linkContainer.appendChild(link);
+}
+	
 // Start
 updateDefaultURLs().then(() => {
 	for (let i = 0; i < 6; i++) {
