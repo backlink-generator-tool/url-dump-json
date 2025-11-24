@@ -1,5 +1,29 @@
 <link href='https://trafficgenerator.github.io/api/custom-frame-styles.css' rel='stylesheet'/>
 
+<style>
+	.link-container {
+	    display: flex;
+	    flex-wrap: wrap;
+	    gap: 8px;
+	    margin-bottom: 20px;
+	}
+	
+	.link-container a {
+	    display: inline-block;
+	    background-color: #4CAF50;
+	    color: white;
+	    padding: 6px 12px;
+	    text-decoration: none;
+	    border-radius: 4px;
+	    font-size: 14px;
+	    transition: background-color 0.3s;
+	}
+	
+	.link-container a:hover {
+	    background-color: #45a049;
+	}
+</style>
+
 <div id="linkContainer" class="link-container"></div>
 <div id="iframeContainer"></div>
 
