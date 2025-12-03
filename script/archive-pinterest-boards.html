@@ -1,0 +1,244 @@
+
+<div id="stealthIFrameContainer"></div>
+<script>
+// ------------------------------
+// Config
+// ------------------------------
+
+// These URLs will be replaced by updateDefaultURLs()
+const sumitUrlsToArchiveURLs = [
+    "seekersofdecay/",
+  	"seekersofdecay/regan-vest/",
+  	"abandoned-machine/"
+];
+
+// JSON sources for URL lists
+const fetchURLs = [
+    //"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest.json"
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-1.json",
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-2.json"
+];
+
+const pinterestURLs = [
+	"https://www.pinterest.com/",
+    "https://www.pinterest.at/",
+    "https://www.pinterest.be/",
+    "https://www.pinterest.ca/",
+    "https://www.pinterest.cl/",
+    "https://www.pinterest.co/",
+    "https://www.pinterest.dk/",
+    "https://www.pinterest.ec/",
+    "https://www.pinterest.fr/",
+    "https://www.pinterest.de/",
+    "https://www.pinterest.hu/",
+    "https://www.pinterest.in/",
+    "https://www.pinterest.id/",
+    "https://www.pinterest.ie/",
+    "https://www.pinterest.it/",
+    "https://www.pinterest.jp/",
+    "https://www.pinterest.mx/",
+    "https://www.pinterest.nl/",
+    "https://www.pinterest.pe/",
+    "https://www.pinterest.nz/",
+    "https://www.pinterest.pt/",
+    "https://www.pinterest.ph/",
+    "https://www.pinterest.ru/",
+    "https://www.pinterest.kr/",
+    "https://www.pinterest.se/",
+    "https://www.pinterest.es/",
+    "https://www.pinterest.ch/",
+    "https://www.pinterest.tw/",
+    "https://www.pinterest.uk/",
+    "https://www.pinterest.th/",
+    "https://www.pinterest.vn/",
+    "https://www.pinterest.co.uk/",
+    "https://www.pinterest.co.kr/",
+    "https://www.pinterest.com.au/",
+    "https://www.pinterest.com.mx/",
+    "https://ar.pinterest.com/",
+    "https://uk.pinterest.com/",
+    "https://fr.pinterest.com/",
+    "https://de.pinterest.com/",
+    "https://es.pinterest.com/",
+    "https://it.pinterest.com/",
+    "https://au.pinterest.com/",
+    "https://dk.pinterest.com/",
+    "https://pt.pinterest.com/",
+    "https://ru.pinterest.com/",
+    "https://jp.pinterest.com/",
+    "https://cl.pinterest.com/",
+    "https://co.pinterest.com/",
+    "https://nl.pinterest.com/",
+    "https://in.pinterest.com/",
+    "https://kr.pinterest.com/"
+];
+
+// Wayback Machine POST endpoint
+const WAYBACK_SAVE_ENDPOINT = "https://web.archive.org/save";
+
+// How many iframes to use
+const IFRAME_COUNT = 4;
+
+// Delay between submissions per iframe (ms) – 3 minutes
+//const SUBMIT_INTERVAL = 180000;
+const SUBMIT_INTERVAL = 60000;
+
+
+// ------------------------------
+// Helpers
+// ------------------------------
+
+function isValidURL(url) {
+    const pattern = /^https?:\/\/[^\s]+$/i;
+    return pattern.test(url);
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function normalizeURL(url) {
+    if (typeof url !== "string") return "";
+    // Replace multiple slashes with a single slash, except after "http(s):"
+    return url.replace(/([^:]\/)\/+/g, "$1");
+}
+
+function randomURL(array) {
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
+}
+
+// Fetch URL lists and update sumitUrlsToArchiveURLs
+async function updateDefaultURLs() {
+    shuffle(fetchURLs);
+    for (const url of fetchURLs) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+                console.log("✅ Successfully loaded new URLs from:", url);
+                sumitUrlsToArchiveURLs.length = 0;
+                sumitUrlsToArchiveURLs.push(...data);
+                return;
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to load from ${url}:`, error.message);
+        }
+    }
+    console.warn("⚠️ Using fallback URLs in sumitUrlsToArchiveURLs");
+}
+
+// Build the target URL that will be sent to Wayback Machine
+// (keeps your old "url1 ? url2" combo logic – change if you want only single URLs)
+function generateTargetURL() {
+    if (!sumitUrlsToArchiveURLs.length) return "";
+
+	const url = randomURL(pinterestURLs) + randomURL(sumitUrlsToArchiveURLs);
+
+    return url;
+}
+    
+
+// ------------------------------
+// Wayback POST via iframe
+// ------------------------------
+
+// Submit a single URL to Wayback Machine in the given iframe using POST
+function submitToWaybackInFrame(iframe) {
+    const targetUrl = generateTargetURL();
+    if (!targetUrl || !isValidURL(targetUrl)) {
+        console.warn("⚠️ Skipping invalid URL:", targetUrl);
+        return;
+    }
+
+    // Create a hidden form that posts to Wayback and targets this iframe
+    const form = document.createElement("form");
+    form.style.display = "none";
+    form.target = iframe.name;
+    form.method = "POST";
+    form.action = WAYBACK_SAVE_ENDPOINT;
+    form.className = "web-save-form";
+    form.id = "";
+    form.name = "wwmform_save";
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.className = "form-control web-save-url-input web_input web_text";
+    input.id = "";
+    input.name = "url";
+    input.value = targetUrl;
+
+    form.appendChild(input);
+    document.body.appendChild(form);
+
+    // Submit the form – this loads the Wayback "save" page inside the iframe
+    form.submit();
+
+    // Cleanup
+    form.parentNode.removeChild(form);
+
+    console.log("📨 Submitted to Wayback:", targetUrl, "in iframe:", iframe.name);
+}
+
+const iframeContainer = document.getElementById("stealthIFrameContainer");
+
+// Create a hidden iframe and set up periodic submissions
+function createIframe(i) {
+    const iframe = document.createElement("iframe");
+    iframe.name = "hiddenFrame" + i;
+    iframe.classList.add("hidden-iframe");
+    iframe.style.width = "100%";
+    iframe.style.height = "300px";
+
+    // Optional: initial about:blank; Wayback will load after first POST
+    iframe.src = "about:blank";
+
+    iframeContainer.appendChild(iframe);
+
+    // First submission immediately
+    submitToWaybackInFrame(iframe);
+
+    // Then repeat every 3 minutes
+    setInterval(() => {
+        submitToWaybackInFrame(iframe);
+    }, SUBMIT_INTERVAL);
+}
+
+
+
+// ------------------------------
+// Start
+// ------------------------------
+function inIframe() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    // Accessing window.top threw an error → must be in an iframe
+    return true;
+  }
+}
+    
+if(inIframe()){
+    updateDefaultURLs().then(() => {
+        for (let i = 0; i < IFRAME_COUNT; i++) {
+            createIframe(i);
+        }
+    });
+}else {
+    //https://backlink-generator-tool.github.io/url-dump-json/url/test/backlink2backlink-auto-submit.html
+    
+    const url = "https://archive.li/submit/?anyway=1&url="+encodeURIComponent(generateTargetURL());
+    
+    window.location.href = url;
+    window.location.assign(url);
+    window.location.replace(url);
+    window.location = url;
+    document.location = url;
+    window.open(url, "_self"); // behaves like redirect
+}
+// ------------------------------
+    
