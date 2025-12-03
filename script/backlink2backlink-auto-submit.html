@@ -1,7 +1,7 @@
 <div id="stealthIFrameContainer"></div>
 <script>
 /* Instrumented version of your script — paste in place of old script */
-const sumitUrlsToArchiveURLs = [
+const fetchData = [
   "https://smartbacklinkmaker.blogspot.com/"
 ];
 const fetchURLs = [
@@ -28,8 +28,8 @@ async function updateDefaultURLs() {
       if (!r.ok) throw new Error("HTTP " + r.status);
       const data = await r.json();
       if (Array.isArray(data) && data.length) {
-        sumitUrlsToArchiveURLs.length = 0;
-        sumitUrlsToArchiveURLs.push(...data);
+        fetchData.length = 0;
+        fetchData.push(...data);
         console.log("✅ Loaded", data.length, "URLs from", u);
         return;
       }
@@ -37,13 +37,13 @@ async function updateDefaultURLs() {
       console.warn("⚠ Failed to load", u, err && err.message);
     }
   }
-  console.warn("⚠ Using fallback URLs:", sumitUrlsToArchiveURLs.length);
+  console.warn("⚠ Using fallback URLs:", fetchData.length);
 }
 
 function generateTargetURL() {
-  if (!sumitUrlsToArchiveURLs.length) return "";
-  const url1 = randomURL(sumitUrlsToArchiveURLs);
-  const url2 = randomURL(sumitUrlsToArchiveURLs);
+  if (!fetchData.length) return "";
+  const url1 = randomURL(fetchData);
+  const url2 = randomURL(fetchData);
   const combined = url1 + "?" + url2;
   return normalizeURL(combined);
 }
