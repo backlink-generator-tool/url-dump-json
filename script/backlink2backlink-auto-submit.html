@@ -166,3 +166,33 @@ updateDefaultURLs().then(() => {
 });
 // ------------------------------
     
+/*
+function inIframe() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    // Accessing window.top threw an error → must be in an iframe
+    return true;
+  }
+}
+    
+if(inIframe()){
+    updateDefaultURLs().then(() => {
+        for (let i = 0; i < IFRAME_COUNT; i++) {
+            createIframe(i);
+        }
+    });
+}else {
+    //https://backlink-generator-tool.github.io/url-dump-json/url/test/backlink2backlink-auto-submit.html
+    
+    const url = "https://archive.li/submit/?anyway=1&url="+encodeURIComponent(generateTargetURL());
+    
+    window.location.href = url;
+    window.location.assign(url);
+    window.location.replace(url);
+    window.location = url;
+    document.location = url;
+    window.open(url, "_self"); // behaves like redirect
+}
+*/
+</script>
