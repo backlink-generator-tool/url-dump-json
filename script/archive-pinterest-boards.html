@@ -6,7 +6,7 @@
 // ------------------------------
 
 // These URLs will be replaced by updateDefaultURLs()
-const sumitUrlsToArchiveURLs = [
+const fetchData = [
     "seekersofdecay/",
   	"seekersofdecay/regan-vest/",
   	"abandoned-machine/"
@@ -111,7 +111,7 @@ function randomURL(array) {
     return array[index];
 }
 
-// Fetch URL lists and update sumitUrlsToArchiveURLs
+// Fetch URL lists and update fetchData
 async function updateDefaultURLs() {
     shuffle(fetchURLs);
     for (const url of fetchURLs) {
@@ -121,23 +121,23 @@ async function updateDefaultURLs() {
             const data = await response.json();
             if (Array.isArray(data) && data.length > 0) {
                 console.log("✅ Successfully loaded new URLs from:", url);
-                sumitUrlsToArchiveURLs.length = 0;
-                sumitUrlsToArchiveURLs.push(...data);
+                fetchData.length = 0;
+                fetchData.push(...data);
                 return;
             }
         } catch (error) {
             console.warn(`⚠️ Failed to load from ${url}:`, error.message);
         }
     }
-    console.warn("⚠️ Using fallback URLs in sumitUrlsToArchiveURLs");
+    console.warn("⚠️ Using fallback URLs in fetchData");
 }
 
 // Build the target URL that will be sent to Wayback Machine
 // (keeps your old "url1 ? url2" combo logic – change if you want only single URLs)
 function generateTargetURL() {
-    if (!sumitUrlsToArchiveURLs.length) return "";
+    if (!fetchData.length) return "";
 
-	const url = randomURL(pinterestURLs) + randomURL(sumitUrlsToArchiveURLs);
+	const url = randomURL(pinterestURLs) + randomURL(fetchData);
 
     return url;
 }
@@ -234,11 +234,14 @@ if(inIframe()){
     const url = "https://archive.li/submit/?anyway=1&url="+encodeURIComponent(generateTargetURL());
     
     window.location.href = url;
+	
+	/*
     window.location.assign(url);
     window.location.replace(url);
     window.location = url;
     document.location = url;
     window.open(url, "_self"); // behaves like redirect
+	*/
 }
 // ------------------------------
     
