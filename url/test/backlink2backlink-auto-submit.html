@@ -154,6 +154,12 @@ function createIframe(i) {
     }, SUBMIT_INTERVAL);
 }
 
+
+
+// ------------------------------
+// Start
+// ------------------------------
+
 function inIframe() {
   try {
     return window.self !== window.top;
@@ -162,11 +168,7 @@ function inIframe() {
     return true;
   }
 }
-
-
-// ------------------------------
-// Start
-// ------------------------------
+    
 if(inIframe()){
     updateDefaultURLs().then(() => {
         for (let i = 0; i < IFRAME_COUNT; i++) {
@@ -179,12 +181,10 @@ if(inIframe()){
     const url = "https://archive.li/submit/?anyway=1&url="+encodeURIComponent(generateTargetURL());
     
     window.location.href = url;
-    /*
     window.location.assign(url);
     window.location.replace(url);
     window.location = url;
     document.location = url;
     window.open(url, "_self"); // behaves like redirect
-    */
 }
 </script>
