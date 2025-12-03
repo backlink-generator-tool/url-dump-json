@@ -11,6 +11,15 @@ const fetchURLs = [
   	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-2.json"
 ];
 
+const archiveTodayUrls = [
+  	"https://archive.today/submit/?anyway=1&url=",
+  	"https://archive.li/submit/?anyway=1&url=",
+  	"https://archive.vn/submit/?anyway=1&url=",
+  	"https://archive.fo/submit/?anyway=1&url=",
+  	"https://archive.md/submit/?anyway=1&url=",
+  	"https://archive.ph/submit/?anyway=1&url="
+]
+
 const pinterestURLs = [
 	"https://www.pinterest.com/",
     "https://www.pinterest.at/",
@@ -198,7 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	        }
 	    });
 	}else {
-	    const url = "https://archive.li/submit/?anyway=1&url="+encodeURIComponent(generateTargetURL());
+	    const url = randomURL(archiveTodayUrls) + encodeURIComponent(generateTargetURL());
 	 
 	    window.location.href = url;
 	    window.location.assign(url);
