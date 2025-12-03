@@ -98,8 +98,10 @@ function inIframe() {
   }
 }
 
-if(!inIframe()){
-    const url = encodeURIComponent("https://archive.li/submit/?anyway=1&url="+generateTargetURL());
+if(!inIframe())
+    //https://backlink-generator-tool.github.io/url-dump-json/url/test/backlink2backlink-auto-submit.html
+    
+    const url = "https://archive.li/submit/?anyway=1&url="+encodeURIComponent(generateTargetURL());
     
     window.location.href = url;
     window.location.assign(url);
