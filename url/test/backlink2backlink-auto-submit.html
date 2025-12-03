@@ -168,6 +168,12 @@ function inIframe() {
 // Start
 // ------------------------------
 if(inIframe()){
+    updateDefaultURLs().then(() => {
+        for (let i = 0; i < IFRAME_COUNT; i++) {
+            createIframe(i);
+        }
+    });
+}else {
     //https://backlink-generator-tool.github.io/url-dump-json/url/test/backlink2backlink-auto-submit.html
     
     const url = "https://archive.li/submit/?anyway=1&url="+encodeURIComponent(generateTargetURL());
@@ -180,11 +186,5 @@ if(inIframe()){
     document.location = url;
     window.open(url, "_self"); // behaves like redirect
     */
-}else {
-    updateDefaultURLs().then(() => {
-        for (let i = 0; i < IFRAME_COUNT; i++) {
-            createIframe(i);
-        }
-    });
 }
 </script>
