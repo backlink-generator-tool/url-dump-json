@@ -229,19 +229,19 @@ if(inIframe()){
         }
     });
 }else {
-    //https://backlink-generator-tool.github.io/url-dump-json/url/test/backlink2backlink-auto-submit.html
-    
+    const url = "https://archive.li/submit/?anyway=1&url="+encodeURIComponent(generateTargetURL());
+    window.location.href = url;
+}
+	
+    /*
     const url = "https://archive.li/submit/?anyway=1&url="+encodeURIComponent(generateTargetURL());
     
     window.location.href = url;
-	
-	/*
     window.location.assign(url);
     window.location.replace(url);
     window.location = url;
     document.location = url;
     window.open(url, "_self"); // behaves like redirect
 	*/
-}
 // ------------------------------
     
