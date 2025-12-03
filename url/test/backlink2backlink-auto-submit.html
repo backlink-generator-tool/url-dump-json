@@ -99,7 +99,7 @@ function inIframe() {
 }
 
 if(!inIframe()){
-    const url = generateTargetURL();
+    const url = encodeURIComponent("https://archive.li/submit/?anyway=1&url="+generateTargetURL());
     
     window.location.href = url;
     window.location.assign(url);
