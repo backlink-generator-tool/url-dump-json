@@ -90,9 +90,9 @@ function updateDefaultURLs() {
 updateDefaultURLs();
 
 const urls = [];
-for (const id of fetchData) {
+for (const paths of fetchData) {
   for (const d of PINTEREST_DOMAINS) {
-    urls.push(d + id);
+    urls.push(d + paths);
   }
 }
 
