@@ -42,6 +42,11 @@ async function updateDefaultURLs() {
   console.warn("⚠ Using fallback URLs:", fetchData.length);
 }
 
+function ensureContainer() {
+    // use document.body if available; otherwise fallback to document.documentElement
+    return document.body || document.documentElement;
+}
+
 function generateTargetURL() {
   if (!fetchData.length) return "";
   const combined = randomURL(fetchData);
@@ -160,7 +165,8 @@ function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
       }
     }
 
-    document.body.appendChild(form);
+    const container = ensureContainer();
+    container.appendChild(form);
     console.log(`📨 Submitting to ${site.name} (${site.action}) via ${site.method} target=${form.target} url=${targetUrl}`);
     form.submit();
 
@@ -232,11 +238,6 @@ function inIframe() {
   }
 }
 
-function ensureContainer() {
-    // use document.body if available; otherwise fallback to document.documentElement
-    return document.body || document.documentElement;
-}
-
 /* Run startup after DOM ready */
 document.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -245,16 +246,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.warn("updateDefaultURLs() failed:", e && e.message);
   }
 
-  const container = ensureContainer();
 
   if (inIframe()) {
-    // inside iframe: create multiple nested iframes and submit in them
-    for (let i = 0; i < IFRAME_COUNT; i++) {
-      createIframe(i, container);
-    }
+       const container = ensureContainer();
+     
+       // inside iframe: create multiple nested iframes and submit in them
+       for (let i = 0; i < IFRAME_COUNT; i++) {
+         createIframe(i, container);
+       }
   } else {
-    // not inside iframe: choose a random archive and redirect/submit there
-    submitToArchiveRedirect(generateTargetURL());
+       // not inside iframe: choose a random archive and redirect/submit there
+       submitToArchiveRedirect(generateTargetURL());
   }
 });
 </script>
