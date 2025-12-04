@@ -7,10 +7,10 @@ const fetchData = [
   "https://smartbacklinkmaker.blogspot.com/"
 ];
 const fetchURLs = [
-  "https://backlink-generator-tool.github.io/url-dump-json/script/fetch/js/pinterest-pins.js"
+	"https://backlink-generator-tool.github.io/url-dump-json/script/fetch/js/pinterest-pins.js"
 ];
 
-const IFRAME_COUNT = 6;
+const IFRAME_COUNT = 4;
 const SUBMIT_INTERVAL = 60000; // 60s
 
 function isValidURL(url) {
@@ -196,6 +196,15 @@ function generateTargetURL() {
   return normalizeURL(combined);
 }
 
+const archiveURLs = [
+        "https://archive.today/submit/",
+        "https://archive.li/submit/",
+        "https://archive.vn/submit/",
+        "https://archive.fo/submit/",
+        "https://archive.md/submit/",
+        "https://archive.ph/submit/"
+];
+
 /* Archive site definitions */
 const ARCHIVE_SITES = [
       [
@@ -250,7 +259,7 @@ const ARCHIVE_SITES = [
           inputName: "url",
           extraParams: { anyway: "1" }
         }
-     ]
+    ]
 	/*
     [
         {
