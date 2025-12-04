@@ -48,33 +48,87 @@ function generateTargetURL() {
   return normalizeURL(combined);
 }
 
+const archiveURLs = [
+        "https://archive.today/submit/",
+        "https://archive.li/submit/",
+        "https://archive.vn/submit/",
+        "https://archive.fo/submit/",
+        "https://archive.md/submit/",
+        "https://archive.ph/submit/"
+];
+
 /* Archive site definitions */
 const ARCHIVE_SITES = [
-  {
-    name: "Wayback",
-    action: "https://web.archive.org/save",
-    method: "POST",
-    inputName: "url",
-    extraParams: {}
-  },
-  {
-    name: "GhostArchive",
-    action: "https://ghostarchive.org/archive2",
-    method: "POST",
-    inputName: "archive",
-    extraParams: {}
-  },
-  {
-    name: "archive.today",
-    action: "https://archive.today/submit/",
-    method: "GET",
-    inputName: "url",
-    extraParams: { anyway: "1" }
-  }
+      [
+        {
+          name: "Wayback",
+          action: "https://web.archive.org/save",
+          method: "POST",
+          inputName: "url",
+          extraParams: {}
+        }
+    ],
+    [
+        {
+          name: "GhostArchive",
+          action: "https://ghostarchive.org/archive2",
+          method: "POST",
+          inputName: "archive",
+          extraParams: {}
+        }
+    ],
+    [
+        {
+          name: "archive.today",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        },
+        {
+          name: "archive.li",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        },
+        {
+          name: "archive.vn",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        },
+        {
+          name: "archive.fo",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        },
+        {
+          name: "archive.md",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        },
+        {
+          name: "archive.ph",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        }
+     ]
 ];
 
 function chooseRandomArchive() {
-  return ARCHIVE_SITES[Math.floor(Math.random() * ARCHIVE_SITES.length)];
+     //return ARCHIVE_SITES[Math.floor(Math.random() * ARCHIVE_SITES.length)];
+
+     const randomArray = ARCHIVE_SITES[Math.floor(Math.random() * ARCHIVE_SITES.length)];
+    
+     return randomArray[Math.floor(Math.random() * randomArray.length)];
 }
 
 /* Generic form builder that handles GET/POST, target (iframe or _self), and extra params */
