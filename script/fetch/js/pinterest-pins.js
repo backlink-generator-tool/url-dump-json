@@ -1,6 +1,6 @@
 // examble-build-pinterest.module.js
 // ES module: export default an array of fully-formed URLs (no global)
-const PIN_IDS = [
+const fetchData  = [
     "615656211566717661",
   	"615656211564500126",
   	"615656211564500024",
@@ -74,7 +74,7 @@ const PINTEREST_DOMAINS = [
     "https://kr.pinterest.com/pin/"
 ];
 
-const fetchIds = [
+const fetchURLs  = [
     "https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-1.json",
   	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-2.json",
   	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-3.json",
@@ -95,16 +95,16 @@ const fetchIds = [
 function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
 
 function updateDefaultURLs() {
-  shuffle(fetchIds);
-  for (const u of fetchIds) {
+  shuffle(fetchURLs );
+  for (const u of fetchURLs) {
     try {
       console.log("🔎 Trying to fetch URL list from:", u);
       const r = await fetch(u);
       if (!r.ok) throw new Error("HTTP " + r.status);
       const data = await r.json();
       if (Array.isArray(data) && data.length) {
-        PIN_IDS.length = 0;
-        PIN_IDS.push(...data);
+        fetchData.length = 0;
+        fetchData.push(...data);
         console.log("✅ Loaded", data.length, "URLs from", u);
         return;
       }
@@ -117,7 +117,7 @@ function updateDefaultURLs() {
 updateDefaultURLs();
 
 const urls = [];
-for (const id of PIN_IDS) {
+for (const id of fetchData) {
   for (const d of PINTEREST_DOMAINS) {
     urls.push(d + id);
   }
