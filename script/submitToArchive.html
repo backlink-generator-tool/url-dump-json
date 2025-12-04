@@ -4,10 +4,11 @@
 */
 
 const fetchData = [
-  "https://smartbacklinkmaker.blogspot.com/"
+    "http://folllike.com/?19265371"
 ];
 const fetchURLs = [
-  "https://backlink-generator-tool.github.io/url-dump-json/script/fetch/js/pinterest-pins.js"
+	//"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
+	"https://backlink-generator-tool.github.io/url-dump-json/script/fetch/js/pinterest-pins.js"
 ];
 
 const IFRAME_COUNT = 4;
@@ -21,31 +22,233 @@ function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Ma
 function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
 function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
 
+/* ============================================================
+     🔥 UPDATED FUNCTION — JS + JSON Support
+   ============================================================ */
 async function updateDefaultURLs() {
-  shuffle(fetchURLs);
-  for (const u of fetchURLs) {
+  // Helper: import JS text as module from blob URL
+  async function importModuleFromText(jsText) {
+    const blob = new Blob([jsText], { type: "application/javascript" });
+    const moduleUrl = URL.createObjectURL(blob);
     try {
-      console.log("🔎 Trying to fetch URL list from:", u);
-      const r = await fetch(u);
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      const data = await r.json();
-      if (Array.isArray(data) && data.length) {
-        fetchData.length = 0;
-        fetchData.push(...data);
-        console.log("✅ Loaded", data.length, "URLs from", u);
-        return;
-      }
-    } catch (err) {
-      console.warn("⚠ Failed to load", u, err && err.message);
+      return await import(moduleUrl);
+    } finally {
+      URL.revokeObjectURL(moduleUrl);
     }
   }
+
+  function extractFromJSON(data) {
+    if (Array.isArray(data)) return data.slice();
+    for (const key of ["urls","items","data","list"]) {
+      if (Array.isArray(data?.[key])) return data[key].slice();
+    }
+    return [];
+  }
+
+  async function extractFromModule(mod) {
+    if (!mod) return [];
+    try {
+      if (Array.isArray(mod.default)) return mod.default.slice();
+      for (const key of ["urls","items","data","list","pins","pinIds"]) {
+        if (Array.isArray(mod[key])) return mod[key].slice();
+      }
+      for (const fn of ["build","load","get"]) {
+        if (typeof mod[fn] === "function") {
+          const out = await mod[fn]();
+          if (Array.isArray(out)) return out.slice();
+        }
+      }
+    } catch (e) {
+      console.error("❌ extractFromModule threw:", e);
+    }
+    return [];
+  }
+
+  function loadViaScriptTag(url, timeout = 8000) {
+    const GLOBAL_KEYS = [
+      "REMOTE_URLS","REMOTE_DATA","REMOTE_ARRAY",
+      "FETCH_JS_DATA","FETCH_DATA",
+      "urls","items","pins","PIN_IDS"
+    ];
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      let done = false;
+      const timer = setTimeout(() => {
+        if (done) return;
+        done = true;
+        script.remove();
+        console.warn("⚠ Script tag load timed out for", url);
+        resolve([]);
+      }, timeout);
+
+      script.async = true;
+      script.src = url;
+
+      script.onload = () => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        let found = [];
+        for (const key of GLOBAL_KEYS) {
+          if (Array.isArray(window[key]) && window[key].length) {
+            found = window[key].slice();
+            try { delete window[key]; } catch(e) {}
+            console.log("ℹ Found global array on window.", key, "length=", found.length);
+            break;
+          }
+        }
+        script.remove();
+        resolve(found);
+      };
+
+      script.onerror = (ev) => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        script.remove();
+        console.error("❌ Script tag failed to load:", url, ev && (ev.error || ev.message) || ev);
+        resolve([]);
+      };
+
+      // attach to head
+      document.head.appendChild(script);
+    });
+  }
+
+  shuffle(fetchURLs);
+
+  for (const u of fetchURLs) {
+    console.log("🔎 Trying to fetch URL list from:", u);
+    const lower = u.split('?')[0].toLowerCase();
+
+    // JSON path
+    if (lower.endsWith(".json")) {
+      try {
+        const r = await fetch(u);
+        console.log("→ fetch status", r.status, r.statusText, "for", u);
+        console.log("→ content-type:", r.headers.get("content-type"));
+        if (!r.ok) {
+          console.warn("⚠ JSON fetch returned not ok for", u);
+        } else {
+          const payload = await r.json().catch(e => { console.error("⚠ JSON parse error:", e); return null; });
+          if (payload) {
+            const arr = extractFromJSON(payload);
+            console.log("→ JSON array length:", arr.length);
+            if (arr.length) {
+              fetchData.length = 0;
+              fetchData.push(...arr);
+              console.log("✅ Loaded", arr.length, "URLs from JSON:", u);
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("⚠ Error fetching/parsing JSON", u, e);
+      }
+      continue;
+    }
+
+    // JS / MJS path
+    if (lower.endsWith(".js") || lower.endsWith(".mjs")) {
+      // 1) Try fetch + import module
+      try {
+        const r = await fetch(u);
+        console.log("→ fetch status", r.status, r.statusText, "for", u);
+        console.log("→ content-type:", r.headers.get("content-type"));
+        if (!r.ok) {
+          console.warn("⚠ JS fetch returned not ok for", u);
+        } else {
+          const text = await r.text();
+          console.log("→ fetched JS length:", text.length, "chars. Preview:\n", text.slice(0,400).replace(/\n/g,'↵'));
+          // Attempt to import module from text
+          try {
+            const mod = await importModuleFromText(text);
+            console.log("→ import(module) success for", u, "module keys:", Object.keys(mod));
+            const arr = await extractFromModule(mod);
+            console.log("→ extracted array from module length:", arr.length);
+            if (arr.length) {
+              fetchData.length = 0;
+              fetchData.push(...arr);
+              console.log("✅ Loaded", arr.length, "URLs from JS module:", u);
+              return;
+            } else {
+              console.warn("⚠ Module imported but no array found in module exports for", u);
+            }
+          } catch (impErr) {
+            console.error("⚠ import(module) failed for", u, impErr && (impErr.stack || impErr.message || impErr));
+          }
+        }
+      } catch (fetchErr) {
+        console.error("⚠ Fetch JS text failed for", u, fetchErr && (fetchErr.stack || fetchErr.message || fetchErr));
+      }
+
+      // 2) Fallback: script tag injection
+      try {
+        console.log("→ Attempting script-tag fallback for", u);
+        const arr = await loadViaScriptTag(u);
+        console.log("→ script-tag returned array length:", arr.length);
+        if (arr.length) {
+          fetchData.length = 0;
+          fetchData.push(...arr);
+          console.log("✅ Loaded", arr.length, "URLs from JS script:", u);
+          return;
+        } else {
+          console.warn("⚠ Script fallback returned no usable array for", u);
+        }
+      } catch (e) {
+        console.error("⚠ Script fallback error for", u, e);
+      }
+
+      continue;
+    }
+
+    // Unknown extension: try JSON then JS fallback (same diagnostics)
+    try {
+      const r = await fetch(u);
+      console.log("→ fallback fetch status", r.status, r.statusText, "for", u);
+      console.log("→ content-type:", r.headers.get("content-type"));
+      if (r.ok) {
+        const maybeJson = await r.json().catch(()=>null);
+        if (maybeJson) {
+          const arr = extractFromJSON(maybeJson);
+          console.log("→ fallback JSON array length:", arr.length);
+          if (arr.length) {
+            fetchData.length = 0;
+            fetchData.push(...arr);
+            console.log("✅ Loaded", arr.length, "URLs from fallback JSON:", u);
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("⚠ fallback JSON attempt failed for", u, e);
+    }
+
+    // fallback script tag
+    try {
+      console.log("→ fallback script-tag attempt for", u);
+      const arr2 = await loadViaScriptTag(u);
+      console.log("→ fallback script returned length:", arr2.length);
+      if (arr2.length) {
+        fetchData.length = 0;
+        fetchData.push(...arr2);
+        console.log("✅ Loaded", arr2.length, "URLs from fallback JS:", u);
+        return;
+      }
+    } catch (e) {
+      console.warn("⚠ fallback script-tag failed for", u, e);
+    }
+
+    console.warn("⚠ Failed to load from", u);
+  }
+
   console.warn("⚠ Using fallback URLs:", fetchData.length);
 }
 
-function ensureContainer() {
-    // use document.body if available; otherwise fallback to document.documentElement
-    return document.body || document.documentElement;
-}
+
+/* ============================================================
+   (rest of your original code remains unchanged)
+   ============================================================ */
 
 function generateTargetURL() {
   if (!fetchData.length) return "";
@@ -130,14 +333,10 @@ const ARCHIVE_SITES = [
 ];
 
 function chooseRandomArchive() {
-     //return ARCHIVE_SITES[Math.floor(Math.random() * ARCHIVE_SITES.length)];
-
      const randomArray = ARCHIVE_SITES[Math.floor(Math.random() * ARCHIVE_SITES.length)];
-    
      return randomArray[Math.floor(Math.random() * randomArray.length)];
 }
 
-/* Generic form builder that handles GET/POST, target (iframe or _self), and extra params */
 function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
   if (!site || !targetUrl) return;
   try {
@@ -148,14 +347,12 @@ function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
     if (targetFrameName) form.target = targetFrameName;
     else form.target = "_self";
 
-    // Main URL input
     const urlInput = document.createElement("input");
     urlInput.type = (site.method === "GET") ? "text" : "hidden";
     urlInput.name = site.inputName || "url";
     urlInput.value = targetUrl;
     form.appendChild(urlInput);
 
-    // Extra params as hidden inputs
     if (site.extraParams) {
       for (const [k, v] of Object.entries(site.extraParams)) {
         const inp = document.createElement("input");
@@ -166,18 +363,15 @@ function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
       }
     }
 
-    const container = ensureContainer();
-    container.appendChild(form);
+    document.body.appendChild(form);
     console.log(`📨 Submitting to ${site.name} (${site.action}) via ${site.method} target=${form.target} url=${targetUrl}`);
     form.submit();
-
     setTimeout(() => { try { form.remove(); } catch(e){} }, 1000);
   } catch (err) {
     console.error("❌ buildAndSubmitArchiveForm error:", err);
   }
 }
 
-/* Submit inside an iframe */
 function submitToArchiveInFrame(iframe) {
   try {
     const targetUrl = generateTargetURL();
@@ -192,7 +386,6 @@ function submitToArchiveInFrame(iframe) {
   }
 }
 
-/* Create iframe and periodically submit into it */
 function createIframe(i, container) {
   try {
     const iframe = document.createElement("iframe");
@@ -202,15 +395,13 @@ function createIframe(i, container) {
     iframe.classList.add("hidden-iframe");
     iframe.style.width = "100%";
     iframe.style.height = "200px";
-    iframe.style.border = "0"; // no visible border by default
+    iframe.style.border = "0";
     iframe.src = "about:blank";
 
     container.appendChild(iframe);
 
-    // initial submit after attached
     setTimeout(() => submitToArchiveInFrame(iframe), 250);
 
-    // periodic submissions
     setInterval(() => {
       console.log("⏱ Interval firing for iframe:", fname);
       submitToArchiveInFrame(iframe);
@@ -220,7 +411,6 @@ function createIframe(i, container) {
   }
 }
 
-/* If page is top or not inside an iframe, submit (redirect) with a random archive site */
 function submitToArchiveRedirect(url) {
   if (!url || !isValidURL(url)) {
     console.warn("⚠ Invalid or empty URL for redirect submission:", url);
@@ -230,7 +420,6 @@ function submitToArchiveRedirect(url) {
   buildAndSubmitArchiveForm(site, url, "_self");
 }
 
-/* Utility: are we inside an iframe? */
 function inIframe() {
   try {
     return window.self !== window.top;
@@ -239,7 +428,10 @@ function inIframe() {
   }
 }
 
-/* Run startup after DOM ready */
+function ensureContainer() {
+  return document.body || document.documentElement;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     await updateDefaultURLs();
@@ -247,17 +439,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.warn("updateDefaultURLs() failed:", e && e.message);
   }
 
+  const container = ensureContainer();
 
   if (inIframe()) {
-       const container = ensureContainer();
-     
-       // inside iframe: create multiple nested iframes and submit in them
-       for (let i = 0; i < IFRAME_COUNT; i++) {
-         createIframe(i, container);
-       }
+    for (let i = 0; i < IFRAME_COUNT; i++) {
+      createIframe(i, container);
+    }
   } else {
-       // not inside iframe: choose a random archive and redirect/submit there
-       submitToArchiveRedirect(generateTargetURL());
+    submitToArchiveRedirect(generateTargetURL());
   }
-});
+
 </script>
