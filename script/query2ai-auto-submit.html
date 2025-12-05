@@ -1286,6 +1286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.warn("updateDefaultURLs() failed:", e && e.message);
   }
 
+	/*
 	if(inIframe()){
 	    updateDefaultURLs().then(() => {
 	        for (let i = 0; i < IFRAME_COUNT; i++) {
@@ -1302,5 +1303,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 	    document.location = url;
 	    window.open(url, "_self"); // behaves like redirect
 	}
+	*/
+	 updateDefaultURLs().then(() => {
+	        for (let i = 0; i < IFRAME_COUNT; i++) {
+	            createIframe(i);
+	        }
+	 });
 });
 </script>
