@@ -156,32 +156,39 @@ async function updateDefaultURLs() {
       "FETCH_JS_DATA", "FETCH_DATA",
       "urls", "items", "pins", "PIN_IDS"
     ];
+
     return new Promise((resolve) => {
       const script = document.createElement("script");
       script.src = url;
       script.async = true;
 
-      script.onload = () => {
-        let result = [];
+      script.onload = async () => {
+
+        // Wait if script exports a promise for readiness
+        if (window.FETCH_JS_READY instanceof Promise) {
+          try {
+            const result = await window.FETCH_JS_READY;
+            resolve(result);
+            return;
+          } catch (e) {}
+        }
+
+        // Otherwise use instant globals
         for (const key of GLOBAL_KEYS) {
           if (Array.isArray(window[key])) {
-            result = window[key].slice();
-            try { delete window[key]; } catch(e){}
-            break;
+            resolve(window[key].slice());
+            return;
           }
         }
-        script.remove();
-        resolve(result);
-      };
 
-      script.onerror = () => {
-        script.remove();
         resolve([]);
       };
 
+      script.onerror = () => resolve([]);
       document.head.appendChild(script);
     });
-  }
+}
+
 
   /* main behavior */
   shuffle(fetchURLs);
