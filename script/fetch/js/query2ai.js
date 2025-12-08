@@ -1161,7 +1161,7 @@ const chatURLs = [
         "https://ultimatebacklinktool.blogspot.com/",
         "https://rapidseobacklinks.blogspot.com/",
         "https://backlinkbuilderhub.blogspot.com/",
-        "https://instantseolinks.blogspot.com/",
+        "https://instantseolinks.blogspot.com/"
   ];
 
   const fetchIds = [
