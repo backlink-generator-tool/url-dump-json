@@ -384,7 +384,52 @@ function generateTargetURL() {
 
 /* Archive site definitions */
 const ARCHIVE_SITES = [
-      [
+    [
+        {
+          name: "archive.today",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        },
+        {
+          name: "archive.li",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        },
+        {
+          name: "archive.vn",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        },
+        {
+          name: "archive.fo",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        },
+        {
+          name: "archive.md",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        },
+        {
+          name: "archive.ph",
+          action: "https://archive.today/submit/",
+          method: "GET",
+          inputName: "url",
+          extraParams: { anyway: "1" }
+        }
+    ]
+/*
+    [
         {
           name: "Wayback",
           action: "https://web.archive.org/save",
@@ -436,8 +481,7 @@ const ARCHIVE_SITES = [
           inputName: "url",
           extraParams: { anyway: "1" }
         }
-    ]
-	/*
+    ],
     [
         {
           name: "GhostArchive",
@@ -448,7 +492,8 @@ const ARCHIVE_SITES = [
           extraParams: {}
         }
     ]
-	*/
+*/
+	
 ];
 
 function chooseRandomArchive() {
