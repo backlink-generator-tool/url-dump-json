@@ -65,8 +65,8 @@
   ];
 
   const fetchIds = [
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-1.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-2.json"
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-1.json"
+  	//"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-2.json"
   ];
 
   function shuffle(array) {
