@@ -7,10 +7,7 @@
   const SUBMIT_INTERVAL = 60000; // ms
 
   // Archive endpoints (sub-arrays allowed for future expansion)
-  const archiveURLs = [
-    ["https://web.archive.org/save/{{URL}}"]
-    // additional providers could be added here as arrays
-  ];
+  const WAYBACK_SAVE_ENDPOINT = "https://web.archive.org/save/";
 
   // A compact list of target pages (trimmed example; keep/replace with full list)
   const mainURLs = [
@@ -101,45 +98,54 @@
     return null;
   }
 
-  // Build the final target URL (archive submit URL)
-  function generateArchiveSubmitURL() {
+  // Provide the name used earlier in the submit function
+  function generateTargetURL() {
     const picked = pickValidMainURL();
     if (!picked) return null;
     const original = addAndShuffleParams(picked);
-    const endpointTemplate = getRandomArchiveEndpoint();
-    if (!endpointTemplate) return null;
-    const replaced = endpointTemplate
-      .replace(/{{URL}}/g, original)
-      .replace(/{{ENCODE_URL}}/g, encodeURIComponent(original));
-    return normalizeURL(replaced);
-  }
-
-  // Provide the name used earlier in the submit function
-  function generateTargetURL() {
-    return generateArchiveSubmitURL();
+    return normalizeURL(original);
   }
 
   // ====== Submission logic ======
-  function submitToWaybackInFrame(iframe) {
-    try {
-      const targetUrl = generateTargetURL();
-      if (!targetUrl || !isValidURL(targetUrl)) {
-        console.warn("⚠ Skipping invalid target:", targetUrl);
-        return;
-      }
+function submitToWaybackInFrame(iframe) {
+  try {
+    const targetUrl = generateTargetURL();
 
-      // To avoid caching / identical-URL optimizations, append a cache-buster
-      const cacheBusted = targetUrl + (targetUrl.includes("?") ? "&_=" : "?_=") + Date.now();
-
-      // Load the archive-save url into the iframe (GET). This is simpler than
-      // creating and posting a form to an undefined endpoint.
-      iframe.src = cacheBusted;
-      console.log("📨 iframe", iframe.name, "loading", cacheBusted);
-
-    } catch (err) {
-      console.error("❌ submitToWaybackInFrame error:", err);
+    if (!targetUrl || !isValidURL(targetUrl)) {
+      console.warn("⚠ Skipping invalid target:", targetUrl);
+      return;
     }
+
+    const form = document.createElement("form");
+    form.style.display = "none";
+    form.target = iframe.name;
+    form.method = "POST";
+    form.action = WAYBACK_SAVE_ENDPOINT;
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "url";
+    input.value = targetUrl;
+
+    form.appendChild(input);
+    document.body.appendChild(form);
+
+    console.log(
+      "📨 Submitting Wayback save:",
+      "iframe =", iframe.name,
+      "url =", targetUrl
+    );
+
+    form.submit();
+
+    setTimeout(() => {
+      try { form.remove(); } catch (_) {}
+    }, 1000);
+
+  } catch (err) {
+    console.error("❌ submitToWaybackInFrame error:", err);
   }
+}
 
   const iframeContainer = document.getElementById("iframeContainer");
 
@@ -172,3 +178,4 @@
     createIframe(i);
   }
 </script>
+
