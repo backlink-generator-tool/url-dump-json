@@ -114,25 +114,118 @@ function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Ma
 function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
 function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
 
-async function updateDefaultURLs() {
+// --- caching configuration ---
+const CACHE_KEY = "pinterest_fetchData_cache_v1";
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours (change if you want shorter/longer)
+
+// helper: read cache
+function readFetchDataCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.data)) return null;
+    return parsed;
+  } catch (err) {
+    console.warn("readFetchDataCache error:", err);
+    return null;
+  }
+}
+
+// helper: write cache
+function writeFetchDataCache(data, meta = {}) {
+  try {
+    const payload = {
+      ts: Date.now(),
+      data: Array.isArray(data) ? data : [],
+      meta
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
+  } catch (err) {
+    console.warn("writeFetchDataCache error:", err);
+  }
+}
+
+// helper: populate global fetchData array (keeps original reference)
+function populateFetchData(arr) {
+  fetchData.length = 0;
+  fetchData.push(...arr);
+}
+
+// Try to fetch sequentially from fetchURLs; returns array or throws
+async function fetchFromNetwork() {
   shuffle(fetchURLs);
   for (const u of fetchURLs) {
     try {
       console.log("🔎 Trying to fetch URL list from:", u);
-      const r = await fetch(u);
+      const r = await fetch(u, { cache: "no-store" }); // no-store to avoid browser HTTP cache interference
       if (!r.ok) throw new Error("HTTP " + r.status);
       const data = await r.json();
       if (Array.isArray(data) && data.length) {
-        fetchData.length = 0;
-        fetchData.push(...data);
-        console.log("✅ Loaded", data.length, "URLs from", u);
-        return;
+        console.log("✅ Network loaded", data.length, "URLs from", u);
+        return { data, source: u };
       }
     } catch (err) {
       console.warn("⚠ Failed to load", u, err && err.message);
     }
   }
-  console.warn("⚠ Using fallback URLs:", fetchData.length);
+  throw new Error("All network fetches failed");
+}
+
+// The updated function you should use
+async function updateDefaultURLs() {
+  // 1) Try to read cache
+  const cache = readFetchDataCache();
+  const now = Date.now();
+
+  if (cache && Array.isArray(cache.data) && cache.data.length) {
+    const age = now - (cache.ts || 0);
+    populateFetchData(cache.data);
+    console.log(`📥 Loaded ${cache.data.length} URLs from cache (age ${Math.round(age/1000)}s)`);
+
+    // If cache is still fresh -> done (but still attempt background refresh if it is older than half TTL)
+    if (age < CACHE_TTL_MS) {
+      // background refresh if older than half TTL to keep things relatively fresh
+      if (age > CACHE_TTL_MS / 2) {
+        (async () => {
+          try {
+            const net = await fetchFromNetwork();
+            writeFetchDataCache(net.data, { source: net.source });
+            populateFetchData(net.data);
+            console.log("🔄 Background refresh succeeded - cache updated");
+          } catch (err) {
+            console.warn("🔄 Background refresh failed:", err && err.message);
+          }
+        })();
+      }
+      return;
+    }
+
+    // Cache exists but expired -> attempt to refresh immediately, if fails keep expired cache
+    try {
+      const net = await fetchFromNetwork();
+      writeFetchDataCache(net.data, { source: net.source });
+      populateFetchData(net.data);
+      console.log("🔃 Expired cache replaced with fresh network data");
+      return;
+    } catch (err) {
+      console.warn("⚠ Network refresh failed; using expired cache as fallback:", err && err.message);
+      return;
+    }
+  }
+
+  // 2) No cache -> fetch from network and save
+  try {
+    const net = await fetchFromNetwork();
+    writeFetchDataCache(net.data, { source: net.source });
+    populateFetchData(net.data);
+    console.log("✅ Loaded URLs from network and cached them");
+    return;
+  } catch (err) {
+    console.warn("❌ All fetches failed and no cache available:", err && err.message);
+    // leave fetchData as-is (your existing fallback array remains)
+    return;
+  }
 }
 
 function generateTargetURL() {
