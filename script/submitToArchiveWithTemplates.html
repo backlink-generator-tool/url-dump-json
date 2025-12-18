@@ -542,16 +542,35 @@ const shortArchiveCodes = [
 	"b37o1l"
 ];
 const templates = [
-    "https://archive.st/?error=Archived&URL=[ENCODE_URL]&short=[SHORT_CODE]",
-  	"https://megalodon.jp/pc/main?url=[ENCODE_URL]",
-	"[SUBDOMAIN]"
+    [
+		"https://archive.st/?error=Archived&URL=[ENCODE_URL]&short=[SHORT_CODE]"
+    ],
+    [
+        "https://megalodon.jp/pc/main?url=[ENCODE_URL]"
+    ],
+    [
+		"https://check.claydy.com/da/www/[HOST]",
+		"https://check.claydy.com/de/www/[HOST]",
+		"https://check.claydy.com/en/www/[HOST]",
+		"https://check.claydy.com/es/www/[HOST]",
+		"https://check.claydy.com/fr/www/[HOST]",
+		"https://check.claydy.com/it/www/[HOST]",
+		"https://check.claydy.com/nl/www/[HOST]",
+		"https://check.claydy.com/pt/www/[HOST]",
+		"https://check.claydy.com/fi/www/[HOST]",
+		"https://check.claydy.com/sv/www/[HOST]",
+		"https://check.claydy.com/ru/www/[HOST]"
+    ]
 ];
 
 function generateTargetURL() {
   if (!fetchData.length) return "";
   
   const normUrl = randomURL(fetchData);
-  const template = randomURL(templates);
+
+  // fix: use existing 'templates' variable (was 'chatURLs' which is undefined)
+  const randomTemplateArray = templates[Math.floor(Math.random() * (templates.length || 1)) || 0];
+  const template = randomURL(randomTemplateArray);
   
   const finalUrl = generateUrl(template, normUrl);
   
@@ -613,18 +632,6 @@ const ARCHIVE_SITES = [
           extraParams: { anyway: "1" }
         }
     ]
-	/*
-    [
-        {
-          name: "GhostArchive",
-          //action: "https://ghostarchive.org/archive2",
-          action: "https://ghostarchive.org/archive",
-          method: "POST",
-          inputName: "archive",
-          extraParams: {}
-        }
-    ]
-	*/
 ];
 
 function chooseRandomArchive() {
@@ -735,16 +742,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.warn("updateDefaultURLs() failed:", e && e.message);
   }
 
-/*
-  if (inIframe()) {
-	const container = ensureContainer();
-    for (let i = 0; i < IFRAME_COUNT; i++) {
-      createIframe(i, container);
-    }
-  } else {
-    submitToArchiveRedirect(generateTargetURL());
-  }
-*/
 	const container = ensureContainer();
     for (let i = 0; i < IFRAME_COUNT; i++) {
       createIframe(i, container);
