@@ -1129,7 +1129,39 @@ const chatURLs = [
 ];
 
   const FETCH_URLS = [
-        "https://seoquickbacklink.blogspot.com/"
+        "https://seoquickbacklink.blogspot.com/",
+        "https://linkboosttool.blogspot.com/",
+        "https://seobacklinkboosters.blogspot.com/",
+        "https://linkbuilderzone.blogspot.com/",
+        "https://oneclickbacklinks.blogspot.com/",
+        "https://quicklinkseo.blogspot.com/",
+        "https://boostbacklinkspro.blogspot.com/",
+        "https://seobacklinkprotool.blogspot.com/",
+        "https://linkrankpro.blogspot.com/",
+        "https://probacklinkgen.blogspot.com/",
+        "https://linkpowerbuilder.blogspot.com/",
+        "https://boostbacklinksfree.blogspot.com/",
+        "https://seoboostpanel.blogspot.com/",
+        "https://turboindexbot.blogspot.com/",
+        "https://fastbacklinkbuilder.blogspot.com/",
+        "https://instantbacklinkbuilder.blogspot.com/",
+        "https://easybacklinklab.blogspot.com/",
+        "https://rankboostertool.blogspot.com/",
+        "https://rankrocketbacklinks.blogspot.com/",
+        "https://pingmysitenow.blogspot.com/",
+        "https://linkbuildermaster.blogspot.com/",
+        "https://linkbuildermachine.blogspot.com/",
+        "https://clicktobacklink.blogspot.com/",
+        "https://backlinkrampage.blogspot.com/",
+        "https://backlinkfleet.blogspot.com/",
+        "https://autolinkvelocity.blogspot.com/",
+        "https://backlinkpowerhouse.blogspot.com/",
+        "https://rapidbacklinker.blogspot.com/",
+        "https://one-click-backlinks.blogspot.com/",
+        "https://ultimatebacklinktool.blogspot.com/",
+        "https://rapidseobacklinks.blogspot.com/",
+        "https://backlinkbuilderhub.blogspot.com/",
+        "https://instantseolinks.blogspot.com/"
   ];
 
   const fetchIds = [
@@ -1141,7 +1173,6 @@ function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Ma
 function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
 function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
 
-  /*
   // Fetch JSON → override PIN_IDS
   shuffle(fetchIds);
 
@@ -1163,8 +1194,6 @@ function randomURL(array){ return array[Math.floor(Math.random()*array.length)];
       console.warn("⚠ Failed:", url, e);
     }
   }
-  */
-  await updateDefaultURLs(fetchIds, FETCH_URLS);
 
   // Expand into full URLs
   const output = [];
