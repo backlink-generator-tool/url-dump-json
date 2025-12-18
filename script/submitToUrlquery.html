@@ -46,8 +46,8 @@ const fetchURLs = [
 	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
 ];
 
-const IFRAME_COUNT = 8;
-const SUBMIT_INTERVAL = 60000; // 60s
+const IFRAME_COUNT = 4;
+const SUBMIT_INTERVAL = 30000; // 60s
 
 function isValidURL(url) {
   const pattern = /^https?:\/\/[^\s]+$/i;
@@ -419,223 +419,34 @@ function generateUrl(tpl, normUrl) {
 }
 
 
-const shortArchiveCodes = [
-	"ukoob9",
-	"a6clw0",
-	"z0ymol",
-	"yvklwa",
-	"mulldj",
-	"m8ix6c",
-	"j27wsc",
-	"wexhwe",
-	"4wtsed",
-	"rrxb5f",
-	"43i8f6",
-	"toytti",
-	"2plxxt",
-	"vhev1e",
-	"1bt8ew",
-	"iw7otm",
-	"y4levc",
-	"nfewxi",
-	"93b0ab",
-	"y0vei5",
-	"ou4avq",
-	"92ua6u",
-	"b5yh3i",
-	"g5ua0e",
-	"byeg58",
-	"tsy7a0",
-	"r47bfm",
-	"qfpf1n",
-	"88qmdi",
-	"o0n0bj",
-	"p8ljkr",
-	"ah1aim",
-	"wx39nj",
-	"gzbtpn",
-	"iy9vj5",
-	"qt24fs",
-	"ichp0i",
-	"htpr6t",
-	"68zbuf",
-	"8v9j3g",
-	"jss18o",
-	"6vtohx",
-	"chtd69",
-	"2vw3md",
-	"etanja",
-	"jpx7dd",
-	"rwhnyi",
-	"qtrlca",
-	"eryks6",
-	"tnh7bh",
-	"ypou27",
-	"jkt2qj",
-	"r1jv5u",
-	"oyf3e9",
-	"13cqwd",
-	"nitgds",
-	"83dnt5",
-	"gka46z",
-	"kv5jcg",
-	"t54mi5",
-	"jhkony",
-	"exzm53",
-	"yxe8pz",
-	"t2qv7y",
-	"f3dskz",
-	"76tamp",
-	"j9serx",
-	"6fyob2",
-	"rcidm3",
-	"71uuwd",
-	"ez28gv",
-	"mtzu5q",
-	"o0sesq",
-	"1chzyu",
-	"9l84cd",
-	"dmx0uw",
-	"uyorfm",
-	"jyz5bn",
-	"e1ez7f",
-	"r2ogk2",
-	"9h3qto",
-	"bpc06n",
-	"kekkke",
-	"jnw3si",
-	"w786lb",
-	"9o9dpp",
-	"me81wr",
-	"b4ycbg",
-	"no1w0t",
-	"3pkjja",
-	"s8pavi",
-	"irtkwh",
-	"e6fr1d",
-	"pfihdn",
-	"znbc6z",
-	"tvpeji",
-	"vo3xmf",
-	"lj5vl7",
-	"sfq6l6",
-	"r4q30r",
-	"n4iwn3",
-	"ygaf02",
-	"vnwkbv",
-	"1350k6",
-	"4dy40x",
-	"8kjx45",
-	"yoesax",
-	"e7lws5",
-	"pnz2q6",
-	"5u6rvq",
-	"wamr80",
-	"zgwe4e",
-	"9mc7yf",
-	"m3oyxg",
-	"w1n4iq",
-	"5pk90k",
-	"sqi3e4",
-	"i56htv",
-	"71vymo",
-	"b37o1l"
-];
-const templates = [
-    [
-		"https://archive.st/?error=Archived&URL=[ENCODE_URL]&short=[SHORT_CODE]"
-    ],
-    [
-        "https://megalodon.jp/pc/main?url=[ENCODE_URL]"
-    ],
-    [
-		"https://check.claydy.com/da/www/[HOST]",
-		"https://check.claydy.com/de/www/[HOST]",
-		"https://check.claydy.com/en/www/[HOST]",
-		"https://check.claydy.com/es/www/[HOST]",
-		"https://check.claydy.com/fr/www/[HOST]",
-		"https://check.claydy.com/it/www/[HOST]",
-		"https://check.claydy.com/nl/www/[HOST]",
-		"https://check.claydy.com/pt/www/[HOST]",
-		"https://check.claydy.com/fi/www/[HOST]",
-		"https://check.claydy.com/sv/www/[HOST]",
-		"https://check.claydy.com/ru/www/[HOST]"
-    ]
-];
-
 function generateTargetURL() {
   if (!fetchData.length) return "";
   
   const normUrl = randomURL(fetchData);
 
-  // fix: use existing 'templates' variable (was 'chatURLs' which is undefined)
-  const randomTemplateArray = templates[Math.floor(Math.random() * (templates.length || 1)) || 0];
-  const template = randomURL(randomTemplateArray);
-  
+/*
   const finalUrl = generateUrl(template, normUrl);
-  
   return normalizeURL(finalUrl);
+*/
+	
+  return normalizeURL(normUrl);
 }
 
 /* Archive site definitions */
-const ARCHIVE_SITES = [
+const SUBMIT_SITES = [
     [
         {
-          name: "Wayback",
-          action: "https://web.archive.org/save",
+          name: "urlquery",
+          action: "https://urlquery.net/",
           method: "POST",
           inputName: "url",
           extraParams: {}
         }
-    ],
-    [
-        {
-          name: "archive.today",
-          action: "https://archive.today/submit/",
-          method: "GET",
-          inputName: "url",
-          extraParams: { anyway: "1" }
-        },
-        {
-          name: "archive.li",
-          action: "https://archive.today/submit/",
-          method: "GET",
-          inputName: "url",
-          extraParams: { anyway: "1" }
-        },
-        {
-          name: "archive.vn",
-          action: "https://archive.today/submit/",
-          method: "GET",
-          inputName: "url",
-          extraParams: { anyway: "1" }
-        },
-        {
-          name: "archive.fo",
-          action: "https://archive.today/submit/",
-          method: "GET",
-          inputName: "url",
-          extraParams: { anyway: "1" }
-        },
-        {
-          name: "archive.md",
-          action: "https://archive.today/submit/",
-          method: "GET",
-          inputName: "url",
-          extraParams: { anyway: "1" }
-        },
-        {
-          name: "archive.ph",
-          action: "https://archive.today/submit/",
-          method: "GET",
-          inputName: "url",
-          extraParams: { anyway: "1" }
-        }
     ]
 ];
 
-function chooseRandomArchive() {
-     const randomArray = ARCHIVE_SITES[Math.floor(Math.random() * ARCHIVE_SITES.length)];
+function chooseRandomSubmitSite() {
+     const randomArray = SUBMIT_SITES[Math.floor(Math.random() * SUBMIT_SITES.length)];
      return randomArray[Math.floor(Math.random() * randomArray.length)];
 }
 
@@ -686,7 +497,7 @@ function submitToArchiveInFrame(iframe) {
       console.warn("⚠ Skipping invalid target:", targetUrl);
       return;
     }
-    const site = chooseRandomArchive();
+    const site = chooseRandomSubmitSite();
     buildAndSubmitArchiveForm(site, targetUrl, iframe.name);
   } catch (err) {
     console.error("❌ submitToArchiveInFrame error:", err);
@@ -723,7 +534,7 @@ function submitToArchiveRedirect(url) {
     console.warn("⚠ Invalid or empty URL for redirect submission:", url);
     return;
   }
-  const site = chooseRandomArchive();
+  const site = chooseRandomSubmitSite();
   buildAndSubmitArchiveForm(site, url, "_self");
 }
 
