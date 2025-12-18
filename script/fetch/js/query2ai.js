@@ -1173,6 +1173,7 @@ function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Ma
 function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
 function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
 
+  /*
   // Fetch JSON → override PIN_IDS
   shuffle(fetchIds);
 
@@ -1194,6 +1195,8 @@ function randomURL(array){ return array[Math.floor(Math.random()*array.length)];
       console.warn("⚠ Failed:", url, e);
     }
   }
+  */
+  await updateDefaultURLs(fetchIds, FETCH_URLS);
 
   // Expand into full URLs
   const output = [];
