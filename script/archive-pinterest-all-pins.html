@@ -102,7 +102,14 @@ const pinterestURLs = [
     "https://kr.pinterest.com/pin/"
 ];
 	
-const WAYBACK_SAVE_ENDPOINT = "https://web.archive.org/save";
+const WAYBACK_SAVE_ENDPOINTS = [
+      "https://web.archive.org/save"
+     
+      //"https://web.archive.org/save",
+      //"https://web.archive.org/",
+      //"https://web.archive.org/web/*/",
+      //"https://web.archive.org/web/"
+  ];;
 const IFRAME_COUNT = 4;
 const SUBMIT_INTERVAL = 60000;
 
@@ -248,7 +255,7 @@ function submitToWaybackInFrame(iframe) {
     form.style.display = "none";
     form.target = iframe.name;
     form.method = "POST";
-    form.action = WAYBACK_SAVE_ENDPOINT;
+    form.action = randomURL(WAYBACK_SAVE_ENDPOINTS);
     form.className = "web-save-form";
     const input = document.createElement("input");
     input.type = "hidden";
