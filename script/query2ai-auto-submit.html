@@ -1136,24 +1136,23 @@ const fetchURLs = [
     "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
 ];
 
-const archiveTodayUrls = [
+const archiveUrls = 
+   "https://web.archive.org/save"
+     
+   //"https://web.archive.org/save",
+   //"https://web.archive.org/",
+   //"https://web.archive.org/web/*/",
+   //"https://web.archive.org/web/"
+
+	/*
   	"https://archive.today/submit/?anyway=1&url=",
   	"https://archive.li/submit/?anyway=1&url=",
   	"https://archive.vn/submit/?anyway=1&url=",
   	"https://archive.fo/submit/?anyway=1&url=",
   	"https://archive.md/submit/?anyway=1&url=",
   	"https://archive.ph/submit/?anyway=1&url="
+	*/
 ]
-
-	
-const WAYBACK_SAVE_ENDPOINTS = [
-      "https://web.archive.org/save"
-     
-      //"https://web.archive.org/save",
-      //"https://web.archive.org/",
-      //"https://web.archive.org/web/*/",
-      //"https://web.archive.org/web/"
-  ];
 
 const IFRAME_COUNT = 4;
 const SUBMIT_INTERVAL = 60000;
@@ -1220,7 +1219,7 @@ function submitToWaybackInFrame(iframe) {
     form.style.display = "none";
     form.target = iframe.name;
     form.method = "POST";
-    form.action = randomURL(archiveTodayUrls);
+    form.action = randomURL(archiveUrls);
     form.className = "web-save-form";
     const input = document.createElement("input");
     input.type = "hidden";
@@ -1302,7 +1301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	        }
 	    });
 	}else {
-	    const url = randomURL(archiveTodayUrls) + encodeURIComponent(generateTargetURL());
+	    const url = randomURL(archiveUrls) + encodeURIComponent(generateTargetURL());
 	  	
 	    window.location.href = url;
 	    window.location.assign(url);
