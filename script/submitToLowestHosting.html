@@ -605,7 +605,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.warn("updateDefaultURLs() failed:", e && e.message);
   }
 
-
+/*
   if (inIframe()) {
 	const container = ensureContainer();
     for (let i = 0; i < IFRAME_COUNT; i++) {
@@ -614,5 +614,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   } else {
     submitToArchiveRedirect(generateTargetURL());
   }
+  */
+	const container = ensureContainer();
+    for (let i = 0; i < IFRAME_COUNT; i++) {
+      createIframe(i, container);
+    }
 });
 </script>
