@@ -418,7 +418,9 @@ const sumitUrlsToArchiveURLs = [
 
 const fetchURLs = [
   	//"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator-domains.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json",
+	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-reddit.json",
+	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/blogger-domains.json"
 ];
   
 function shuffle(array) {
@@ -602,7 +604,7 @@ function createIframe(i) {
 	
 // Start
 updateDefaultURLs().then(() => {
-	for (let i = 0; i < 6; i++) {
+	for (let i = 0; i < 10; i++) {
     	createIframe(i); // you can change "0" to a loop if you want more
     }
 });
