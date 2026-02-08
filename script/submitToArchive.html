@@ -614,14 +614,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-  if (inIframe()) {
+/*
+if (inIframe()) {
 	const container = ensureContainer();
-    for (let i = 0; i < IFRAME_COUNT; i++) {
-      createIframe(i, container);
+	for (let i = 0; i < IFRAME_COUNT; i++) {
+		createIframe(i, container);
     }
-  } else {
-    submitToArchiveRedirect(generateTargetURL());
-  }
+} else {
+	submitToArchiveRedirect(generateTargetURL());
+}
+*/
+const container = ensureContainer();
+for (let i = 0; i < IFRAME_COUNT; i++) {
+	createIframe(i, container);
+}
+	
 });
 </script>
 
