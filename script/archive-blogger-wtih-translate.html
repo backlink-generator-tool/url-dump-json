@@ -17,6 +17,10 @@
 </script>
 <!---------------------------------------------------------->
 
+
+
+<!---------------------------------------------------------->
+
 <div id="stealthIFrameContainer"></div>
 <script>
 const googleTranslateUrls = [
@@ -287,21 +291,16 @@ const fetchData = [
 const fetchURLs = [
   "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
 ];
-const WAYBACK_SAVE_ENDPOINTS = [
-      "https://web.archive.org/save"
-     
-      //"https://web.archive.org/save",
-      //"https://web.archive.org/",
-      //"https://web.archive.org/web/*/",
-      //"https://web.archive.org/web/"
-  ];
+const WAYBACK_SAVE_ENDPOINT = "https://web.archive.org/save/{{URL}}";
 const IFRAME_COUNT = 4;
 const SUBMIT_INTERVAL = 60000*3;
 
+// Simple URL check (basic regex)
 function isValidURL(url) {
-  const pattern = /^https?:\/\/[^\s]+$/i;
-  return pattern.test(url);
+    const pattern = /^https?:\/\/[^\s]+$/i;
+    return pattern.test(url);
 }
+
 function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
 function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
 function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
@@ -327,6 +326,16 @@ async function updateDefaultURLs() {
   console.warn("⚠ Using fallback URLs:", fetchData.length);
 }
 
+	
+
+function getSubdomain(url) {
+  const hostname = new URL(url).hostname;          // linkboosttool.blogspot.com
+  const parts = hostname.split('.');               // ["linkboosttool", "blogspot", "com"]
+
+  // return first part only (the subdomain)
+  return parts.length > 2 ? parts[0] : null;
+}
+
 /*
 function generateTargetURL() {
   if (!fetchData.length) return "";
@@ -337,23 +346,18 @@ function generateTargetURL() {
 }
 */
   
-// Get random URL from random sub-array, retry until valid
 function generateTargetURL() {
-    while (true) {
-        // pick random sub-array
-        const randomArray = archiveURLs[Math.floor(Math.random() * archiveURLs.length)];
+	const languageCode  = randomURL(languageCodes);
+	const translateUrl  = randomURL(googleTranslateUrls).replace(/{{LANGUAGE_CODES}}/g, languageCode)
+	
+    const url = randomURL(fetchData);
+	const subdomain = getSubdomain(url);
+	
+	const submitUrl = translateUrl.replace(/{{SUBDOMAIN}}/g, subdomain);
 
-        if (!Array.isArray(randomArray) || randomArray.length === 0) continue;
-
-        // pick random URL inside it
-        const url = randomArray[Math.floor(Math.random() * randomArray.length)];
-
-        // validate and return
-        if (isValidURL(url)) {
-            return url;
-        }
-    }
+    return submitUrl;
 }
+
   
 
 function submitToWaybackInFrame(iframe) {
@@ -367,7 +371,7 @@ function submitToWaybackInFrame(iframe) {
     form.style.display = "none";
     form.target = iframe.name;
     form.method = "POST";
-    form.action = randomURL(WAYBACK_SAVE_ENDPOINTS);
+    form.action = WAYBACK_SAVE_ENDPOINT;
     form.className = "web-save-form";
     const input = document.createElement("input");
     input.type = "hidden";
