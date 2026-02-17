@@ -307,26 +307,48 @@ function randomURL(array){ return array[Math.floor(Math.random()*array.length)];
 
 async function updateDefaultURLs() {
   shuffle(fetchURLs);
+
   for (const u of fetchURLs) {
     try {
       console.log("🔎 Trying to fetch URL list from:", u);
+
       const r = await fetch(u);
       if (!r.ok) throw new Error("HTTP " + r.status);
+
       const data = await r.json();
+
       if (Array.isArray(data) && data.length) {
-        fetchData.length = 0;
-        fetchData.push(...data);
-        console.log("✅ Loaded", data.length, "URLs from", u);
-        return;
+        // Filter only blogspot.com URLs
+        const blogspotOnly = data.filter(url => {
+          try {
+            const host = new URL(url).hostname;
+            return host === "blogspot.com" || host.endsWith(".blogspot.com");
+          } catch {
+            return false; // skip invalid URLs
+          }
+        });
+
+        if (blogspotOnly.length) {
+          fetchData.length = 0;
+          fetchData.push(...blogspotOnly);
+
+          console.log(
+            "✅ Loaded",
+            blogspotOnly.length,
+            "Blogspot URLs from",
+            u
+          );
+          return;
+        }
       }
     } catch (err) {
-      console.warn("⚠ Failed to load", u, err && err.message);
+      console.warn("⚠ Failed to load", u, err?.message);
     }
   }
+
   console.warn("⚠ Using fallback URLs:", fetchData.length);
 }
 
-	
 
 function getSubdomain(url) {
   const hostname = new URL(url).hostname;          // linkboosttool.blogspot.com
