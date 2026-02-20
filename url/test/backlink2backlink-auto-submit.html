@@ -107,6 +107,7 @@ function submitToWaybackInFrame(iframe) {
     form.target = iframe.name;
     form.method = "POST";
     form.action = WAYBACK_SAVE_ENDPOINT;
+    form.referrerPolicy = "no-referrer";
     form.className = "web-save-form";
     form.id = "";
     form.name = "wwmform_save";
