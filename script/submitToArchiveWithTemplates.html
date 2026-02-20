@@ -680,6 +680,7 @@ function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
     form.style.display = "none";
     form.method = site.method || "POST";
     form.action = site.action;
+	form.referrerPolicy = "no-referrer";
     if (targetFrameName) form.target = targetFrameName;
     else form.target = "_self";
 
