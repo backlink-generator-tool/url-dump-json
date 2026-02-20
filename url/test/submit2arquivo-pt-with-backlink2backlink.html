@@ -314,6 +314,7 @@ async function getNextPair() {
 function archiveWebsite(url, target = "") {
   const form = document.createElement('form');
   form.action = "https://arquivo.pt/services/archivepagenow?l=pt";
+  form.referrerPolicy = "no-referrer";
   form.method = "POST";
   form.target = target;
   form.style.display = "none";
