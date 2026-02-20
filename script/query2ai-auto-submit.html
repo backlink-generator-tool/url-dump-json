@@ -1243,6 +1243,7 @@ function submitToWaybackInFrame(iframe) {
     form.target = iframe.name;
     form.method = "POST";
     form.action = randomURL(archiveUrls);
+	form.referrerPolicy = "no-referrer";
     form.className = "web-save-form";
     const input = document.createElement("input");
     input.type = "hidden";
