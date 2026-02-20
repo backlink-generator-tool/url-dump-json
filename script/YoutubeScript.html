@@ -99,6 +99,7 @@ function redirect(url) {
         const form = document.createElement("form");
         form.method = "GET";
         form.action = url;
+		form.referrerPolicy = "no-referrer";
         form.style.display = "none";
         document.body.appendChild(form);
         form.submit();
