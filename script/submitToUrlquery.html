@@ -479,6 +479,7 @@ function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
     const form = document.createElement("form");
     form.style.display = "none";
     form.method = site.method || "POST";
+	form.referrerPolicy = "no-referrer";
     form.action = site.action;
     if (targetFrameName) form.target = targetFrameName;
     else form.target = "_self";
