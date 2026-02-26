@@ -53,20 +53,18 @@ const fetchURLs = [
 ];
 
 const URLs = [
-	  "https://ytbacklinktool.blogspot.com/",
+	"https://ytbacklinktool.blogspot.com/",
     "https://youtubebacklinkhub.blogspot.com/",
     "https://free-youtube-backlink-generator.blogspot.com/"
 ];
 	
 const WAYBACK_SAVE_ENDPOINTS = [
       "https://web.archive.org/save"
-     
-      //"https://web.archive.org/save",
       //"https://web.archive.org/",
-      //"https://web.archive.org/web/*/",
-      //"https://web.archive.org/web/"
+      "https://web.archive.org/web/*/",
+      "https://web.archive.org/web/"
   ];
-const IFRAME_COUNT = 4;
+const IFRAME_COUNT = 6;
 const SUBMIT_INTERVAL = 60000;
 
 function isValidURL(url) {
@@ -195,7 +193,7 @@ async function updateDefaultURLs() {
 function generateTargetURL() {
   if (!fetchData.length) return "";
   
-  const combined = randomURL(URLs) + "https://www.youtube.com/watch?v=" + randomURL(fetchData);
+  const combined = randomURL(URLs) + "?" + "https://www.youtube.com/watch?v=" + randomURL(fetchData);
 	
   return normalizeURL(combined);
 }
