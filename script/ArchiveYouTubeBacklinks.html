@@ -216,6 +216,26 @@ function submitToWaybackInFrame(iframe) {
     input.type = "hidden";
     input.name = "url";
     input.value = targetUrl;
+
+	// Helper function to create checkbox
+    function addCheckbox(name, checked = false) {
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = name;
+        checkbox.value = "1";
+        if (checked) checkbox.checked = true;
+        form.appendChild(checkbox);
+    }
+
+    // Add options
+    addCheckbox("capture_outlinks", true);
+    addCheckbox("capture_all", true); // default checked
+    addCheckbox("capture_screenshot", true);
+    addCheckbox("disable_adblocker");
+    addCheckbox("wm-save-mywebarchive", true);
+    addCheckbox("email_result");
+    addCheckbox("wacz");
+	  
     form.appendChild(input);
     document.body.appendChild(form);
 
