@@ -1189,8 +1189,12 @@ const chatURLs = [
   ];
 
   const fetchUrl = [
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-1.json"
+	  
+	/*
   	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-1.json",
   	"https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/pinterest-patch/patch-2.json"
+	*/
   ];
 
 function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
