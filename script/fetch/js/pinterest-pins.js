@@ -93,24 +93,7 @@
   	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-12.json",
   	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-13.json",
   	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-14.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-15.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-16.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-17.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-18.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-19.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-20.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-21.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-22.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-23.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-24.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-25.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-26.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-27.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-28.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-29.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-30.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-31.json",
-  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-32.json"
+  	"https://backlink-generator-tool.github.io/url-dump-json/url/pinterest-pins/pin-15.json"
   ];
 
   function shuffle(array) {
