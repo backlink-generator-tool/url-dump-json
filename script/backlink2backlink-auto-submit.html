@@ -291,7 +291,7 @@ function generateTargetURL() {
      ② URL-template — urlTemplate w/ [PLACEHOLDER] support, method: "GET_NAV"
    ============================================================ */
 const ARCHIVE_SITES = [
-  /* Wayback Machine: snapshot via POST */
+ /* Wayback Machine: snapshot via POST (standard) */
   [
     {
       name: "Wayback POST",
@@ -301,8 +301,13 @@ const ARCHIVE_SITES = [
       extraParams: {}
     }
   ],
-  /* Wayback Machine: viewer URL-templates (GET_NAV — navigates iframe directly) */
+  /* Wayback Machine: viewer + save-path URL-templates (navigates iframe directly) */
   [
+    {
+      name: "Wayback Save Path",
+      urlTemplate: "https://web.archive.org/save/[ENCODE_URL]",
+      method: "GET_NAV"
+    },
     {
       name: "Wayback CDX View",
       urlTemplate: "https://web.archive.org/web/*/[ENCODE_URL]",
