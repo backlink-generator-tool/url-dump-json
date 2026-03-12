@@ -1129,7 +1129,7 @@ const chatURLs = [
 ];
 
   const PINTEREST_DOMAINS = [
-	  "https://www.pinterest.com/",
+	  "https://www.pinterest.com",
     "https://www.pinterest.at/",
     "https://www.pinterest.be/",
     "https://www.pinterest.ca/",
@@ -1164,22 +1164,22 @@ const chatURLs = [
     "https://www.pinterest.co.kr/",
     "https://www.pinterest.com.au/",
     "https://www.pinterest.com.mx/",
-    "https://ar.pinterest.com/",
-    "https://uk.pinterest.com/",
-    "https://fr.pinterest.com/",
-    "https://de.pinterest.com/",
-    "https://es.pinterest.com/",
-    "https://it.pinterest.com/",
-    "https://au.pinterest.com/",
-    "https://dk.pinterest.com/",
-    "https://pt.pinterest.com/",
-    "https://ru.pinterest.com/",
-    "https://jp.pinterest.com/",
-    "https://cl.pinterest.com/",
-    "https://co.pinterest.com/",
-    "https://nl.pinterest.com/",
-    "https://in.pinterest.com/",
-    "https://kr.pinterest.com/"
+    "https://ar.pinterest.com",
+    "https://uk.pinterest.com",
+    "https://fr.pinterest.com",
+    "https://de.pinterest.com",
+    "https://es.pinterest.com",
+    "https://it.pinterest.com",
+    "https://au.pinterest.com",
+    "https://dk.pinterest.com",
+    "https://pt.pinterest.com",
+    "https://ru.pinterest.com",
+    "https://jp.pinterest.com",
+    "https://cl.pinterest.com",
+    "https://co.pinterest.com",
+    "https://nl.pinterest.com",
+    "https://in.pinterest.com",
+    "https://kr.pinterest.com"
   ];
 
   const FETCH_DATA = [
