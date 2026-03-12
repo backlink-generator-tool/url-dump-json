@@ -2,6 +2,7 @@
 
 <!---------------------------------------------------------->
 
+
 <script>
 /* Injects a stealthIFrameContainer into the current page (no need for a manual <div>)
    Supports random submissions to web.archive.org, ghostarchive.org, and archive.today.
@@ -386,15 +387,39 @@ function generateTargetURL() {
   return normalizeURL(combined);
 }
 
-/* Archive site definitions */
+/* Archive site definitions
+   Supports two entry shapes:
+   1. Form-submit shape  — has `action`, `method`, `inputName`, `extraParams`
+   2. URL-template shape — has `urlTemplate` containing {{URL}} placeholder;
+      the iframe is navigated directly (no form needed).
+      Use method: "GET_NAV" to distinguish from form entries.
+*/
 const ARCHIVE_SITES = [
     [
         {
-          name: "Wayback",
+          name: "Wayback POST",
           action: "https://web.archive.org/save",
           method: "POST",
           inputName: "url",
           extraParams: {}
+        },
+        {
+          name: "Wayback Search",
+          action: "https://archive.org/search",
+          method: "GET",
+          inputName: "query",
+          extraParams: {}
+        },
+        /* ── NEW: Wayback viewer URL-template entries ── */
+        {
+          name: "Wayback CDX View",
+          urlTemplate: "https://web.archive.org/web/*/{{URL}}",
+          method: "GET_NAV"
+        },
+        {
+          name: "Wayback Direct View",
+          urlTemplate: "https://web.archive.org/web/{{URL}}",
+          method: "GET_NAV"
         }
     ]
 /*
@@ -519,6 +544,16 @@ function submitToArchiveInFrame(iframe) {
       return;
     }
     const site = chooseRandomArchive();
+
+    /* ── URL-template (GET_NAV) path ── */
+    if (site.method === "GET_NAV" && site.urlTemplate) {
+      const resolved = site.urlTemplate.replace("{{URL}}", encodeURIComponent(targetUrl));
+      console.log(`🔗 Navigating iframe ${iframe.name} → ${site.name}: ${resolved}`);
+      iframe.src = resolved;
+      return;
+    }
+
+    /* ── Normal form-submit path ── */
     buildAndSubmitArchiveForm(site, targetUrl, iframe.name);
   } catch (err) {
     console.error("❌ submitToArchiveInFrame error:", err);
@@ -592,6 +627,8 @@ for (let i = 0; i < IFRAME_COUNT; i++) {
 	
 });
 </script>
+
+
 
 <!---------------------------------------------------------->
 <div id="container">
