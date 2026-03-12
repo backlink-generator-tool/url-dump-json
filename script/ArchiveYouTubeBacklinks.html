@@ -320,7 +320,7 @@ async function updateDefaultURLs() {
   if (cache && cache.data.length) {
     const age = now - (cache.ts || 0);
     populateFetchData(cache.data);
-    console.log(`📥 Loaded ${cache.data.length} YouTube IDs from cache (age ${Math.round(age/1000)}s)`);
+    console.log(`📥 Loaded ${cache.data.length} IDs from cache (age ${Math.round(age/1000)}s)`);
 
     if (age < CACHE_TTL_MS) {
       if (age > CACHE_TTL_MS / 2) {
@@ -351,7 +351,7 @@ async function updateDefaultURLs() {
     const net = await fetchFromNetwork();
     writeFetchDataCache(net.data, { source: net.source });
     populateFetchData(net.data);
-    console.log("✅ Loaded YouTube IDs from network and cached them");
+    console.log("✅ Loaded IDs from network and cached them");
   } catch (err) {
     console.warn("❌ All fetches failed and no cache available:", err && err.message);
   }
@@ -422,18 +422,24 @@ function generateUrl(tpl, normUrl) {
   return replacePlaceholders(tpl, buildMap(normUrl));
 }
 
-/* generateTargetURL — blogger URL + YouTube watch URL as query param
-   e.g. https://ytbacklinktool.blogspot.com/?https://www.youtube.com/watch?v=Zpy1tCC2XrA */
+/* generateTargetURL — blogspot URL + YouTube watch URL as query param
+   (unique to this file — preserved exactly) */
 function generateTargetURL() {
   if (!fetchData.length) return "";
-  return normalizeURL(randomURL(URLs) + "?" + "https://www.youtube.com/watch?v=" + randomURL(fetchData));
+  return normalizeURL(
+    randomURL(URLs) + "?" + "https://www.youtube.com/watch?v=" + randomURL(fetchData)
+  );
 }
 
 /* ============================================================
      Archive site definitions
      ① Form-submit  — action, method (POST|GET), inputName, extraParams,
-                       extraCheckboxes (checked checkboxes, unique to Wayback)
+                      checkboxParams (optional) — name → checked bool
      ② URL-template — urlTemplate w/ [PLACEHOLDER] support, method: "GET_NAV"
+
+     checkboxParams is unique to this file: Wayback's extended save options
+     (capture_outlinks, capture_all, capture_screenshot, etc.) are submitted
+     as checked checkboxes alongside the URL field.
    ============================================================ */
 const ARCHIVE_SITES = [
   /* Wayback Machine: full snapshot POST with capture options */
@@ -444,25 +450,27 @@ const ARCHIVE_SITES = [
       method: "POST",
       inputName: "url",
       extraParams: {},
-      /* Checked checkboxes sent alongside the URL — unique to this file */
-      extraCheckboxes: [
-        "capture_outlinks",
-        "capture_all",
-        "capture_screenshot",
-        "wm-save-mywebarchive"
-      ]
+      checkboxParams: {
+        "capture_outlinks":      true,
+        "capture_all":           true,
+        "capture_screenshot":    true,
+        "disable_adblocker":     false,
+        "wm-save-mywebarchive":  true,
+        "email_result":          false,
+        "wacz":                  false
+      }
     }
   ],
   /* Wayback Machine: viewer URL-templates (navigates iframe directly) */
   [
     {
       name: "Wayback CDX View",
-      urlTemplate: "https://web.archive.org/web/*/[ENCODE_URL]",
+      urlTemplate: "https://web.archive.org/web/*/[URL]",
       method: "GET_NAV"
     },
     {
       name: "Wayback Direct View",
-      urlTemplate: "https://web.archive.org/web/[ENCODE_URL]",
+      urlTemplate: "https://web.archive.org/web/[URL]",
       method: "GET_NAV"
     }
   ]
@@ -489,13 +497,14 @@ function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
     form.referrerPolicy = "no-referrer";
     form.target         = targetFrameName || "_self";
 
+    /* Primary URL field */
     const urlInput  = document.createElement("input");
     urlInput.type   = (site.method === "GET") ? "text" : "hidden";
     urlInput.name   = site.inputName || "url";
     urlInput.value  = targetUrl;
     form.appendChild(urlInput);
 
-    /* Standard hidden key/value params */
+    /* Hidden extra params */
     if (site.extraParams) {
       for (const [k, v] of Object.entries(site.extraParams)) {
         const inp = document.createElement("input");
@@ -504,14 +513,14 @@ function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
       }
     }
 
-    /* Checked checkboxes (Wayback capture options) */
-    if (Array.isArray(site.extraCheckboxes)) {
-      for (const name of site.extraCheckboxes) {
-        const cb = document.createElement("input");
+    /* Checkbox params — unique to this file's Wayback capture options */
+    if (site.checkboxParams) {
+      for (const [k, checked] of Object.entries(site.checkboxParams)) {
+        const cb   = document.createElement("input");
         cb.type    = "checkbox";
-        cb.name    = name;
+        cb.name    = k;
         cb.value   = "1";
-        cb.checked = true;
+        cb.checked = !!checked;
         form.appendChild(cb);
       }
     }
@@ -598,256 +607,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   */
   for (let i = 0; i < IFRAME_COUNT; i++) createIframe(i);
-});
-</script>
-
-// helper: read cache
-function readFetchDataCache() {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || !Array.isArray(parsed.data)) return null;
-    return parsed;
-  } catch (err) {
-    console.warn("readFetchDataCache error:", err);
-    return null;
-  }
-}
-
-// helper: write cache
-function writeFetchDataCache(data, meta = {}) {
-  try {
-    const payload = {
-      ts: Date.now(),
-      data: Array.isArray(data) ? data : [],
-      meta
-    };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
-  } catch (err) {
-    console.warn("writeFetchDataCache error:", err);
-  }
-}
-
-// helper: populate global fetchData array (keeps original reference)
-function populateFetchData(arr) {
-  fetchData.length = 0;
-  fetchData.push(...arr);
-}
-
-// Try to fetch sequentially from fetchURLs; returns array or throws
-async function fetchFromNetwork() {
-  shuffle(fetchURLs);
-  for (const u of fetchURLs) {
-    try {
-      console.log("🔎 Trying to fetch URL list from:", u);
-      const r = await fetch(u, { cache: "no-store" }); // no-store to avoid browser HTTP cache interference
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      const data = await r.json();
-      if (Array.isArray(data) && data.length) {
-        console.log("✅ Network loaded", data.length, "URLs from", u);
-        return { data, source: u };
-      }
-    } catch (err) {
-      console.warn("⚠ Failed to load", u, err && err.message);
-    }
-  }
-  throw new Error("All network fetches failed");
-}
-
-// The updated function you should use
-async function updateDefaultURLs() {
-  // 1) Try to read cache
-  const cache = readFetchDataCache();
-  const now = Date.now();
-
-  if (cache && Array.isArray(cache.data) && cache.data.length) {
-    const age = now - (cache.ts || 0);
-    populateFetchData(cache.data);
-    console.log(`📥 Loaded ${cache.data.length} URLs from cache (age ${Math.round(age/1000)}s)`);
-
-    // If cache is still fresh -> done (but still attempt background refresh if it is older than half TTL)
-    if (age < CACHE_TTL_MS) {
-      // background refresh if older than half TTL to keep things relatively fresh
-      if (age > CACHE_TTL_MS / 2) {
-        (async () => {
-          try {
-            const net = await fetchFromNetwork();
-            writeFetchDataCache(net.data, { source: net.source });
-            populateFetchData(net.data);
-            console.log("🔄 Background refresh succeeded - cache updated");
-          } catch (err) {
-            console.warn("🔄 Background refresh failed:", err && err.message);
-          }
-        })();
-      }
-      return;
-    }
-
-    // Cache exists but expired -> attempt to refresh immediately, if fails keep expired cache
-    try {
-      const net = await fetchFromNetwork();
-      writeFetchDataCache(net.data, { source: net.source });
-      populateFetchData(net.data);
-      console.log("🔃 Expired cache replaced with fresh network data");
-      return;
-    } catch (err) {
-      console.warn("⚠ Network refresh failed; using expired cache as fallback:", err && err.message);
-      return;
-    }
-  }
-
-  // 2) No cache -> fetch from network and save
-  try {
-    const net = await fetchFromNetwork();
-    writeFetchDataCache(net.data, { source: net.source });
-    populateFetchData(net.data);
-    console.log("✅ Loaded URLs from network and cached them");
-    return;
-  } catch (err) {
-    console.warn("❌ All fetches failed and no cache available:", err && err.message);
-    // leave fetchData as-is (your existing fallback array remains)
-    return;
-  }
-}
-
-
-function generateTargetURL() {
-  if (!fetchData.length) return "";
-  
-  const combined = randomURL(URLs) + "?" + "https://www.youtube.com/watch?v=" + randomURL(fetchData);
-	
-  return normalizeURL(combined);
-}
-
-function submitToWaybackInFrame(iframe) {
-  try {
-    const targetUrl = generateTargetURL();
-    if (!targetUrl || !isValidURL(targetUrl)) {
-      console.warn("⚠ Skipping invalid target:", targetUrl);
-      return;
-    }
-    const form = document.createElement("form");
-    form.style.display = "none";
-    form.target = iframe.name;
-    form.method = "POST";
-    form.action = "https://web.archive.org/save";
-	form.referrerPolicy = "no-referrer";
-    form.className = "web-save-form";
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = "url";
-    input.value = targetUrl;
-
-	// Helper function to create checkbox
-    function addCheckbox(name, checked = false) {
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.name = name;
-        checkbox.value = "1";
-        if (checked) checkbox.checked = true;
-        form.appendChild(checkbox);
-    }
-
-    // Add options
-    addCheckbox("capture_outlinks", true);
-    addCheckbox("capture_all", true); // default checked
-    addCheckbox("capture_screenshot", true);
-    addCheckbox("disable_adblocker");
-    addCheckbox("wm-save-mywebarchive", true);
-    addCheckbox("email_result");
-    addCheckbox("wacz");
-	  
-    form.appendChild(input);
-    document.body.appendChild(form);
-
-    console.log("📨 Submitting to Wayback in frame:", iframe.name, "target URL:", targetUrl);
-    form.submit();
-
-    // remove after a short delay to be safe
-    setTimeout(() => {
-      try { form.remove(); } catch(e) { /* ignore */ }
-    }, 1000);
-  } catch (err) {
-    console.error("❌ submitToWaybackInFrame error:", err);
-  }
-}
-
-function createIframe(i) {
-  try {
-    const iframe = document.createElement("iframe");
-    const fname = "hiddenFrame" + i;
-    iframe.setAttribute("name", fname);
-    iframe.setAttribute("id", fname);
-    iframe.classList.add("hidden-iframe");
-    // make it visible for debugging — remove border later if you want hidden
-    iframe.style.width = "100%";
-    iframe.style.height = "200px";
-    iframe.style.border = "2px dashed red"; // debug border — remove or change to display:none if desired
-    iframe.src = "about:blank";
-
-    const container = document.getElementById("stealthIFrameContainer");
-    container.appendChild(iframe);
-
-    // wait a little so iframe is attached, then submit
-    setTimeout(() => submitToWaybackInFrame(iframe), 250);
-
-    setInterval(() => {
-      console.log("⏱ Interval firing for iframe:", fname);
-      submitToWaybackInFrame(iframe);
-    }, SUBMIT_INTERVAL);
-  } catch (err) {
-    console.error("❌ createIframe error:", err);
-  }
-}
-
-function inIframe() {
-  try {
-    return window.self !== window.top;
-  } catch (e) {
-    // Accessing window.top threw an error → must be in an iframe
-    return true;
-  }
-}
-
-/* Ensure container exists (defensive) */
-if (!document.getElementById("stealthIFrameContainer")) {
-  const c = document.createElement("div");
-  c.id = "stealthIFrameContainer";
-  document.body.appendChild(c);
-  console.log("➕ Created missing stealthIFrameContainer.");
-}
-
-/* Run startup after DOM ready */
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    await updateDefaultURLs();
-  } catch (e) {
-    console.warn("updateDefaultURLs() failed:", e && e.message);
-  }
-
-	/*
-	if(inIframe()){
-	    updateDefaultURLs().then(() => {
-	        for (let i = 0; i < IFRAME_COUNT; i++) {
-	            createIframe(i);
-	        }
-	    });
-	}else {
-	    const url = randomURL(archiveTodayUrls) + encodeURIComponent(generateTargetURL());
-	  	
-	    window.location.href = url;
-	    window.location.assign(url);
-	    window.location.replace(url);
-	    window.location = url;
-	    document.location = url;
-	    window.open(url, "_self"); // behaves like redirect
-	}
-	*/
-	 updateDefaultURLs().then(() => {
-	        for (let i = 0; i < IFRAME_COUNT; i++) {
-	            createIframe(i);
-	        }
-	 });
 });
 </script>
