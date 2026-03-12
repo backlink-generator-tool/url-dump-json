@@ -663,17 +663,40 @@ function generateTargetURL() {
   return normalizeURL(finalUrl);
 }
 
-/* Archive site definitions */
+/* Archive site definitions
+   Two entry shapes supported:
+   ① Form-submit  — fields: action, method (POST|GET), inputName, extraParams
+   ② URL-template — fields: urlTemplate (uses same [PLACEHOLDER] / {{PLACEHOLDER}} engine
+                             as the `templates` array above), method: "GET_NAV"
+                    The iframe is navigated directly; no form is created.
+                    [URL] / [ENCODE_URL] refer to the already-resolved targetUrl.
+*/
 const ARCHIVE_SITES = [
+    /* ── Wayback Machine: form POST (save/snapshot) ── */
     [
         {
-          name: "Wayback",
+          name: "Wayback POST",
           action: "https://web.archive.org/save",
           method: "POST",
           inputName: "url",
           extraParams: {}
         }
+    ],
+
+    /* ── Wayback Machine: viewer URL-templates (GET_NAV) ── */
+    [
+        {
+          name: "Wayback CDX View",
+          urlTemplate: "https://web.archive.org/web/*/[ENCODE_URL]",
+          method: "GET_NAV"
+        },
+        {
+          name: "Wayback Direct View",
+          urlTemplate: "https://web.archive.org/web/[ENCODE_URL]",
+          method: "GET_NAV"
+        }
     ]
+
 	/*
     [
         {
@@ -776,6 +799,16 @@ function submitToArchiveInFrame(iframe) {
       return;
     }
     const site = chooseRandomArchive();
+
+    /* ── URL-template (GET_NAV) path — reuses the existing generateUrl() engine ── */
+    if (site.method === "GET_NAV" && site.urlTemplate) {
+      const resolved = generateUrl(site.urlTemplate, targetUrl);
+      console.log(`🔗 Navigating iframe ${iframe.name} → ${site.name}: ${resolved}`);
+      iframe.src = resolved;
+      return;
+    }
+
+    /* ── Normal form-submit path ── */
     buildAndSubmitArchiveForm(site, targetUrl, iframe.name);
   } catch (err) {
     console.error("❌ submitToArchiveInFrame error:", err);
