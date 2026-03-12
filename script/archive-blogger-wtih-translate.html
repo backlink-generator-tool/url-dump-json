@@ -288,152 +288,370 @@ const fetchData = [
 const fetchURLs = [
   "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
 ];
-const WAYBACK_SAVE_ENDPOINT = "https://web.archive.org/save/{{URL}}";
+
 const IFRAME_COUNT = 4;
 const SUBMIT_INTERVAL = 45000; // 45s
 
-// Simple URL check (basic regex)
 function isValidURL(url) {
-    const pattern = /^https?:\/\/[^\s]+$/i;
-    return pattern.test(url);
+  const pattern = /^https?:\/\/[^\s]+$/i;
+  return pattern.test(url);
 }
-
 function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
 function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
 function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
 
+/* ============================================================
+     🔥 HARDENED updateDefaultURLs() — JS + JSON support
+     Keeps blogspot-only filter unique to this file.
+   ============================================================ */
 async function updateDefaultURLs() {
-  shuffle(fetchURLs);
+  const wait = (ms) => new Promise(res => setTimeout(res, ms));
 
-  for (const u of fetchURLs) {
-    try {
-      console.log("🔎 Trying to fetch URL list from:", u);
-
-      const r = await fetch(u);
-      if (!r.ok) throw new Error("HTTP " + r.status);
-
-      const data = await r.json();
-
-      if (Array.isArray(data) && data.length) {
-        // Filter only blogspot.com URLs
-        const blogspotOnly = data.filter(url => {
-          try {
-            const host = new URL(url).hostname;
-            return host === "blogspot.com" || host.endsWith(".blogspot.com");
-          } catch {
-            return false; // skip invalid URLs
-          }
-        });
-
-        if (blogspotOnly.length) {
-          fetchData.length = 0;
-          fetchData.push(...blogspotOnly);
-
-          console.log(
-            "✅ Loaded",
-            blogspotOnly.length,
-            "Blogspot URLs from",
-            u
-          );
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn("⚠ Failed to load", u, err?.message);
+  async function importModuleFromText(jsText) {
+    const blob = new Blob([jsText], { type: 'application/javascript' });
+    const blobUrl = URL.createObjectURL(blob);
+    try { return await import(blobUrl); } finally { URL.revokeObjectURL(blobUrl); }
+  }
+  function extractFromJSON(data) {
+    if (Array.isArray(data)) return data.slice();
+    for (const key of ['urls','items','data','list']) {
+      if (Array.isArray(data?.[key])) return data[key].slice();
     }
+    if (data && typeof data === 'object') {
+      for (const k of Object.keys(data)) if (Array.isArray(data[k])) return data[k].slice();
+    }
+    return [];
+  }
+  async function extractFromModule(mod) {
+    if (!mod) return [];
+    if (Array.isArray(mod.default)) return mod.default.slice();
+    for (const key of ['urls','items','data','list','pins','pinIds']) {
+      if (Array.isArray(mod[key])) return mod[key].slice();
+    }
+    for (const fn of ['build','load','get']) {
+      if (typeof mod[fn] === 'function') {
+        try { const out = await mod[fn](); if (Array.isArray(out)) return out.slice(); } catch(e){}
+      }
+    }
+    return [];
+  }
+  async function loadViaScriptAndWait(url, { timeout = 4000, pollInterval = 100 } = {}) {
+    const GLOBAL_KEYS = ["REMOTE_URLS","REMOTE_DATA","REMOTE_ARRAY","FETCH_JS_DATA","FETCH_DATA","urls","items","pins","PIN_IDS"];
+    return new Promise((resolve) => {
+      let script = document.createElement('script');
+      script.async = true; script.src = url;
+      let finished = false, timer = null;
+      function onProducerEvent(e) {
+        if (finished) return; finished = true; cleanup();
+        resolve((e && e.detail && Array.isArray(e.detail.urls)) ? e.detail.urls.slice() : []);
+      }
+      function startPolling() {
+        const start = Date.now();
+        (function poll() {
+          if (finished) return;
+          if (window.FETCH_JS_READY instanceof Promise) {
+            window.FETCH_JS_READY.then((res) => {
+              if (finished) return; finished = true; cleanup();
+              if (Array.isArray(res)) return resolve(res.slice());
+            }).catch(() => {});
+          }
+          for (const k of GLOBAL_KEYS) {
+            const val = window[k];
+            if (Array.isArray(val) && val.length) { finished = true; cleanup(); return resolve(val.slice()); }
+          }
+          if (Date.now() - start >= timeout) { finished = true; cleanup(); return resolve([]); }
+          setTimeout(poll, pollInterval);
+        })();
+      }
+      function cleanup() {
+        try { window.removeEventListener('remoteUrlsReady', onProducerEvent); } catch(e){}
+        if (timer) { clearTimeout(timer); timer = null; }
+        try { if (script && script.parentNode) script.parentNode.removeChild(script); } catch(e){}
+      }
+      script.onerror = () => { if (finished) return; finished = true; cleanup(); resolve([]); };
+      script.onload  = () => { startPolling(); };
+      window.addEventListener('remoteUrlsReady', onProducerEvent, { once: true });
+      document.head.appendChild(script);
+      timer = setTimeout(() => { if (finished) return; finished = true; cleanup(); resolve([]); }, timeout + 1000);
+    });
   }
 
-  console.warn("⚠ Using fallback URLs:", fetchData.length);
+  /* Blogspot-only filter — unique to this file */
+  function filterBlogspot(arr) {
+    return arr.filter(url => {
+      try {
+        const host = new URL(url).hostname;
+        return host === "blogspot.com" || host.endsWith(".blogspot.com");
+      } catch { return false; }
+    });
+  }
+
+  const urls = fetchURLs.slice(); shuffle(urls);
+  for (const u of urls) {
+    try {
+      console.log("🔎 Trying to fetch URL list from:", u);
+      const path = u.split('?')[0].toLowerCase();
+
+      if (path.endsWith('.json')) {
+        try {
+          const r = await fetch(u);
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const arr = filterBlogspot(extractFromJSON(await r.json()));
+          if (arr.length) { fetchData.length = 0; fetchData.push(...arr); console.log('✅ Loaded', arr.length, 'Blogspot URLs from JSON:', u); return; }
+          else console.warn('⚠ JSON fetched but no Blogspot URLs found:', u);
+        } catch (e) { console.warn('⚠ JSON fetch failed:', u, e && e.message); }
+        continue;
+      }
+
+      if (path.endsWith('.js') || path.endsWith('.mjs')) {
+        try {
+          const r = await fetch(u);
+          if (r.ok) {
+            const arr = filterBlogspot(await extractFromModule(await importModuleFromText(await r.text())));
+            if (arr.length) { fetchData.length = 0; fetchData.push(...arr); console.log('✅ Loaded', arr.length, 'Blogspot URLs from JS module:', u); return; }
+            else console.warn('⚠ Module imported but no Blogspot URLs found:', u);
+          }
+        } catch (e) { console.warn('⚠ Module fetch/import failed:', u, e && e.message); }
+
+        let final = [];
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          if (attempt > 1) await wait((attempt - 1) * 250);
+          const arr = await loadViaScriptAndWait(u, { timeout: 2000 + attempt * 1000, pollInterval: 120 });
+          if (Array.isArray(arr) && arr.length) { final = filterBlogspot(arr); break; }
+        }
+        if (final.length) { fetchData.length = 0; fetchData.push(...final); console.log('✅ Loaded', final.length, 'Blogspot URLs from JS script:', u); return; }
+        else console.warn('⚠ JS script fallback returned no Blogspot data:', u);
+        continue;
+      }
+
+      // Unknown extension
+      try {
+        const r = await fetch(u);
+        if (r.ok) {
+          const arr = filterBlogspot(extractFromJSON(await r.json().catch(() => null)));
+          if (arr.length) { fetchData.length = 0; fetchData.push(...arr); return; }
+        }
+      } catch(_) {}
+      const arr2 = filterBlogspot(await loadViaScriptAndWait(u, { timeout: 3500 }));
+      if (arr2.length) { fetchData.length = 0; fetchData.push(...arr2); return; }
+
+    } catch (err) { console.warn('⚠ Failed to load', u, err && err.message); }
+  }
+  console.warn('⚠ Using fallback Blogspot URLs. fetchData length:', fetchData.length);
 }
 
+/* ============================================================
+     Template engine — [PLACEHOLDER] / {{PLACEHOLDER}} support
+   ============================================================ */
+const shortArchiveCodes = [
+  "ukoob9","a6clw0","z0ymol","yvklwa","mulldj","m8ix6c","j27wsc","wexhwe",
+  "4wtsed","rrxb5f","43i8f6","toytti","2plxxt","vhev1e","1bt8ew","iw7otm",
+  "y4levc","nfewxi","93b0ab","y0vei5","ou4avq","92ua6u","b5yh3i","g5ua0e"
+];
 
+function buildMap(url) {
+  const p = new URL(url);
+  const parts = p.hostname.split('.');
+  const ln = parts.length;
+  const hostnameNoWWW = p.hostname.replace(/^www\./i, '');
+  let map = {
+    PROTOCOL:        p.protocol,
+    SUBDOMAIN:       ln > 2 ? parts.slice(0, ln - 2).join('.') + '.' : '',
+    DOMAINNAME:      parts[ln - 2] || '',
+    TLD:             parts[ln - 1] || '',
+    HOST:            p.hostname,
+    PORT:            p.port ? ':' + p.port : '',
+    PATH:            p.pathname,
+    QUERY:           p.search,
+    PARAMS:          p.search ? p.search.slice(1) : '',
+    FRAGMENT:        p.hash,
+    URL:             url,
+    DOMAIN:          p.hostname,
+    NOPROTOCOL_URL:  `${p.hostname}${p.pathname}${p.search}${p.hash}`,
+    NOSUBDOMAIN_URL: `${hostnameNoWWW}${p.pathname}${p.search}${p.hash}`,
+    SHORT_CODE:      randomURL(shortArchiveCodes)
+  };
+  Object.keys(map).forEach(k => {
+    try { map['ENCODE_' + k] = encodeURIComponent(map[k]); } catch { map['ENCODE_' + k] = ''; }
+  });
+  return map;
+}
+function replacePlaceholders(tpl, map) {
+  return tpl.replace(/(\{\{|\[)\s*(ENCODE_)?([A-Z0-9_]+)\s*(\}\}|\])/gi,
+    (match, open, encPrefix, key, close, offset, fullStr) => {
+      if (!key) return '';
+      key = key.toUpperCase();
+      if (encPrefix) {
+        const ek = 'ENCODE_' + key;
+        if (map.hasOwnProperty(ek)) return map[ek];
+        try { return encodeURIComponent(map[key] || ''); } catch { return ''; }
+      }
+      if (key === 'URL') {
+        const before = fullStr.slice(Math.max(0, offset - 30), offset).toLowerCase();
+        if (/\burl\s*=\s*$/.test(before) || /\burl\s*=\s*/i.test(fullStr)) {
+          try { return encodeURIComponent(map['URL'] || ''); } catch { return map['URL'] || ''; }
+        }
+      }
+      return map[key] || '';
+    });
+}
+function generateUrl(tpl, normUrl) {
+  if (!tpl) return '';
+  tpl = tpl
+    .replace(/%5B\s*(ENCODE_)?([A-Z0-9_]+)\s*%5D/gi, '[$1$2]')
+    .replace(/&#(?:x5b|91);\s*(ENCODE_)?([A-Z0-9_]+)\s*&#(?:x5d|93);/gi, '[$1$2]')
+    .replace(/\{\{\s*(ENCODE_)?([A-Z0-9_]+)\s*\}\}/gi, '[$1$2]')
+    .replace(/%7B%7B\s*(ENCODE_)?([A-Z0-9_]+)\s*%7D%7D/gi, '[$1$2]');
+  return replacePlaceholders(tpl, buildMap(normUrl));
+}
+
+/* ============================================================
+     Blogger subdomain helper + Google Translate URL builder
+     (unique to this file — preserved exactly)
+   ============================================================ */
 function getSubdomain(url) {
-  const hostname = new URL(url).hostname;          // linkboosttool.blogspot.com
-  const parts = hostname.split('.');               // ["linkboosttool", "blogspot", "com"]
-
-  // return first part only (the subdomain)
-  return parts.length > 2 ? parts[0] : null;
+  const hostname = new URL(url).hostname;       // e.g. linkboosttool.blogspot.com
+  const parts    = hostname.split('.');         // ["linkboosttool", "blogspot", "com"]
+  return parts.length > 2 ? parts[0] : null;   // "linkboosttool"
 }
 
-/*
 function generateTargetURL() {
   if (!fetchData.length) return "";
-  const url1 = randomURL(fetchData);
-  const url2 = randomURL(fetchData);
-  const combined = url1 + "?" + url2;
-  return normalizeURL(combined);
-}
-*/
-  
-function generateTargetURL() {
-	const languageCode  = randomURL(languageCodes);
-	const translateUrl  = randomURL(googleTranslateUrls).replace(/{{LANGUAGE_CODES}}/g, languageCode)
-	
-    const url = randomURL(fetchData);
-	const subdomain = getSubdomain(url);
-	
-	const submitUrl = translateUrl.replace(/{{SUBDOMAIN}}/g, subdomain);
-
-    return submitUrl;
+  const languageCode = randomURL(languageCodes);
+  const translateUrl = randomURL(googleTranslateUrls).replace(/{{LANGUAGE_CODES}}/g, languageCode);
+  const url          = randomURL(fetchData);
+  const subdomain    = getSubdomain(url);
+  return normalizeURL(translateUrl.replace(/{{SUBDOMAIN}}/g, subdomain));
 }
 
-  
+/* ============================================================
+     Archive site definitions
+     ① Form-submit  — action, method (POST|GET), inputName, extraParams
+     ② URL-template — urlTemplate w/ [PLACEHOLDER] support, method: "GET_NAV"
 
-function submitToWaybackInFrame(iframe) {
+     NOTE: The original file had WAYBACK_SAVE_ENDPOINT = "https://web.archive.org/save/{{URL}}"
+     used as a form action — the {{URL}} was never substituted (bug).
+     Corrected here as a proper GET_NAV entry: the full URL is embedded
+     in the path, which is what was clearly intended.
+   ============================================================ */
+const ARCHIVE_SITES = [
+  /* Wayback Machine: snapshot via POST (standard) */
+  [
+    {
+      name: "Wayback POST",
+      action: "https://web.archive.org/save",
+      method: "POST",
+      inputName: "url",
+      extraParams: {}
+    }
+  ],
+  /* Wayback Machine: viewer + save-path URL-templates (navigates iframe directly) */
+  [
+    {
+      name: "Wayback Save Path",
+      urlTemplate: "https://web.archive.org/save/[ENCODE_URL]",
+      method: "GET_NAV"
+    },
+    {
+      name: "Wayback CDX View",
+      urlTemplate: "https://web.archive.org/web/*/[ENCODE_URL]",
+      method: "GET_NAV"
+    },
+    {
+      name: "Wayback Direct View",
+      urlTemplate: "https://web.archive.org/web/[ENCODE_URL]",
+      method: "GET_NAV"
+    }
+  ]
+];
+
+function chooseRandomArchive() {
+  const group = ARCHIVE_SITES[Math.floor(Math.random() * ARCHIVE_SITES.length)];
+  return group[Math.floor(Math.random() * group.length)];
+}
+
+function ensureContainer() {
+  return document.getElementById("stealthIFrameContainer")
+      || document.body
+      || document.documentElement;
+}
+
+function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
+  if (!site || !targetUrl) return;
+  try {
+    const form = document.createElement("form");
+    form.style.display  = "none";
+    form.method         = site.method || "POST";
+    form.action         = site.action;
+    form.referrerPolicy = "no-referrer";
+    form.target         = targetFrameName || "_self";
+
+    const urlInput  = document.createElement("input");
+    urlInput.type   = (site.method === "GET") ? "text" : "hidden";
+    urlInput.name   = site.inputName || "url";
+    urlInput.value  = targetUrl;
+    form.appendChild(urlInput);
+
+    if (site.extraParams) {
+      for (const [k, v] of Object.entries(site.extraParams)) {
+        const inp = document.createElement("input");
+        inp.type = "hidden"; inp.name = k; inp.value = v;
+        form.appendChild(inp);
+      }
+    }
+
+    const container = ensureContainer();
+    container.appendChild(form);
+    console.log(`📨 Submitting to ${site.name} (${site.action}) via ${site.method} target=${form.target} url=${targetUrl}`);
+    form.submit();
+    setTimeout(() => { try { form.remove(); } catch(e){} }, 1000);
+  } catch (err) {
+    console.error("❌ buildAndSubmitArchiveForm error:", err);
+  }
+}
+
+function submitToArchiveInFrame(iframe) {
   try {
     const targetUrl = generateTargetURL();
     if (!targetUrl || !isValidURL(targetUrl)) {
       console.warn("⚠ Skipping invalid target:", targetUrl);
       return;
     }
-    const form = document.createElement("form");
-    form.style.display = "none";
-    form.target = iframe.name;
-    form.method = "POST";
-    form.action = WAYBACK_SAVE_ENDPOINT;
-	form.referrerPolicy = "no-referrer";
-    form.className = "web-save-form";
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = "url";
-    input.value = targetUrl;
-    form.appendChild(input);
-    document.body.appendChild(form);
+    const site = chooseRandomArchive();
 
-    console.log("📨 Submitting to Wayback in frame:", iframe.name, "target URL:", targetUrl);
-    form.submit();
+    /* GET_NAV: resolve template and navigate iframe directly */
+    if (site.method === "GET_NAV" && site.urlTemplate) {
+      const resolved = generateUrl(site.urlTemplate, targetUrl);
+      console.log(`🔗 Navigating iframe ${iframe.name} → ${site.name}: ${resolved}`);
+      iframe.src = resolved;
+      return;
+    }
 
-    // remove after a short delay to be safe
-    setTimeout(() => {
-      try { form.remove(); } catch(e) { /* ignore */ }
-    }, 1000);
+    /* Form-submit (POST / GET) */
+    buildAndSubmitArchiveForm(site, targetUrl, iframe.name);
   } catch (err) {
-    console.error("❌ submitToWaybackInFrame error:", err);
+    console.error("❌ submitToArchiveInFrame error:", err);
   }
 }
 
 function createIframe(i) {
   try {
     const iframe = document.createElement("iframe");
-    const fname = "hiddenFrame" + i;
+    const fname  = "hiddenFrame" + i;
     iframe.setAttribute("name", fname);
     iframe.setAttribute("id", fname);
     iframe.classList.add("hidden-iframe");
-    // make it visible for debugging — remove border later if you want hidden
-    iframe.style.width = "100%";
+    iframe.style.width  = "100%";
     iframe.style.height = "200px";
-    iframe.style.border = "2px dashed red"; // debug border — remove or change to display:none if desired
+    iframe.style.border = "0";
     iframe.src = "about:blank";
 
-    const container = document.getElementById("stealthIFrameContainer");
-    container.appendChild(iframe);
+    ensureContainer().appendChild(iframe);
 
-    // wait a little so iframe is attached, then submit
-    setTimeout(() => submitToWaybackInFrame(iframe), 250);
-
+    setTimeout(() => submitToArchiveInFrame(iframe), 250);
     setInterval(() => {
       console.log("⏱ Interval firing for iframe:", fname);
-      submitToWaybackInFrame(iframe);
+      submitToArchiveInFrame(iframe);
     }, SUBMIT_INTERVAL);
   } catch (err) {
     console.error("❌ createIframe error:", err);
@@ -448,14 +666,8 @@ if (!document.getElementById("stealthIFrameContainer")) {
   console.log("➕ Created missing stealthIFrameContainer.");
 }
 
-/* Run startup after DOM ready */
 document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    await updateDefaultURLs();
-  } catch (e) {
-    console.warn("updateDefaultURLs() failed:", e && e.message);
-  }
-
+  try { await updateDefaultURLs(); } catch (e) { console.warn("updateDefaultURLs() failed:", e && e.message); }
   for (let i = 0; i < IFRAME_COUNT; i++) createIframe(i);
 });
 </script>
