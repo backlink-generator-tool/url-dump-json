@@ -394,15 +394,37 @@ function generateTargetURL() {
       Use method: "GET_NAV" to distinguish from form entries.
 */
 const ARCHIVE_SITES = [
-    [
-        {
-          name: "Wikiwix",
-          action: "https://archive.wikiwix.com/cache/",
-          method: "GET",
-          inputName: "url",
-          extraParams: {}
-        }
-    ]
+	 [
+	    {
+	      name: "Wikiwix",
+	      action: "https://archive.wikiwix.com/cache/",
+	      method: "GET",
+	      inputName: "url",
+	      extraParams: {}
+	    }
+	  ]
+	/*
+	  /* Wayback Machine: snapshot via POST */
+	  [
+	    {
+	      name: "Wayback POST",
+	      action: "https://web.archive.org/save",
+	      method: "POST",
+	      inputName: "url",
+	      extraParams: {}
+	    }
+	  ],
+	  /* Wikiwix: snapshot via GET */
+	  [
+	    {
+	      name: "Wikiwix",
+	      action: "https://archive.wikiwix.com/cache/",
+	      method: "GET",
+	      inputName: "url",
+	      extraParams: {}
+	    }
+	  ]
+	*/
 ];
 
 function chooseRandomArchive() {
