@@ -1414,13 +1414,13 @@ function generateTargetURL() {
 const ARCHIVE_SITES = [
   /* Wayback Machine: snapshot via POST */
   [
-    {
+    	{
           name: "Wikiwix",
           action: "https://archive.wikiwix.com/cache/",
           method: "GET",
           inputName: "url",
           extraParams: {}
-    }
+        }
   ]
 ];
 
@@ -1532,7 +1532,14 @@ if (!document.getElementById("stealthIFrameContainer")) {
 document.addEventListener('DOMContentLoaded', async () => {
   try { await updateDefaultURLs(); } catch (e) { console.warn("updateDefaultURLs() failed:", e && e.message); }
 
-   const url = randomURL(archiveUrls) + encodeURIComponent(generateTargetURL());
-   window.location.replace(url);
+  /*
+  if (inIframe()) {
+    for (let i = 0; i < IFRAME_COUNT; i++) createIframe(i);
+  } else {
+    const url = randomURL(archiveUrls) + encodeURIComponent(generateTargetURL());
+    window.location.replace(url);
+  }
+  */
+  for (let i = 0; i < IFRAME_COUNT; i++) createIframe(i);
 });
 </script>
