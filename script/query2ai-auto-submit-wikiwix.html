@@ -17,7 +17,7 @@
 </script>
 <!---------------------------------------------------------->
 
-<div id="stealthIFrameContainer"></div>
+<div id="archiveFormContainer"></div>
 <script>
 // --- Data used to build targets (kept from your original)
 const searchQueries = [
@@ -1421,15 +1421,6 @@ const ARCHIVE_SITES = [
           inputName: "url",
           extraParams: {}
         }
-  ].
-	[
-    {
-      name: "Wayback POST",
-      action: "https://web.archive.org/save",
-      method: "POST",
-      inputName: "url",
-      extraParams: {}
-    }
   ]
 ];
 
@@ -1438,26 +1429,37 @@ function chooseRandomArchive() {
   return group[Math.floor(Math.random() * group.length)];
 }
 
-function ensureContainer() {
-  return document.getElementById("stealthIFrameContainer")
-      || document.body
-      || document.documentElement;
+/* ── GET helper: build full URL with inputName + extraParams as query string ── */
+function buildArchiveGetURL(site, targetUrl) {
+  const params = new URLSearchParams();
+  params.set(site.inputName || "url", targetUrl);
+  if (site.extraParams) {
+    for (const [k, v] of Object.entries(site.extraParams)) {
+      params.set(k, v);
+    }
+  }
+  return site.action + "?" + params.toString();
 }
 
-function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
+/* ── POST helper: create hidden form, append all fields, submit to _blank ── */
+function buildAndSubmitPostForm(site, targetUrl) {
   if (!site || !targetUrl) return;
   try {
+    const container = document.getElementById("archiveFormContainer")
+        || document.body
+        || document.documentElement;
+
     const form = document.createElement("form");
     form.style.display  = "none";
-    form.method         = site.method || "POST";
+    form.method         = "POST";
     form.action         = site.action;
     form.referrerPolicy = "no-referrer";
-    form.target         = targetFrameName || "_self";
+    form.target         = "_self";
 
-    const urlInput  = document.createElement("input");
-    urlInput.type   = (site.method === "GET") ? "text" : "hidden";
-    urlInput.name   = site.inputName || "url";
-    urlInput.value  = targetUrl;
+    const urlInput = document.createElement("input");
+    urlInput.type  = "hidden";
+    urlInput.name  = site.inputName || "url";
+    urlInput.value = targetUrl;
     form.appendChild(urlInput);
 
     if (site.extraParams) {
@@ -1468,17 +1470,17 @@ function buildAndSubmitArchiveForm(site, targetUrl, targetFrameName) {
       }
     }
 
-    const container = ensureContainer();
     container.appendChild(form);
-    console.log(`📨 Submitting to ${site.name} (${site.action}) via ${site.method} target=${form.target} url=${targetUrl}`);
+    console.log(`📨 POST submit → ${site.name} (${site.action}) url=${targetUrl}`);
     form.submit();
     setTimeout(() => { try { form.remove(); } catch(e){} }, 1000);
   } catch (err) {
-    console.error("❌ buildAndSubmitArchiveForm error:", err);
+    console.error("❌ buildAndSubmitPostForm error:", err);
   }
 }
 
-function submitToArchiveInFrame(iframe) {
+/* ── Main dispatch: GET → redirect, POST → form submit ── */
+function submitToArchive() {
   try {
     const targetUrl = generateTargetURL();
     if (!targetUrl || !isValidURL(targetUrl)) {
@@ -1487,42 +1489,41 @@ function submitToArchiveInFrame(iframe) {
     }
     const site = chooseRandomArchive();
 
-    /* GET_NAV: resolve template and navigate iframe directly */
+    /* GET_NAV: resolve URL template and redirect current window */
     if (site.method === "GET_NAV" && site.urlTemplate) {
       const resolved = generateUrl(site.urlTemplate, targetUrl);
-      console.log(`🔗 Navigating iframe ${iframe.name} → ${site.name}: ${resolved}`);
-      iframe.src = resolved;
+      console.log(`🔗 GET_NAV redirect → ${site.name}: ${resolved}`);
+      window.location.href = resolved;
       return;
     }
 
-    /* Form-submit (POST / GET) */
-    buildAndSubmitArchiveForm(site, targetUrl, iframe.name);
+    /* GET: build full URL with all params and redirect current window */
+    if (site.method === "GET") {
+      const fullUrl = buildArchiveGetURL(site, targetUrl);
+      console.log(`🔗 GET redirect → ${site.name}: ${fullUrl}`);
+      window.location.href = fullUrl;
+      return;
+    }
+
+    /* POST: submit hidden form targeting new tab */
+    if (site.method === "POST") {
+      buildAndSubmitPostForm(site, targetUrl);
+      return;
+    }
+
+    console.warn("⚠ Unknown method for site:", site.name, site.method);
   } catch (err) {
-    console.error("❌ submitToArchiveInFrame error:", err);
+    console.error("❌ submitToArchive error:", err);
   }
 }
 
-function createIframe(i) {
-  try {
-    const iframe = document.createElement("iframe");
-    const fname  = "hiddenFrame" + i;
-    iframe.setAttribute("name", fname);
-    iframe.setAttribute("id", fname);
-    iframe.classList.add("hidden-iframe");
-    iframe.style.width  = "100%";
-    iframe.style.height = "200px";
-    iframe.style.border = "0";
-    iframe.src = "about:blank";
-
-    ensureContainer().appendChild(iframe);
-
-    setTimeout(() => submitToArchiveInFrame(iframe), 250);
-    setInterval(() => {
-      console.log("⏱ Interval firing for iframe:", fname);
-      submitToArchiveInFrame(iframe);
-    }, SUBMIT_INTERVAL);
-  } catch (err) {
-    console.error("❌ createIframe error:", err);
+/* ── Schedule repeated submissions (replaces iframe creation) ── */
+function scheduleSubmissions() {
+  for (let i = 0; i < IFRAME_COUNT; i++) {
+    /* Stagger initial submissions by 250 ms per slot */
+    setTimeout(() => submitToArchive(), i * 250);
+    /* Then repeat each slot on its own interval */
+    setInterval(() => submitToArchive(), SUBMIT_INTERVAL);
   }
 }
 
@@ -1530,25 +1531,17 @@ function inIframe() {
   try { return window.self !== window.top; } catch (e) { return true; }
 }
 
-/* Ensure container exists (defensive) */
-if (!document.getElementById("stealthIFrameContainer")) {
+/* Ensure form container exists (defensive) */
+if (!document.getElementById("archiveFormContainer")) {
   const c = document.createElement("div");
-  c.id = "stealthIFrameContainer";
+  c.id = "archiveFormContainer";
   document.body.appendChild(c);
-  console.log("➕ Created missing stealthIFrameContainer.");
+  console.log("➕ Created missing archiveFormContainer.");
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   try { await updateDefaultURLs(); } catch (e) { console.warn("updateDefaultURLs() failed:", e && e.message); }
 
-  /*
-  if (inIframe()) {
-    for (let i = 0; i < IFRAME_COUNT; i++) createIframe(i);
-  } else {
-    const url = randomURL(archiveUrls) + encodeURIComponent(generateTargetURL());
-    window.location.replace(url);
-  }
-  */
-  for (let i = 0; i < IFRAME_COUNT; i++) createIframe(i);
+  scheduleSubmissions();
 });
 </script>
