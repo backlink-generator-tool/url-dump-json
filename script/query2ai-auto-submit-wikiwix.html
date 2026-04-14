@@ -1412,16 +1412,37 @@ function generateTargetURL() {
      ② URL-template — urlTemplate w/ [PLACEHOLDER] support, method: "GET_NAV"
    ============================================================ */
 const ARCHIVE_SITES = [
-  /* Wayback Machine: snapshot via POST */
-  [
-    	{
-          name: "Wikiwix",
-          action: "https://archive.wikiwix.com/cache/",
-          method: "GET",
-          inputName: "url",
-          extraParams: {}
-        }
-  ]
+	 [
+	    {
+	      name: "Wikiwix",
+	      action: "https://archive.wikiwix.com/cache/",
+	      method: "GET",
+	      inputName: "url",
+	      extraParams: {}
+	    }
+	  ]
+	/*
+	  /* Wayback Machine: snapshot via POST */
+	  [
+	    {
+	      name: "Wayback POST",
+	      action: "https://web.archive.org/save",
+	      method: "POST",
+	      inputName: "url",
+	      extraParams: {}
+	    }
+	  ],
+	  /* Wikiwix: snapshot via GET */
+	  [
+	    {
+	      name: "Wikiwix",
+	      action: "https://archive.wikiwix.com/cache/",
+	      method: "GET",
+	      inputName: "url",
+	      extraParams: {}
+	    }
+	  ]
+	*/
 ];
 
 function chooseRandomArchive() {
