@@ -1395,7 +1395,7 @@ function generateUrl(tpl, normUrl) {
 function generateTargetURL() {
   if (!fetchData.length) return "";
 
-  const url   = "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(randomURL(fetchData) + "?" + randomURL(fetchData));
+  const url   = randomURL(fetchData) + "?" + randomURL(fetchData);
   
   const query = (randomURL(searchQueries) || "").replace(/{{LINK}}/g, url);
 
@@ -1404,7 +1404,7 @@ function generateTargetURL() {
     .replace(/{{QUERY}}/g, query)
     .replace(/{{ENCODE_QUERY}}/g, encodeURIComponent(query || ""));
 
-  return normalizeURL(chatURL);
+  return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(normalizeURL(chatURL));
 }
 
 /* ============================================================
