@@ -1403,7 +1403,14 @@ function generateTargetURL() {
     .replace(/{{QUERY}}/g, query)
     .replace(/{{ENCODE_QUERY}}/g, encodeURIComponent(query || ""));
 
-  return normalizeURL(chatURL);
+  //return normalizeURL(chatURL);
+  const link = normalizeURL(chatURL);
+
+  if (Math.random() < 0.5) {
+    return link;
+  } else {
+    return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(link);
+  }
 }
 
 /* ============================================================
