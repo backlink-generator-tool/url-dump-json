@@ -26,8 +26,8 @@ const fetchURLs = [
   "https://backlink-generator-tool.github.io/url-dump-json/url/custom-urls/backlink-generator.json"
 ];
 
-const IFRAME_COUNT = 8;
-const SUBMIT_INTERVAL = 45000; // 45s
+const IFRAME_COUNT = 10;
+const SUBMIT_INTERVAL = 60000*2; // 45s
 
 function isValidURL(url) {
   const pattern = /^https?:\/\/[^\s]+$/i;
@@ -219,6 +219,39 @@ const templates = [
   ],
   [
     "https://archive.wikiwix.com/cache/?url=[ENCODE_URL]"
+  ],
+  [
+    "https://www.seoptimer.com/[HOST]"
+  ],
+  [
+    "https://website.grader.com/tests/[HOST]"
+  ],
+  [
+    "https://seositecheckup.com/seo-audit/[HOST]"
+  ],
+  [
+    "https://sitechecker.pro/app/main/seo-report?hiddenDelayPopup=true&tool=on-page-seo-checker&pageUrl=[ENCODE_URL]"
+  ],
+  [
+    "https://www.websiteauditserver.com/process-embedded.inc?type=pdf&uid=46847&behaviour=new_tab&template=0&domain=[ENCODE_URL]"
+  ],
+  [
+    "https://thehoth.websiteauditserver.com/process-embedded.inc?domain=[ENCODE_URL]"
+  ],
+  [
+    "https://pagespeed.web.dev/analysis?url=[ENCODE_URL]"
+  ],
+  [
+    "https://altovalleit.com/tools/website-analyzer/[HOST]"
+  ],
+  [
+    "https://theseotools.net/website-reviewer/[HOST]"
+  ],
+  [
+    "https://www.turboseotools.com/domain/[HOST]"
+  ],
+  [
+    "https://majestic.com/reports/site-explorer?q=[ENCODE_URL]"
   ]
 ];
 
@@ -285,7 +318,15 @@ function generateTargetURL() {
   if (!fetchData.length) return "";
   const normUrl = randomURL(fetchData);
   const randomTemplateArray = templates[Math.floor(Math.random() * templates.length)];
-  return normalizeURL(generateUrl(randomURL(randomTemplateArray), normUrl));
+	
+  //return normalizeURL(generateUrl(randomURL(randomTemplateArray), normUrl));
+  const url = normalizeURL(generateUrl(randomURL(randomTemplateArray), normUrl));
+	  
+  if (Math.random() < 0.5) {
+      return url;
+  } else {
+	  return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(url);
+  }
 }
 
 /* ============================================================
@@ -425,8 +466,24 @@ if (!document.getElementById("stealthIFrameContainer")) {
   console.log("➕ Created missing stealthIFrameContainer.");
 }
 
+/*
 document.addEventListener('DOMContentLoaded', async () => {
   try { await updateDefaultURLs(); } catch (e) { console.warn("updateDefaultURLs() failed:", e && e.message); }
   for (let i = 0; i < IFRAME_COUNT; i++) createIframe(i);
 });
+*/
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try { await updateDefaultURLs(); } catch (e) { console.warn("updateDefaultURLs() failed:", e && e.message); }
+
+  // ✅ Filter out .github.io URLs after loading
+  const before = fetchData.length;
+  fetchData.splice(0, fetchData.length, ...fetchData.filter(u => {
+    try { return !new URL(u).hostname.endsWith('.github.io'); } catch { return false; }
+  }));
+  console.log(`🧹 Filtered fetchData: ${before} → ${fetchData.length} URLs (.github.io removed)`);
+
+  for (let i = 0; i < IFRAME_COUNT; i++) createIframe(i);
+});
+	
 </script>
