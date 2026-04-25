@@ -278,7 +278,7 @@ const templates = [
     "https://isitdownorjustme.net/status/[HOST]"
   ],
   [
-    "https://api.urlscan.io/domain/like4likeexchange.blogspot.com"
+    "https://api.urlscan.io/domain/[HOST]"
   ],
   [
     "https://grafana.com/grot/?chat=[ENCODE_URL]"
@@ -412,6 +412,14 @@ const templates = [
   [
     "http://searchmana.com/?q=[ENCODE_URL]",
     "https://planet-search.com/search/?q=[ENCODE_URL]"
+  ],
+  [
+    "https://www.addtoany.com/share?linkurl=[ENCODE_URL]",
+    "https://www.addtoany.com/share?linkurl=[ENCODE_URL]&linkname=[ENCODE_URL]",
+    "https://www.addtoany.com/share?linkurl=[ENCODE_URL]&linkname=[HOST]"
+  ],
+  [
+    "https://www.onfry.com/social/?url=[HOST]"
   ]
 ];
 
