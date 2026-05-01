@@ -218,13 +218,11 @@ const templates = [
   [
     "https://neilpatel.com/seo-analyzer/analyze/?website=[HOST]&id=1772994022"
   ],
-  /*
   [
     "https://archive.wikiwix.com/cache/?url=[ENCODE_URL]",
 	"https://archive.wikiwix.com/cache/index.php?url=[ENCODE_URL]",
 	"https://archive.wikiwix.com/cache/index2.php?url=[ENCODE_URL]"
   ],
-  */
   [
     "https://www.seoptimer.com/[HOST]"
   ],
@@ -496,14 +494,12 @@ function generateTargetURL() {
 	
   //return normalizeURL(generateUrl(randomURL(randomTemplateArray), normUrl));
   const url = normalizeURL(generateUrl(randomURL(randomTemplateArray), normUrl));
-
-  /*
+	
   if (Math.random() < 0.5) {
       return url;
   } else {
 	  return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(url);
   }
-  */
 
   return url;
 }
