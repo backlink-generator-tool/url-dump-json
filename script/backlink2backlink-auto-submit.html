@@ -554,27 +554,6 @@ const ARCHIVE_SITES = [
       method: "POST",
       inputName: "url",
       extraParams: {}
-    },
-	{
-      name: "Wayback POST",
-      action: "http://web.archive.org/save",
-      method: "POST",
-      inputName: "url",
-      extraParams: {}
-    },
-	{
-      name: "Wayback POST",
-      action: "http://wayback.archive.org/save",
-      method: "POST",
-      inputName: "url",
-      extraParams: {}
-    },
-	{
-      name: "Wayback POST",
-      action: "https://wayback.archive.org/save",
-      method: "POST",
-      inputName: "url",
-      extraParams: {}
     }
   ],
   /* Wayback Machine: viewer + save-path URL-templates (navigates iframe directly) */
@@ -592,51 +571,6 @@ const ARCHIVE_SITES = [
     {
       name: "Wayback Direct View",
       urlTemplate: "https://web.archive.org/web/[URL]",
-      method: "GET_NAV"
-    },
-	{
-      name: "Wayback Save Path",
-      urlTemplate: "http://web.archive.org/save/[URL]",
-      method: "GET_NAV"
-    },
-    {
-      name: "Wayback CDX View",
-      urlTemplate: "http://web.archive.org/web/*/[URL]",
-      method: "GET_NAV"
-    },
-    {
-      name: "Wayback Direct View",
-      urlTemplate: "http://web.archive.org/web/[URL]",
-      method: "GET_NAV"
-    },
-    {
-      name: "Wayback Save Path",
-      urlTemplate: "https://wayback.archive.org/save/[URL]",
-      method: "GET_NAV"
-    },
-    {
-      name: "Wayback CDX View",
-      urlTemplate: "https://wayback.archive.org/web/*/[URL]",
-      method: "GET_NAV"
-    },
-    {
-      name: "Wayback Direct View",
-      urlTemplate: "https://wayback.archive.org/web/[URL]",
-      method: "GET_NAV"
-    },
-	{
-      name: "Wayback Save Path",
-      urlTemplate: "http://wayback.archive.org/save/[URL]",
-      method: "GET_NAV"
-    },
-    {
-      name: "Wayback CDX View",
-      urlTemplate: "http://wayback.archive.org/web/*/[URL]",
-      method: "GET_NAV"
-    },
-    {
-      name: "Wayback Direct View",
-      urlTemplate: "http://wayback.archive.org/web/[URL]",
       method: "GET_NAV"
     }
   ]
