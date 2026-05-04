@@ -519,12 +519,59 @@ function generateTargetURL() {
      ① Form-submit  — action, method (POST|GET), inputName, extraParams
      ② URL-template — urlTemplate w/ [PLACEHOLDER] support, method: "GET_NAV"
    ============================================================ */
+// ==UserScript==
+// @name	AutoSave to Internet Archive - Wayback Machine - Enhanced Edition
+// @namespace      Flare0n
+// @description    Automatically save the page you visited and all links on the page to the Internet Archive's Wayback Machine.
+// @version	1.0.3e
+// @match	*
+// @match	http://*
+// @match	https://*
+// @match	http://*/*
+// @match	https://*/*
+// @match	http://wayback.archive.org/web/*
+// @match	https://wayback.archive.org/web/*
+// @match	http://web.archive.org/web/*
+// @match	https://web.archive.org/web/*
+// @match	http://web.archive.org/save/*
+// @match	https://web.archive.org/save/*
+// @match	http://web.archive.org/record/*
+// @match	https://web.archive.org/record/*
+// @exclude     *google.com*
+// @exclude     *mail.google.com*
+// @exclude     *facebook.com*
+// @exclude     *gmail.com*
+// @exclude     *wormhole.app*
+// @grant	GM_xmlhttpRequest
+// @run-at document-start
+// ==/UserScript==
 const ARCHIVE_SITES = [
  /* Wayback Machine: snapshot via POST (standard) */
   [
     {
       name: "Wayback POST",
       action: "https://web.archive.org/save",
+      method: "POST",
+      inputName: "url",
+      extraParams: {}
+    },
+	{
+      name: "Wayback POST",
+      action: "http://web.archive.org/save",
+      method: "POST",
+      inputName: "url",
+      extraParams: {}
+    },
+	{
+      name: "Wayback POST",
+      action: "http://wayback.archive.org/save",
+      method: "POST",
+      inputName: "url",
+      extraParams: {}
+    },
+	{
+      name: "Wayback POST",
+      action: "https://wayback.archive.org/save",
       method: "POST",
       inputName: "url",
       extraParams: {}
@@ -545,6 +592,51 @@ const ARCHIVE_SITES = [
     {
       name: "Wayback Direct View",
       urlTemplate: "https://web.archive.org/web/[URL]",
+      method: "GET_NAV"
+    },
+	{
+      name: "Wayback Save Path",
+      urlTemplate: "http://web.archive.org/save/[URL]",
+      method: "GET_NAV"
+    },
+    {
+      name: "Wayback CDX View",
+      urlTemplate: "http://web.archive.org/web/*/[URL]",
+      method: "GET_NAV"
+    },
+    {
+      name: "Wayback Direct View",
+      urlTemplate: "http://web.archive.org/web/[URL]",
+      method: "GET_NAV"
+    },
+    {
+      name: "Wayback Save Path",
+      urlTemplate: "https://wayback.archive.org/save/[URL]",
+      method: "GET_NAV"
+    },
+    {
+      name: "Wayback CDX View",
+      urlTemplate: "https://wayback.archive.org/web/*/[URL]",
+      method: "GET_NAV"
+    },
+    {
+      name: "Wayback Direct View",
+      urlTemplate: "https://wayback.archive.org/web/[URL]",
+      method: "GET_NAV"
+    },
+	{
+      name: "Wayback Save Path",
+      urlTemplate: "http://wayback.archive.org/save/[URL]",
+      method: "GET_NAV"
+    },
+    {
+      name: "Wayback CDX View",
+      urlTemplate: "http://wayback.archive.org/web/*/[URL]",
+      method: "GET_NAV"
+    },
+    {
+      name: "Wayback Direct View",
+      urlTemplate: "http://wayback.archive.org/web/[URL]",
       method: "GET_NAV"
     }
   ]
