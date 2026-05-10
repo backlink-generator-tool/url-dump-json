@@ -502,7 +502,17 @@ function generateUrl(tpl, normUrl) {
     .replace(/&#(?:x5b|91);\s*(ENCODE_)?([A-Z0-9_]+)\s*&#(?:x5d|93);/gi, '[$1$2]')
     .replace(/\{\{\s*(ENCODE_)?([A-Z0-9_]+)\s*\}\}/gi, '[$1$2]')
     .replace(/%7B%7B\s*(ENCODE_)?([A-Z0-9_]+)\s*%7D%7D/gi, '[$1$2]');
-  return replacePlaceholders(tpl, buildMap(normUrl));
+
+  const url = replacePlaceholders(tpl, buildMap(normUrl));
+	
+  if (Math.random() < 0.5) {
+      return url;
+  } else {
+	  return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(url);
+  }
+
+  return url;
+	
 }
 
 /* ============================================================
