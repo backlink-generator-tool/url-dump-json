@@ -503,16 +503,7 @@ function generateUrl(tpl, normUrl) {
     .replace(/\{\{\s*(ENCODE_)?([A-Z0-9_]+)\s*\}\}/gi, '[$1$2]')
     .replace(/%7B%7B\s*(ENCODE_)?([A-Z0-9_]+)\s*%7D%7D/gi, '[$1$2]');
 
-  const url = replacePlaceholders(tpl, buildMap(normUrl));
-	
-  if (Math.random() < 0.5) {
-      return url;
-  } else {
-	  return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(url);
-  }
-
-  return url;
-	
+  return url replacePlaceholders(tpl, buildMap(normUrl));
 }
 
 /* ============================================================
@@ -531,7 +522,16 @@ function generateTargetURL() {
   const translateUrl = randomURL(googleTranslateUrls).replace(/{{LANGUAGE_CODES}}/g, languageCode);
   const url          = randomURL(fetchData);
   const subdomain    = getSubdomain(url);
-  return normalizeURL(translateUrl.replace(/{{SUBDOMAIN}}/g, subdomain));
+  
+  const url_ = normalizeURL(translateUrl.replace(/{{SUBDOMAIN}}/g, subdomain));
+	
+  if (Math.random() < 0.5) {
+      return url_;
+  } else {
+	  return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(url_);
+  }
+
+  return url;
 }
 
 /* ============================================================
@@ -564,12 +564,12 @@ const ARCHIVE_SITES = [
     },
     {
       name: "Wayback CDX View",
-      urlTemplate: "https://web.archive.org/web/*/[ENCODE_URL]",
+      urlTemplate: "https://web.archive.org/web/*/[URL]",
       method: "GET_NAV"
     },
     {
       name: "Wayback Direct View",
-      urlTemplate: "https://web.archive.org/web/[ENCODE_URL]",
+      urlTemplate: "https://web.archive.org/web/[URL]",
       method: "GET_NAV"
     }
   ]
