@@ -426,9 +426,18 @@ function generateUrl(tpl, normUrl) {
    (unique to this file — preserved exactly) */
 function generateTargetURL() {
   if (!fetchData.length) return "";
-  return normalizeURL(
-    randomURL(URLs) + "?" + "https://www.youtube.com/watch?v=" + randomURL(fetchData)
-  );
+	
+  //return normalizeURL( randomURL(URLs) + "?" + "https://www.youtube.com/watch?v=" + randomURL(fetchData));
+
+  const url = normalizeURL( randomURL(URLs) + "?" + "https://www.youtube.com/watch?v=" + randomURL(fetchData));
+	
+  if (Math.random() < 0.5) {
+      return url;
+  } else {
+	  return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(url);
+  }
+
+  return url;
 }
 
 /* ============================================================
