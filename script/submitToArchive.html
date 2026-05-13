@@ -547,7 +547,9 @@ function submitToArchiveInFrame(iframe) {
 
     /* ── URL-template (GET_NAV) path ── */
     if (site.method === "GET_NAV" && site.urlTemplate) {
-      const resolved = site.urlTemplate.replace("{{URL}}", encodeURIComponent(targetUrl));
+      const resolved = site.urlTemplate
+        .replace("{{ENCODE_URL}}", encodeURIComponent(targetUrl))
+        .replace("{{URL}}", targetUrl);
       console.log(`🔗 Navigating iframe ${iframe.name} → ${site.name}: ${resolved}`);
       iframe.src = resolved;
       return;
