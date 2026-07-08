@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Submit URLs to Wayback Machine</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: #222;
+  }
+  h1 { font-size: 1.4rem; }
+  #controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  button {
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid #888;
+    border-radius: 6px;
+    background: #f5f5f5;
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #status {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #444;
+  }
+  progress { width: 100%; margin: 10px 0; }
+  #frames {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .frame-box {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .frame-label {
+    font-family: monospace;
+    font-size: 11px;
+    background: #eee;
+    padding: 4px 8px;
+    word-break: break-all;
+  }
+  .frame-timer {
+    font-family: monospace;
+    font-size: 11px;
+    color: #666;
+    padding: 2px 8px;
+    background: #f7f7f7;
+  }
+  iframe {
+    width: 100%;
+    height: 260px;
+    border: none;
+    display: block;
+  }
+  #log {
+    font-family: monospace;
+    font-size: 12px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 6px;
+    margin-top: 16px;
+  }
+  .log-line { margin: 2px 0; }
+  .log-ok { color: #0a7d28; }
+  .log-err { color: #b3261e; }
+</style>
+</head>
+<body>
+
+<h1>Submit URLs to the Wayback Machine</h1>
+<p>187 URLs loaded as a static array. 4 iframes run in parallel, each one loading the next random URL 45 seconds after its previous load. Starts automatically on page load.</p>
+
+<div id="controls">
+  <button id="btn-start" disabled>Running automatically&hellip;</button>
+  <button id="btn-stop">Stop</button>
+</div>
+
+<progress id="progress" value="0" max="187"></progress>
+<div id="status">Starting&hellip;</div>
+
+<div id="frames">
+  <div class="frame-box">
+    <div class="frame-label" id="label-0">&mdash;</div>
+    <div class="frame-timer" id="timer-0">waiting&hellip;</div>
+    <iframe id="frame-0" title="Wayback save slot 1"></iframe>
+  </div>
+  <div class="frame-box">
+    <div class="frame-label" id="label-1">&mdash;</div>
+    <div class="frame-timer" id="timer-1">waiting&hellip;</div>
+    <iframe id="frame-1" title="Wayback save slot 2"></iframe>
+  </div>
+  <div class="frame-box">
+    <div class="frame-label" id="label-2">&mdash;</div>
+    <div class="frame-timer" id="timer-2">waiting&hellip;</div>
+    <iframe id="frame-2" title="Wayback save slot 3"></iframe>
+  </div>
+  <div class="frame-box">
+    <div class="frame-label" id="label-3">&mdash;</div>
+    <div class="frame-timer" id="timer-3">waiting&hellip;</div>
+    <iframe id="frame-3" title="Wayback save slot 4"></iframe>
+  </div>
+</div>
+
+<h3>Log</h3>
+<div id="log"></div>
+
+<script>
+  // Static array of URLs -- no fetch() involved.
+  const urls = [
+  "https://www.google.com/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ad/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ae/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.af/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.ag/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.al/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.am/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.ao/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.ar/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.as/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.at/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.au/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.az/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ba/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.bd/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.be/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.bf/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.bg/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.bh/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.bi/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.bj/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.bn/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.bo/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.br/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.bs/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.bt/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.bw/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.by/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.bz/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ca/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.cd/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.cf/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.cg/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ch/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ci/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.ck/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.cl/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.cm/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.cn/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.co/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.cr/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.cu/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.cv/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.cy/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.cz/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.de/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.dj/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.dk/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.dm/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.do/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.dz/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.ec/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ee/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.eg/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.es/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.et/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.fi/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.fj/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.fm/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.fr/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ga/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ge/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.gg/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.gh/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.gi/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.gl/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.gm/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.gr/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.gt/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.gy/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.hk/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.hn/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.hr/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ht/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.hu/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.id/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ie/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.il/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.im/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.in/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.iq/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.is/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.it/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.je/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.jm/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.jo/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.jp/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.ke/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.kh/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ki/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.kg/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.kr/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.kw/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.kz/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.la/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.lb/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.li/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.lk/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.ls/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.lt/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.lu/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.lv/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.ly/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.ma/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.md/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.me/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.mg/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.mk/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ml/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.mm/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.mn/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.mt/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.mu/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.mv/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.mw/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.mx/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.my/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.mz/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.na/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.ng/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.ni/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ne/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.nl/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.no/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.np/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.nr/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.nu/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.nz/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.om/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.pa/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.pe/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.pg/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.ph/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.pk/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.pl/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.pn/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.pr/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ps/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.pt/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.py/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.qa/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ro/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ru/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.rw/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.sa/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.sb/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.sc/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.se/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.sg/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.sh/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.si/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.sk/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.sl/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.sn/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.so/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.sm/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.sr/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.st/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.sv/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.td/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.tg/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.th/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.tj/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.tl/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.tm/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.tn/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.to/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.tr/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.tt/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.tw/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.tz/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.ua/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.ug/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.uk/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.uy/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.uz/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.vc/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.ve/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.vi/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.com.vn/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.vu/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.ws/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.rs/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.za/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.zm/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.co.zw/search?q=\"seekers+of+decay\"&udm=50",
+  "https://www.google.cat/search?q=\"seekers+of+decay\"&udm=50"
+];
+
+  const NUM_FRAMES = 4;
+  const WAIT_MS = 45000; // 45 seconds between loads, per iframe
+
+  const submitted = new Set();      // indices already submitted this session
+  let stopRequested = false;
+  let submittedCount = 0;
+
+  const statusEl = document.getElementById('status');
+  const logEl = document.getElementById('log');
+  const progressEl = document.getElementById('progress');
+  const btnStart = document.getElementById('btn-start');
+  const btnStop = document.getElementById('btn-stop');
+
+  function log(msg, isError) {
+    const line = document.createElement('div');
+    line.className = 'log-line ' + (isError ? 'log-err' : 'log-ok');
+    const time = new Date().toLocaleTimeString();
+    line.textContent = '[' + time + '] ' + msg;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function updateStatus() {
+    statusEl.textContent = urls.length + ' URLs loaded, ' + submittedCount + ' submitted this session.';
+    progressEl.value = Math.min(submittedCount, urls.length);
+  }
+
+  // Pick a random URL index that hasn't been submitted yet, if possible.
+  // Once everything has been submitted at least once, falls back to fully random.
+  function pickRandomIndex() {
+    const remaining = [];
+    for (let i = 0; i < urls.length; i++) {
+      if (!submitted.has(i)) remaining.push(i);
+    }
+    if (remaining.length === 0) {
+      return Math.floor(Math.random() * urls.length);
+    }
+    return remaining[Math.floor(Math.random() * remaining.length)];
+  }
+
+  function countdownTimer(slot, seconds) {
+    const timerEl = document.getElementById('timer-' + slot);
+    let remaining = seconds;
+    timerEl.textContent = 'next load in ' + remaining + 's';
+    const interval = setInterval(() => {
+      if (stopRequested) {
+        clearInterval(interval);
+        return;
+      }
+      remaining -= 1;
+      if (remaining <= 0) {
+        clearInterval(interval);
+      } else {
+        timerEl.textContent = 'next load in ' + remaining + 's';
+      }
+    }, 1000);
+  }
+
+  async function runSlot(slot) {
+    const frame = document.getElementById('frame-' + slot);
+    const label = document.getElementById('label-' + slot);
+
+    while (!stopRequested) {
+      const idx = pickRandomIndex();
+      const targetUrl = urls[idx];
+      const saveUrl = 'https://web.archive.org/save/' + targetUrl;
+
+      submitted.add(idx);
+      submittedCount += 1;
+      label.textContent = targetUrl;
+      frame.src = saveUrl;
+      log('Slot ' + (slot + 1) + ' submitted: ' + targetUrl);
+      updateStatus();
+
+      countdownTimer(slot, WAIT_MS / 1000);
+
+      await new Promise(res => setTimeout(res, WAIT_MS));
+    }
+    document.getElementById('timer-' + slot).textContent = 'stopped';
+  }
+
+  function startAll() {
+    stopRequested = false;
+    btnStart.disabled = true;
+    btnStop.disabled = false;
+    log('Starting ' + NUM_FRAMES + ' parallel slots, ' + (WAIT_MS / 1000) + 's between loads per slot.');
+    for (let s = 0; s < NUM_FRAMES; s++) {
+      // Stagger the initial start slightly so all 4 don't fire in the exact same tick
+      setTimeout(() => runSlot(s), s * 500);
+    }
+  }
+
+  btnStop.addEventListener('click', () => {
+    stopRequested = true;
+    btnStop.disabled = true;
+    btnStart.disabled = true;
+    log('Stop requested. Slots will halt after their current wait.', true);
+  });
+
+  updateStatus();
+  window.addEventListener('load', startAll);
+</script>
+
+</body>
+</html>
