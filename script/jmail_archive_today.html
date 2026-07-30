@@ -4512,6 +4512,15 @@
 
   const idx = pickRandomIndex();
   const targetUrl = setUrlParam(urls[idx], PARAM_KEY, pickRandomParamValue());
+
+  if (Math.random() < 0.5) {
+	  if (Math.random() < 0.5) {
+		  targetUrl = "https://cachedview.nl/#"+targetUrl;
+	  } else {
+		  targetUrl = "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(targetUrl);
+	  }
+  }
+	
   const submitUrl = ARCHIVE_TODAY_SUBMIT + encodeURIComponent(targetUrl);
 
   statusEl.textContent = 'Submitting: ' + targetUrl;
