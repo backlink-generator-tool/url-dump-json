@@ -4515,8 +4515,8 @@
 	let targetUrl = setUrlParam(urls[idx], PARAM_KEY, pickRandomParamValue());
 	if (Math.random() < 0.5) {
 	    if (Math.random() < 0.5) {
-	        //targetUrl = "https://cachedview.nl/#"+targetUrl;
-	        targetUrl = "https://cachedview.nl/?q="+encodeURIComponent(targetUrl)+"#"+targetUrl;
+	        targetUrl = "https://cachedview.nl/#"+targetUrl;
+	        //targetUrl = "https://cachedview.nl/?q="+encodeURIComponent(targetUrl)+"#"+targetUrl;
 	    } else {
 	        targetUrl = "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(targetUrl);
 	    }
