@@ -1409,7 +1409,11 @@ function generateTargetURL() {
   if (Math.random() < 0.5) {
     return link;
   } else {
-    return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(link);
+		if (Math.random() < 0.5) {
+	   		return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(link);
+		} else {
+			return "https://archive.wikiwix.com/cache/index2.php?url="+encodeURIComponent(link)+"&redownload=1&selenium=0&iarefresh=1";
+		}
   }
 	
   return link;
