@@ -4518,7 +4518,11 @@
 	        //targetUrl = "https://cachedview.nl/#"+targetUrl;
 	        targetUrl = "https://cachedview.nl/?q="+encodeURIComponent(targetUrl)+"#"+targetUrl;
 	    } else {
-	        targetUrl = "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(targetUrl);
+			if (Math.random() < 0.5) {
+	        	targetUrl = "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(targetUrl);
+			} else {
+				targetUrl = "https://archive.wikiwix.com/cache/index2.php?url="+encodeURIComponent(targetUrl)+"&redownload=1&selenium=0&iarefresh=1";
+	    	}
 	    }
 	}
 	
