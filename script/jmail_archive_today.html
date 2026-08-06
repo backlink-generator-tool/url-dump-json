@@ -4518,19 +4518,17 @@
 	        //targetUrl = "https://cachedview.nl/#"+targetUrl;
 	        targetUrl = "https://cachedview.nl/?q="+encodeURIComponent(targetUrl)+"#"+targetUrl;
 	    } else {
-				if (Math.random() < 0.2) {
-					targetUrl = "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(targetUrl);
-				} else if(Math.random() < 0.2) {
-					targetUrl = "https://archive.wikiwix.com/cache/index2.php?url="+encodeURIComponent(targetUrl);
-				} else if (Math.random() < 0.2) {
-					targetUrl = "https://archive.wikiwix.com/cache/index2.php?url="+encodeURIComponent(targetUrl)+"&redownload=1&selenium=0&iarefresh=1";
-				}else if (Math.random() < 0.2) {
-					targetUrl = "https://archive.wikiwix.com/cache/index2.php?url="+encodeURIComponent(targetUrl)+"&redownload=1";
-				}else if (Math.random() < 0.2) {
-					targetUrl = "https://archive.wikiwix.com/cache/index2.php?url="+encodeURIComponent(targetUrl)+"&selenium=0";
-				}else {
-					targetUrl = "https://archive.wikiwix.com/cache/index2.php?url="+encodeURIComponent(targetUrl)+"&iarefresh=1";
-	    		}
+				const variants = [
+					  url => "https://archive.wikiwix.com/cache/?url=" + encodeURIComponent(url),
+					  url => "https://archive.wikiwix.com/cache/index2.php?url=" + encodeURIComponent(url),
+					  url => "https://archive.wikiwix.com/cache/index2.php?url=" + encodeURIComponent(url) + "&redownload=1&selenium=0&iarefresh=1",
+					  url => "https://archive.wikiwix.com/cache/index2.php?url=" + encodeURIComponent(url) + "&redownload=1",
+					  url => "https://archive.wikiwix.com/cache/index2.php?url=" + encodeURIComponent(url) + "&selenium=0",
+					  url => "https://archive.wikiwix.com/cache/index2.php?url=" + encodeURIComponent(url) + "&iarefresh=1",
+				];
+				
+				const pick = variants[Math.floor(Math.random() * variants.length)];
+				targetUrl = pick(targetUrl);
 	    }
 	}
 	
