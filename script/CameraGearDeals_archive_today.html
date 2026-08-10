@@ -179,8 +179,7 @@ function randomURL(array){ return array[Math.floor(Math.random()*array.length)];
 
 /* generateTargetURL — build full Pinterest board URL from base + board slug */
 function generateTargetURL() {
-  if (!fetchData.length) return "";
-  return normalizeURL(randomURL(pinterestURLs) + randomURL(Data));
+  return normalizeURL(randomURL(pinterestURLs) + randomURL(data));
 }
   
   const ARCHIVE_TODAY_SUBMIT = 'https://archive.ph/submit/?anyway=1&url=';
