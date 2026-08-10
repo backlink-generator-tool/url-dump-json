@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Submit URL to archive.today</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 700px;
+    margin: 80px auto;
+    padding: 0 20px;
+    color: #222;
+    text-align: center;
+  }
+  h1 { font-size: 1.3rem; }
+  #status {
+    margin: 20px 0;
+    font-size: 14px;
+    color: #444;
+    font-family: monospace;
+    word-break: break-all;
+  }
+</style>
+</head>
+<body>
+
+<h1>Redirecting to archive.today&hellip;</h1>
+<div id="status">Picking a URL&hellip;</div>
+
+<script>
+  
+const data = [
+  	"seekersofdecay/",
+  	"seekersofdecay/_created/",
+  	"seekersofdecay/_saved/",
+  	"seekersofdecay/regan-vest/",
+  	"seekersofdecay/abandoned-shipwreck/",
+  	"seekersofdecay/the-atlantic-wall-coastal-fortifications/",
+  	"seekersofdecay/abandoned-hotels/",
+  	"seekersofdecay/abandoned-nato-air-force-base/",
+  	"seekersofdecay/abandoned-soviet-apartment-blocks/",
+  	"seekersofdecay/secret-soviet-store-bunker-for-nuclear-warheads/",
+  	"seekersofdecay/abandoned-soviet-memorial-walls/",
+  	"seekersofdecay/graffiti-photography-abandoned-places/",
+  	"seekersofdecay/wwii-bunker-turned-into-cold-war-facility/",
+  	"seekersofdecay/gssd-bunker-from-the-cold-war/",
+  	"seekersofdecay/abandoned-military-bases/",
+  	"seekersofdecay/abandoned-zoo/",
+  	"seekersofdecay/abandoned-machine/",
+  	"seekersofdecay/abandoned-east-german/",
+  	"seekersofdecay/abandoned-soviet-military-building/",
+  	"seekersofdecay/the-devils-bridge/",
+  	"seekersofdecay/abandoned-soviet-air-force-base/",
+  	"seekersofdecay/the-white-houses-ww2-weapons-testing-sites/",
+  	"seekersofdecay/abandoned-sanatorium/",
+  	"seekersofdecay/abandoned-lighthouse/",
+  	"seekersofdecay/abandoned-stasi-bunker/",
+  	"seekersofdecay/abandoned-mine-shaft/",
+  	"seekersofdecay/abandoned-places-photography-urban-exploration/",
+  	"seekersofdecay/abandoned-hospital/",
+  	"seekersofdecay/abandoned-cars-trucks-tractors/",
+  	"seekersofdecay/abandoned-houses/",
+  	"seekersofdecay/abandoned-churches-monastery/",
+  	"seekersofdecay/abandoned-factory/",
+  	"seekersofdecay/intotheoutside/",
+  	"seekersofdecay/abandoned-amusement-park/",
+  	"pin/615656211558174355/",
+  	"pin/615656211564500126/",
+  	"pin/615656211564499702/",
+  	"pin/615656211564472019/",
+  	"pin/615656211564471936/",
+  	"pin/615656211564471900/",
+  	"pin/615656211564471675/",
+  	"pin/615656211564471611/",
+  	"pin/615656211564470701/",
+  	"pin/615656211564470735/",
+  	"pin/615656211564470865/",
+  	"pin/615656211564471096/",
+  	"pin/615656211564471262/",
+  	"pin/615656211564471332/",
+  	"pin/615656211558178085/",
+  	"pin/615656211558360868/",
+  	"pin/615656211558279913/",
+  	"pin/615656211558279899/",
+  	"pin/615656211558177715/",
+  	"pin/615656211558176765/",
+  	"pin/615656211558174837/",
+  	"pin/615656211558144233/",
+  	"pin/615656211558145928/",
+  	"pin/615656211558174812/",
+  	"pin/615656211558176742/",
+  	"pin/615656211558144320/",
+  	"pin/615656211558174969/",
+  	"pin/316589048820216941/",
+  	"search/boards/?q=Regelbau&rs=typed",
+  	"search/boards/?q=Regelbau",
+  	"Habicht_profile/",
+  	"Habicht_profile/_created/",
+  	"Habicht_profile/_saved/",
+  	"Habicht_profile/atlantic-wall-regelbau-l480/",
+  	"Habicht_profile/atlantic-wall-regelbau-639/",
+  	"Habicht_profile/atlantic-wall-regelbau-m184/",
+  	"Habicht_profile/atlantic-wall-regelbau-l487/",
+  	"Habicht_profile/atlantic-wall-regelbau-m270/",
+  	"Habicht_profile/atlantic-wall-regelbau-634/",
+  	"pin/692569248951677917/",
+  	"WorldWar2_Bunker/",
+  	"WorldWar2_Bunker/your-tried-pins/",
+  	"WorldWar2_Bunker/underground-doomsday-bunkers-doomsday-shelter/",
+  	"WorldWar2_Bunker/abandoned-place/",
+  	"Habicht_profile/atlantic-wall-regelbau-s174/",
+  	"Habicht_profile/thumbnail-atlantic-wall-regelbau-bunker/",
+  	"Habicht_profile/atlantic-wall-regelbau-fl243-fl249/",
+  	"Habicht_profile/atlantic-wall-regelbau-fl244/",
+  	"Habicht_profile/atlantic-wall-regelbau-fl245/",
+  	"Habicht_profile/atlantic-wall-regelbau-fl246/",
+  	"Habicht_profile/atlantic-wall-regelbau-s75-s80/",
+  	"Habicht_profile/atlantic-wall-regelbau-l485/",
+  	"Habicht_profile/image-gallery-about-ww2-fortifications-1933-1945/"
+];
+  
+const pinterestURLs = [
+	"https://www.pinterest.com/",
+    "https://www.pinterest.at/",
+    "https://www.pinterest.be/",
+    "https://www.pinterest.ca/",
+    "https://www.pinterest.cl/",
+    "https://www.pinterest.co/",
+    "https://www.pinterest.dk/",
+    "https://www.pinterest.ec/",
+    "https://www.pinterest.fr/",
+    "https://www.pinterest.de/",
+    "https://www.pinterest.hu/",
+    "https://www.pinterest.in/",
+    "https://www.pinterest.id/",
+    "https://www.pinterest.ie/",
+    "https://www.pinterest.it/",
+    "https://www.pinterest.jp/",
+    "https://www.pinterest.mx/",
+    "https://www.pinterest.nl/",
+    "https://www.pinterest.pe/",
+    "https://www.pinterest.nz/",
+    "https://www.pinterest.pt/",
+    "https://www.pinterest.ph/",
+    "https://www.pinterest.ru/",
+    "https://www.pinterest.kr/",
+    "https://www.pinterest.se/",
+    "https://www.pinterest.es/",
+    "https://www.pinterest.ch/",
+    "https://www.pinterest.tw/",
+    "https://www.pinterest.uk/",
+    "https://www.pinterest.th/",
+    "https://www.pinterest.vn/",
+    "https://www.pinterest.co.uk/",
+    "https://www.pinterest.co.kr/",
+    "https://www.pinterest.com.au/",
+    "https://www.pinterest.com.mx/",
+    "https://ar.pinterest.com/",
+    "https://uk.pinterest.com/",
+    "https://fr.pinterest.com/",
+    "https://de.pinterest.com/",
+    "https://es.pinterest.com/",
+    "https://it.pinterest.com/",
+    "https://au.pinterest.com/",
+    "https://dk.pinterest.com/",
+    "https://pt.pinterest.com/",
+    "https://ru.pinterest.com/",
+    "https://jp.pinterest.com/",
+    "https://cl.pinterest.com/",
+    "https://co.pinterest.com/",
+    "https://nl.pinterest.com/",
+    "https://in.pinterest.com/",
+    "https://kr.pinterest.com/"
+];
+  
+function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
+function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
+function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
+
+/* generateTargetURL — build full Pinterest board URL from base + board slug */
+function generateTargetURL() {
+  if (!fetchData.length) return "";
+  return normalizeURL(randomURL(pinterestURLs) + randomURL(Data));
+}
+  
+  const ARCHIVE_TODAY_SUBMIT = 'https://archive.ph/submit/?anyway=1&url=';
+
+  const statusEl = document.getElementById('status');
+
+  const idx = pickRandomIndex();
+	
+	let targetUrl = generateTargetURL();
+	
+	const submitUrl = ARCHIVE_TODAY_SUBMIT + encodeURIComponent(targetUrl);
+
+  statusEl.textContent = 'Submitting: ' + targetUrl;
+
+  // Redirect the whole page to archive.today's submit endpoint.
+  window.location.href = submitUrl;
+</script>
+
+</body>
+</html>
