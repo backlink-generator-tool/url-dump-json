@@ -187,11 +187,9 @@ function generateTargetURL() {
 
   const statusEl = document.getElementById('status');
 
-  const idx = pickRandomIndex();
+  let targetUrl = generateTargetURL();
 	
-	let targetUrl = generateTargetURL();
-	
-	const submitUrl = ARCHIVE_TODAY_SUBMIT + encodeURIComponent(targetUrl);
+  const submitUrl = ARCHIVE_TODAY_SUBMIT + encodeURIComponent(targetUrl);
 
   statusEl.textContent = 'Submitting: ' + targetUrl;
 
