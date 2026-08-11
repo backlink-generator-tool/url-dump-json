@@ -70,6 +70,23 @@ const urls = [
   	"https://regelbaulinks.github.io/Create-FREE-backlinks/?https://regelbaulinks.github.io/Create-FREE-backlinks/"
 ];
 
+function generateUrl(tpl, normUrl) {
+  if (!tpl) return '';
+  tpl = tpl
+    .replace(/%5B\s*(ENCODE_)?([A-Z0-9_]+)\s*%5D/gi, '[$1$2]')
+    .replace(/&#(?:x5b|91);\s*(ENCODE_)?([A-Z0-9_]+)\s*&#(?:x5d|93);/gi, '[$1$2]')
+    .replace(/\{\{\s*(ENCODE_)?([A-Z0-9_]+)\s*\}\}/gi, '[$1$2]')
+    .replace(/%7B%7B\s*(ENCODE_)?([A-Z0-9_]+)\s*%7D%7D/gi, '[$1$2]');
+  return replacePlaceholders(tpl, buildMap(normUrl));
+}
+	
+const wikiwixUrls = [
+	"https://archive.wikiwix.com/cache/?url=[ENCODE_URL]",
+	"https://archive.wikiwix.com/cache/index.php?url=[ENCODE_URL]",
+	"https://archive.wikiwix.com/cache/index2.php?url=[ENCODE_URL]",
+	"https://archive.wikiwix.com/cache/index2.php?url=[ENCODE_URL]&redownload=1&selenium=0&iarefresh=1"
+];
+
 function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
 function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
 function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
@@ -79,7 +96,9 @@ function generateTargetURL() {
   const url = randomURL(urls);
 	
   if (Math.random() < 0.5) {
-     return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(url);
+		//const wikiwixUrl = randomURL(wikiwixUrls);
+     	//return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(url);
+     	return generateUrl(randomURL(wikiwixUrls), url);
   } 
 
   return url;
