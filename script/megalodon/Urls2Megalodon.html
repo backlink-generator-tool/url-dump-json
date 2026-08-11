@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Submit URL to archive.today</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 700px;
+    margin: 80px auto;
+    padding: 0 20px;
+    color: #222;
+    text-align: center;
+  }
+  h1 { font-size: 1.3rem; }
+  #status {
+    margin: 20px 0;
+    font-size: 14px;
+    color: #444;
+    font-family: monospace;
+    word-break: break-all;
+  }
+</style>
+</head>
+<body>
+
+<h1>Redirecting to archive.today&hellip;</h1>
+<div id="status">Picking a URL&hellip;</div>
+
+<script>
+  
+const urls = [
+  	"https://backlink-generator-tool.github.io/backlink-generator-tool/demo/",
+  	"https://SocialBoostExchange.github.io/free-backlink-generator-builder-online/",
+  	"https://GenerateBacklinks.github.io/free-backlink-generator-online-tool/",
+  	"https://traffic2archive.github.io/ultimate-seo-backlink-generator/",
+  	"https://openraw.github.io/backlink-maker-tool/demo/",
+  	"https://openbacklink.github.io/Open-backlink-generator/demo/",
+  	"https://backlink-generator-tool.github.io/Free-Social-Growth-SEO-Boosters/",
+  	"https://traffic2archive.github.io/Free-Social-Growth-Tools/",
+  	"https://SocialBoostExchange.github.io/free-social-growth-tools/",
+  	"https://GenerateBacklinks.github.io/FreeSocialBoost-Top10/",
+  	"https://github.com/backlink-generator-tool?tab=repositories",
+  	"https://github.com/SocialBoostExchange?tab=repositories",
+  	"https://github.com/GenerateBacklinks?tab=repositories",
+  	"https://github.com/traffic2archive?tab=repositories",
+  	"https://github.com/openraw?tab=repositories",
+  	"https://github.com/openbacklink?tab=repositories",
+  	"https://github.com/backlink-generator-tool",
+  	"https://github.com/SocialBoostExchange",
+  	"https://github.com/GenerateBacklinks",
+  	"https://github.com/traffic2archive",
+  	"https://github.com/OpenRaw",
+  	"https://github.com/OpenBacklink",
+  	"https://github.com/OpenBacklink/Open-backlink-generator",
+  	"https://github.com/OpenRaw/backlink-maker-tool",
+  	"https://github.com/traffic2archive/ultimate-seo-backlink-generator",
+  	"https://github.com/traffic2archive/Free-Social-Growth-Tools",
+  	"https://github.com/GenerateBacklinks/FreeSocialBoost-Top10",
+  	"https://github.com/GenerateBacklinks/free-backlink-generator-online-tool",
+  	"https://github.com/SocialBoostExchange/free-social-growth-tools",
+  	"https://github.com/SocialBoostExchange/free-backlink-generator-builder-online",
+  	"https://github.com/backlink-generator-tool/backlink-generator-tool",
+  	"https://github.com/backlink-generator-tool/Free-Social-Growth-SEO-Boosters",
+  	"https://github.com/RegelbauLinks",
+  	"https://github.com/RegelbauLinks?tab=repositories",
+  	"https://github.com/RegelbauLinks/Create-FREE-backlinks",
+  	"https://regelbaulinks.github.io/Create-FREE-backlinks/demo/",
+  	"https://regelbaulinks.github.io/Create-FREE-backlinks/",
+  	"https://regelbaulinks.github.io/Create-FREE-backlinks/?https://regelbaulinks.github.io/Create-FREE-backlinks/"
+];
+
+function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
+function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
+function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
+
+
+function generateTargetURL() {
+  const url = randomURL(urls);
+	
+  if (Math.random() < 0.5) {
+     return "https://archive.wikiwix.com/cache/?url="+encodeURIComponent(url);
+  } 
+
+  return url;
+}
+  
+  const ARCHIVE_TODAY_SUBMIT = 'https://megalodon.jp/pc/main?url=';
+
+  const statusEl = document.getElementById('status');
+
+  const targetUrl = generateTargetURL();
+	
+  const submitUrl = ARCHIVE_TODAY_SUBMIT + encodeURIComponent(targetUrl);
+
+  statusEl.textContent = 'Submitting: ' + targetUrl;
+
+  // Redirect the whole page to archive.today's submit endpoint.
+  window.location.href = submitUrl;
+</script>
+
+</body>
+</html>
