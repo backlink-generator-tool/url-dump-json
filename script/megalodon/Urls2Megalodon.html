@@ -89,8 +89,7 @@ function buildMap(url) {
     URL:            url,
     DOMAIN:         p.hostname,
     NOPROTOCOL_URL: `${p.hostname}${p.pathname}${p.search}${p.hash}`,
-    NOSUBDOMAIN_URL:`${hostnameNoWWW}${p.pathname}${p.search}${p.hash}`,
-    SHORT_CODE:     randomURL(shortArchiveCodes)
+    NOSUBDOMAIN_URL:`${hostnameNoWWW}${p.pathname}${p.search}${p.hash}`
   };
   Object.keys(map).forEach(k => {
     try { map['ENCODE_' + k] = encodeURIComponent(map[k]); } catch { map['ENCODE_' + k] = ''; }
