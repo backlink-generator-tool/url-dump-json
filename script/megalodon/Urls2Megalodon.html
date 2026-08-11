@@ -70,6 +70,56 @@ const urls = [
   	"https://regelbaulinks.github.io/Create-FREE-backlinks/?https://regelbaulinks.github.io/Create-FREE-backlinks/"
 ];
 
+function buildMap(url) {
+  const p = new URL(url);
+  const parts = p.hostname.split('.');
+  const ln = parts.length;
+  const hostnameNoWWW = p.hostname.replace(/^www\./i, '');
+  let map = {
+    PROTOCOL:       p.protocol,
+    SUBDOMAIN:      ln > 2 ? parts.slice(0, ln - 2).join('.') + '.' : '',
+    DOMAINNAME:     parts[ln - 2] || '',
+    TLD:            parts[ln - 1] || '',
+    HOST:           p.hostname,
+    PORT:           p.port ? ':' + p.port : '',
+    PATH:           p.pathname,
+    QUERY:          p.search,
+    PARAMS:         p.search ? p.search.slice(1) : '',
+    FRAGMENT:       p.hash,
+    URL:            url,
+    DOMAIN:         p.hostname,
+    NOPROTOCOL_URL: `${p.hostname}${p.pathname}${p.search}${p.hash}`,
+    NOSUBDOMAIN_URL:`${hostnameNoWWW}${p.pathname}${p.search}${p.hash}`,
+    SHORT_CODE:     randomURL(shortArchiveCodes)
+  };
+  Object.keys(map).forEach(k => {
+    try { map['ENCODE_' + k] = encodeURIComponent(map[k]); } catch { map['ENCODE_' + k] = ''; }
+  });
+  return map;
+}
+
+
+function replacePlaceholders(tpl, map) {
+  return tpl.replace(/(\{\{|\[)\s*(ENCODE_)?([A-Z0-9_]+)\s*(\}\}|\])/gi,
+    (match, open, encPrefix, key, close, offset, fullStr) => {
+      if (!key) return '';
+      key = key.toUpperCase();
+      const wantsEncode = !!encPrefix;
+      if (wantsEncode) {
+        const encodedKey = 'ENCODE_' + key;
+        if (map.hasOwnProperty(encodedKey)) return map[encodedKey];
+        try { return encodeURIComponent(map[key] || ''); } catch { return ''; }
+      }
+      if (key === 'URL') {
+        const before = fullStr.slice(Math.max(0, offset - 30), offset).toLowerCase();
+        if (/\burl\s*=\s*$/.test(before) || /\burl\s*=\s*/i.test(fullStr)) {
+          try { return encodeURIComponent(map['URL'] || ''); } catch { return map['URL'] || ''; }
+        }
+      }
+      return map[key] || '';
+    });
+}
+
 function generateUrl(tpl, normUrl) {
   if (!tpl) return '';
   tpl = tpl
