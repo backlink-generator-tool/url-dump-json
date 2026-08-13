@@ -83,7 +83,7 @@
 <body>
 
 <h1>Submit URLs to the Wayback Machine</h1>
-<p>187 URLs loaded as a static array. 4 iframes run in parallel, each submitting via a hidden POST form (not a GET navigation) into its own iframe, then waiting 45 seconds before the next one. Starts automatically on page load.</p>
+<p><span id="url-count"></span> URLs loaded as a static array. 4 iframes run in parallel, each submitting via a hidden POST form (not a GET navigation) into its own iframe, then waiting 45 seconds before the next one. Starts automatically on page load.</p>
 
 <div id="controls">
   <button id="btn-start" disabled>Running automatically&hellip;</button>
@@ -2087,8 +2087,8 @@ function normalizeURL(url){ if(typeof url!=='string') return ""; return url.repl
 function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
 
 /* generateTargetURL — build full Pinterest board URL from base + board slug */
-function generateTargetURL() {
-  return normalizeURL(randomURL(pinterestURLs) + randomURL(data));
+function generateTargetURL(index) {
+  return normalizeURL(randomURL(pinterestURLs) + data[index]);
 }
   
 
@@ -2128,8 +2128,11 @@ function generateTargetURL() {
   let submittedCount = 0;
 
   const statusEl = document.getElementById('status');
+  const urlCountEl = document.getElementById('url-count');
+  if (urlCountEl) urlCountEl.textContent = data.length;
   const logEl = document.getElementById('log');
   const progressEl = document.getElementById('progress');
+  progressEl.max = data.length;
   const btnStart = document.getElementById('btn-start');
   const btnStop = document.getElementById('btn-stop');
 
@@ -2143,19 +2146,19 @@ function generateTargetURL() {
   }
 
   function updateStatus() {
-    statusEl.textContent = urls.length + ' URLs loaded, ' + submittedCount + ' submitted this session.';
-    progressEl.value = Math.min(submittedCount, urls.length);
+    statusEl.textContent = data.length + ' URLs loaded, ' + submittedCount + ' submitted this session.';
+    progressEl.value = Math.min(submittedCount, data.length);
   }
 
   // Pick a random URL index that hasn't been submitted yet, if possible.
   // Once everything has been submitted at least once, falls back to fully random.
   function pickRandomIndex() {
     const remaining = [];
-    for (let i = 0; i < urls.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       if (!submitted.has(i)) remaining.push(i);
     }
     if (remaining.length === 0) {
-      return Math.floor(Math.random() * urls.length);
+      return Math.floor(Math.random() * data.length);
     }
     return remaining[Math.floor(Math.random() * remaining.length)];
   }
@@ -2204,7 +2207,8 @@ function generateTargetURL() {
     const label = document.getElementById('label-' + slot);
 
     while (!stopRequested) {
-      const targetUrl = generateTargetURL();
+      const idx = pickRandomIndex();
+      const targetUrl = generateTargetURL(idx);
 
       submitted.add(idx);
       submittedCount += 1;
