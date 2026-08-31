@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Submit URL to archive.today</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 700px;
+    margin: 80px auto;
+    padding: 0 20px;
+    color: #222;
+    text-align: center;
+  }
+  h1 { font-size: 1.3rem; }
+  #status {
+    margin: 20px 0;
+    font-size: 14px;
+    color: #444;
+    font-family: monospace;
+    word-break: break-all;
+  }
+</style>
+</head>
+<body>
+
+<h1>Redirecting to archive.today&hellip;</h1>
+<div id="status">Picking a URL&hellip;</div>
+
+<script>
+  
+const data = [
+  	"seekersofdecayatlanticwall",
+  	"seekersofdecayatlanticwall/",
+  	"seekersofdecayatlanticwall/_created/",
+  	"seekersofdecayatlanticwall/_created",
+  	"seekersofdecayatlanticwall/_saved/",
+  	"seekersofdecayatlanticwall/_saved"
+];
+  
+const pinterestURLs = [
+    "https://www.pinterest.com/",
+    "https://www.pinterest.at/",
+    "https://www.pinterest.be/",
+    "https://www.pinterest.ca/",
+    "https://www.pinterest.cl/",
+    "https://www.pinterest.co/",
+    "https://www.pinterest.dk/",
+    "https://www.pinterest.ec/",
+    "https://www.pinterest.fr/",
+    "https://www.pinterest.de/",
+    "https://www.pinterest.hu/",
+    "https://www.pinterest.in/",
+    "https://www.pinterest.id/",
+    "https://www.pinterest.ie/",
+    "https://www.pinterest.it/",
+    "https://www.pinterest.jp/",
+    "https://www.pinterest.mx/",
+    "https://www.pinterest.nl/",
+    "https://www.pinterest.pe/",
+    "https://www.pinterest.nz/",
+    "https://www.pinterest.pt/",
+    "https://www.pinterest.ph/",
+    "https://www.pinterest.ru/",
+    "https://www.pinterest.kr/",
+    "https://www.pinterest.se/",
+    "https://www.pinterest.es/",
+    "https://www.pinterest.ch/",
+    "https://www.pinterest.tw/",
+    "https://www.pinterest.uk/",
+    "https://www.pinterest.th/",
+    "https://www.pinterest.vn/",
+    "https://www.pinterest.co.uk/",
+    "https://www.pinterest.co.kr/",
+    "https://www.pinterest.com.au/",
+    "https://www.pinterest.com.mx/",
+    "https://ar.pinterest.com/",
+    "https://uk.pinterest.com/",
+    "https://fr.pinterest.com/",
+    "https://de.pinterest.com/",
+    "https://es.pinterest.com/",
+    "https://it.pinterest.com/",
+    "https://au.pinterest.com/",
+    "https://dk.pinterest.com/",
+    "https://pt.pinterest.com/",
+    "https://ru.pinterest.com/",
+    "https://jp.pinterest.com/",
+    "https://cl.pinterest.com/",
+    "https://co.pinterest.com/",
+    "https://nl.pinterest.com/",
+    "https://in.pinterest.com/",
+    "https://kr.pinterest.com/",
+
+    "https://pinterest.com/",
+    "https://pinterest.at/",
+    "https://pinterest.be/",
+    "https://pinterest.ca/",
+    "https://pinterest.cl/",
+    "https://pinterest.co/",
+    "https://pinterest.dk/",
+    "https://pinterest.ec/",
+    "https://pinterest.fr/",
+    "https://pinterest.de/",
+    "https://pinterest.hu/",
+    "https://pinterest.in/",
+    "https://pinterest.id/",
+    "https://pinterest.ie/",
+    "https://pinterest.it/",
+    "https://pinterest.jp/",
+    "https://pinterest.mx/",
+    "https://pinterest.nl/",
+    "https://pinterest.pe/",
+    "https://pinterest.nz/",
+    "https://pinterest.pt/",
+    "https://pinterest.ph/",
+    "https://pinterest.ru/",
+    "https://pinterest.kr/",
+    "https://pinterest.se/",
+    "https://pinterest.es/",
+    "https://pinterest.ch/",
+    "https://pinterest.tw/",
+    "https://pinterest.uk/",
+    "https://pinterest.th/",
+    "https://pinterest.vn/",
+    "https://pinterest.co.uk/",
+    "https://pinterest.co.kr/",
+    "https://pinterest.com.au/",
+    "https://pinterest.com.mx/"
+];
+  
+function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
+function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
+function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
+
+/* generateTargetURL — build full Pinterest board URL from base + board slug */
+function generateTargetURL() {
+  return normalizeURL(randomURL(pinterestURLs) + randomURL(data));
+}
+  
+  const ARCHIVE_TODAY_SUBMIT = 'https://megalodon.jp/pc/main?url=';
+
+  const statusEl = document.getElementById('status');
+
+  let targetUrl = generateTargetURL();
+	
+  const submitUrl = ARCHIVE_TODAY_SUBMIT + encodeURIComponent(targetUrl);
+
+  statusEl.textContent = 'Submitting: ' + targetUrl;
+
+  // Redirect the whole page to archive.today's submit endpoint.
+  window.location.href = submitUrl;
+</script>
+
+</body>
+</html>
