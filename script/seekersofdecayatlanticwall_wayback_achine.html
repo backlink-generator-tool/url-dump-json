@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Submit URLs to Wayback Machine</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: #222;
+  }
+  h1 { font-size: 1.4rem; }
+  #controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  button {
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid #888;
+    border-radius: 6px;
+    background: #f5f5f5;
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #status {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #444;
+  }
+  progress { width: 100%; margin: 10px 0; }
+  #frames {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .frame-box {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .frame-label {
+    font-family: monospace;
+    font-size: 11px;
+    background: #eee;
+    padding: 4px 8px;
+    word-break: break-all;
+  }
+  .frame-timer {
+    font-family: monospace;
+    font-size: 11px;
+    color: #666;
+    padding: 2px 8px;
+    background: #f7f7f7;
+  }
+  iframe {
+    width: 100%;
+    height: 260px;
+    border: none;
+    display: block;
+  }
+  #log {
+    font-family: monospace;
+    font-size: 12px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 6px;
+    margin-top: 16px;
+  }
+  .log-line { margin: 2px 0; }
+  .log-ok { color: #0a7d28; }
+  .log-err { color: #b3261e; }
+</style>
+</head>
+<body>
+
+<h1>Submit URLs to the Wayback Machine</h1>
+<p><span id="url-count"></span> URLs loaded as a static array. 4 iframes run in parallel, each submitting via a hidden POST form (not a GET navigation) into its own iframe, then waiting 45 seconds before the next one. Starts automatically on page load.</p>
+
+<div id="controls">
+  <button id="btn-start" disabled>Running automatically&hellip;</button>
+  <button id="btn-stop">Stop</button>
+</div>
+
+<progress id="progress" value="0" max="187"></progress>
+<div id="status">Starting&hellip;</div>
+
+<div id="frames">
+  <div class="frame-box">
+    <div class="frame-label" id="label-0">&mdash;</div>
+    <div class="frame-timer" id="timer-0">waiting&hellip;</div>
+    <iframe id="frame-0" name="wb-frame-0" title="Wayback save slot 1"></iframe>
+  </div>
+  <div class="frame-box">
+    <div class="frame-label" id="label-1">&mdash;</div>
+    <div class="frame-timer" id="timer-1">waiting&hellip;</div>
+    <iframe id="frame-1" name="wb-frame-1" title="Wayback save slot 2"></iframe>
+  </div>
+  <div class="frame-box">
+    <div class="frame-label" id="label-2">&mdash;</div>
+    <div class="frame-timer" id="timer-2">waiting&hellip;</div>
+    <iframe id="frame-2" name="wb-frame-2" title="Wayback save slot 3"></iframe>
+  </div>
+  <div class="frame-box">
+    <div class="frame-label" id="label-3">&mdash;</div>
+    <div class="frame-timer" id="timer-3">waiting&hellip;</div>
+    <iframe id="frame-3" name="wb-frame-3" title="Wayback save slot 4"></iframe>
+  </div>
+</div>
+
+<h3>Log</h3>
+<div id="log"></div>
+
+<script>
+
+const data = [
+	"search/pins/?q=Regelbau&rs=filter",
+  "search/pins?q=Regelbau&rs=filter",
+	"search/pins/?q=Regelbau",
+	"search/pins?q=Regelbau",
+  "search/videos/?q=Regelbau",
+  "search/videos?q=Regelbau",
+  "search/videos/?q=Regelbau&rs=content_type_filter&filter_location=1",
+  "search/videos?q=Regelbau&rs=content_type_filter&filter_location=1",
+  "search/videos/?q=Regelbau&rs=content_type_filter",
+  "search/videos?q=Regelbau&rs=content_type_filter",
+  "search/videos/?q=Regelbau&filter_location=1",
+  "search/videos/?q=Regelbau&filter_location=1",
+  "search/videos?q=Regelbau&filter_location=1",
+  "search/boards/?q=Regelbau",
+  "search/boards?q=Regelbau",
+  "search/boards/?q=Regelbau&rs=content_type_filter&filter_location=1",
+  "search/boards?q=Regelbau&rs=content_type_filter&filter_location=1",
+  "search/boards/?q=Regelbau&rs=content_type_filter",
+  "search/boards?q=Regelbau&rs=content_type_filter",
+  "search/boards/?q=Regelbau&filter_location=1",
+  "search/boards?q=Regelbau&filter_location=1",
+  "search/users/?q=Regelbau",
+  "search/users?q=Regelbau",
+  "search/users/?q=Regelbau&rs=content_type_filter&filter_location=1",
+  "search/users?q=Regelbau&rs=content_type_filter&filter_location=1",
+  "search/users/?q=Regelbau&rs=content_type_filter",
+  "search/users?q=Regelbau&rs=content_type_filter",
+  "search/users/?q=Regelbau&filter_location=1",
+  "search/users?q=Regelbau&filter_location=1",
+  "seekersofdecayatlanticwall/_created/",
+  "seekersofdecayatlanticwall/_created",
+  "seekersofdecayatlanticwall/_saved/",
+  "seekersofdecayatlanticwall/_saved",
+  "seekersofdecayatlanticwall/regelbau-600-wwii-5-cm-kwk-bunker/",
+  "seekersofdecayatlanticwall/regelbau-600-wwii-5-cm-kwk-bunker",
+  "seekersofdecayatlanticwall/regelbau-633-m19-mortar-bunker/",
+  "seekersofdecayatlanticwall/regelbau-633-m19-mortar-bunker",
+  "seekersofdecayatlanticwall/regelbau-669-wwii-field-gun-casemate/",
+  "seekersofdecayatlanticwall/regelbau-669-wwii-field-gun-casemate",
+  "seekersofdecayatlanticwall/regelbau-671-wwii-gun-casemate/",
+  "seekersofdecayatlanticwall/regelbau-671-wwii-gun-casemate",
+  "seekersofdecayatlanticwall/regelbau-636-wwii-fire-control-bunker/",
+  "seekersofdecayatlanticwall/regelbau-636-wwii-fire-control-bunker",
+  "seekersofdecayatlanticwall/regelbau-506d-47-cm-festungspak-bunker/",
+  "seekersofdecayatlanticwall/regelbau-506d-47-cm-festungspak-bunker",
+  "seekersofdecayatlanticwall/regelbau-506c-wwii-anti-tank-gun-bunker/",
+  "seekersofdecayatlanticwall/regelbau-506c-wwii-anti-tank-gun-bunker",
+  "seekersofdecayatlanticwall/regelbau-646-wwii-water-supply-bunker-type/",
+  "seekersofdecayatlanticwall/regelbau-646-wwii-water-supply-bunker-type",
+  "seekersofdecayatlanticwall/regelbau-681-wwii-machine-gun-casemate/",
+  "seekersofdecayatlanticwall/regelbau-681-wwii-machine-gun-casemate",
+  "seekersofdecayatlanticwall/regelbau-634-mg34-combat-bunker/",
+  "seekersofdecayatlanticwall/regelbau-634-mg34-combat-bunker",
+  "seekersofdecayatlanticwall/regelbau-s174-wwii-heavy-ammunition-bunker/",
+  "seekersofdecayatlanticwall/regelbau-s174-wwii-heavy-ammunition-bunker",
+  "seekersofdecayatlanticwall/regelbau-s468-wwii-ammunition-bunker/",
+  "seekersofdecayatlanticwall/regelbau-s468-wwii-ammunition-bunker",
+  "seekersofdecayatlanticwall/regelbau-m272-wwii-coastal-gun-bunker/",
+  "seekersofdecayatlanticwall/regelbau-m272-wwii-coastal-gun-bunker",
+  "seekersofdecayatlanticwall/regelbau-fl243-wwii-105cm-flak-bunker/",
+  "seekersofdecayatlanticwall/regelbau-fl243-wwii-105cm-flak-bunker",
+  "seekersofdecayatlanticwall/regelbau-629-german-pak-gun-bunker/",
+  "seekersofdecayatlanticwall/regelbau-629-german-pak-gun-bunker",
+  "seekersofdecayatlanticwall/regelbau-s561-wwii-38cm-gun-bunker/",
+  "seekersofdecayatlanticwall/regelbau-s561-wwii-38cm-gun-bunker",
+  "seekersofdecayatlanticwall/regelbau-tobruk-pzkw-turm-bauform-67/",
+  "seekersofdecayatlanticwall/regelbau-tobruk-pzkw-turm-bauform-67",
+  "seekersofdecayatlanticwall/regelbau-613-wwii-artillery-observation-bunker/",
+  "seekersofdecayatlanticwall/regelbau-613-wwii-artillery-observation-bunker",
+  "seekersofdecayatlanticwall/regelbau-686-wwii-194cm-gun-bunker/",
+  "seekersofdecayatlanticwall/regelbau-686-wwii-194cm-gun-bunker",
+  "seekersofdecayatlanticwall/regelbau-502-wwii-20-man-bunker/",
+  "seekersofdecayatlanticwall/regelbau-502-wwii-20-man-bunker",
+  "seekersofdecayatlanticwall/regelbau-622-inside-the-20-man-wwii-bunker/",
+  "seekersofdecayatlanticwall/regelbau-622-inside-the-20-man-wwii-bunker",
+  "seekersofdecayatlanticwall/regelbau-l487-wwii-night-fighter-command-bunker/",
+  "seekersofdecayatlanticwall/regelbau-l487-wwii-night-fighter-command-bunker",
+  "seekersofdecayatlanticwall/regelbau-v174-wwii-naval-radar-bunker/",
+  "seekersofdecayatlanticwall/regelbau-v174-wwii-naval-radar-bunker",
+  "seekersofdecayatlanticwall/regelbau-s75s80-38cm-naval-gun-bunker/",
+  "seekersofdecayatlanticwall/regelbau-s75s80-38cm-naval-gun-bunker",
+  "seekersofdecayatlanticwall/regelbau-m270-wwii-coastal-gun-bunker/",
+  "seekersofdecayatlanticwall/regelbau-m270-wwii-coastal-gun-bunker",
+  "seekersofdecayatlanticwall/regelbau-501-the-10-man-wwii-bunker/",
+  "seekersofdecayatlanticwall/regelbau-501-the-10-man-wwii-bunker",
+  "seekersofdecayatlanticwall/regelbau-m151-inside-a-28-man-wwii-bunker/",
+  "seekersofdecayatlanticwall/regelbau-m151-inside-a-28-man-wwii-bunker",
+  "seekersofdecayatlanticwall/regelbau-134-the-hidden-wwii-ammo-bunker/",
+  "seekersofdecayatlanticwall/regelbau-134-the-hidden-wwii-ammo-bunker",
+  "seekersofdecayatlanticwall/regelbau-120-wwii-german-observation-bunker/",
+  "seekersofdecayatlanticwall/regelbau-120-wwii-german-observation-bunker",
+  "seekersofdecayatlanticwall/regelbau-118b-wwii-german-medical-bunker-history/",
+  "seekersofdecayatlanticwall/regelbau-118b-wwii-german-medical-bunker-history",
+  "seekersofdecayatlanticwall/regelbau-117a-the-hidden-wwii-hq/",
+  "seekersofdecayatlanticwall/regelbau-117a-the-hidden-wwii-hq",
+  "seekersofdecayatlanticwall/regelbau-120a-wwii-german-observation-bunker/",
+  "seekersofdecayatlanticwall/regelbau-120a-wwii-german-observation-bunker",
+  "seekersofdecayatlanticwall/regelbau-m184-gneisenaus-150mm-gun-bunker/",
+  "seekersofdecayatlanticwall/regelbau-m184-gneisenaus-150mm-gun-bunker",
+  "seekersofdecayatlanticwall/regelbau-110a-three-slit-steel-fortress/",
+  "seekersofdecayatlanticwall/regelbau-110a-three-slit-steel-fortress/"
+];
+  
+const pinterestURLs = [
+	"https://www.pinterest.com/",
+    "https://www.pinterest.at/",
+    "https://www.pinterest.be/",
+    "https://www.pinterest.ca/",
+    "https://www.pinterest.cl/",
+    "https://www.pinterest.co/",
+    "https://www.pinterest.dk/",
+    "https://www.pinterest.ec/",
+    "https://www.pinterest.fr/",
+    "https://www.pinterest.de/",
+    "https://www.pinterest.hu/",
+    "https://www.pinterest.in/",
+    "https://www.pinterest.id/",
+    "https://www.pinterest.ie/",
+    "https://www.pinterest.it/",
+    "https://www.pinterest.jp/",
+    "https://www.pinterest.mx/",
+    "https://www.pinterest.nl/",
+    "https://www.pinterest.pe/",
+    "https://www.pinterest.nz/",
+    "https://www.pinterest.pt/",
+    "https://www.pinterest.ph/",
+    "https://www.pinterest.ru/",
+    "https://www.pinterest.kr/",
+    "https://www.pinterest.se/",
+    "https://www.pinterest.es/",
+    "https://www.pinterest.ch/",
+    "https://www.pinterest.tw/",
+    "https://www.pinterest.uk/",
+    "https://www.pinterest.th/",
+    "https://www.pinterest.vn/",
+    "https://www.pinterest.co.uk/",
+    "https://www.pinterest.co.kr/",
+    "https://www.pinterest.com.au/",
+    "https://www.pinterest.com.mx/",
+    "https://ar.pinterest.com/",
+    "https://uk.pinterest.com/",
+    "https://fr.pinterest.com/",
+    "https://de.pinterest.com/",
+    "https://es.pinterest.com/",
+    "https://it.pinterest.com/",
+    "https://au.pinterest.com/",
+    "https://dk.pinterest.com/",
+    "https://pt.pinterest.com/",
+    "https://ru.pinterest.com/",
+    "https://jp.pinterest.com/",
+    "https://cl.pinterest.com/",
+    "https://co.pinterest.com/",
+    "https://nl.pinterest.com/",
+    "https://in.pinterest.com/",
+    "https://kr.pinterest.com/"
+];
+  
+function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
+function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
+function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
+
+/* generateTargetURL — build full Pinterest board URL from base + board slug */
+function generateTargetURL(index) {
+  return normalizeURL(randomURL(pinterestURLs) + data[index]);
+}
+  
+
+  const NUM_FRAMES = 4;
+  const WAIT_MS = 45000; // 45 seconds between loads, per iframe
+
+  // The submission target. If you ever need to point this at a different
+  // archiving endpoint, just change action / inputName here.
+  const SITE = {
+    action:    'https://web.archive.org/save/',
+    inputName: 'url'
+  };
+
+
+  const usedValues = new Set(); // value indices already used this session
+
+  // Pick a random value from PARAM_VALUES, avoiding repeats until the list
+  // is exhausted, then it starts cycling randomly again (same pattern as
+  // pickRandomIndex below).
+  function pickRandomParamValue() {
+    const remaining = [];
+    for (let i = 0; i < PARAM_VALUES.length; i++) {
+      if (!usedValues.has(i)) remaining.push(i);
+    }
+    let idx;
+    if (remaining.length === 0) {
+      idx = Math.floor(Math.random() * PARAM_VALUES.length);
+    } else {
+      idx = remaining[Math.floor(Math.random() * remaining.length)];
+    }
+    usedValues.add(idx);
+    return PARAM_VALUES[idx];
+  }
+
+  const submitted = new Set();      // indices already submitted this session
+  let stopRequested = false;
+  let submittedCount = 0;
+
+  const statusEl = document.getElementById('status');
+  const urlCountEl = document.getElementById('url-count');
+  if (urlCountEl) urlCountEl.textContent = data.length;
+  const logEl = document.getElementById('log');
+  const progressEl = document.getElementById('progress');
+  progressEl.max = data.length;
+  const btnStart = document.getElementById('btn-start');
+  const btnStop = document.getElementById('btn-stop');
+
+  function log(msg, isError) {
+    const line = document.createElement('div');
+    line.className = 'log-line ' + (isError ? 'log-err' : 'log-ok');
+    const time = new Date().toLocaleTimeString();
+    line.textContent = '[' + time + '] ' + msg;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function updateStatus() {
+    statusEl.textContent = data.length + ' URLs loaded, ' + submittedCount + ' submitted this session.';
+    progressEl.value = Math.min(submittedCount, data.length);
+  }
+
+  // Pick a random URL index that hasn't been submitted yet, if possible.
+  // Once everything has been submitted at least once, falls back to fully random.
+  function pickRandomIndex() {
+    const remaining = [];
+    for (let i = 0; i < data.length; i++) {
+      if (!submitted.has(i)) remaining.push(i);
+    }
+    if (remaining.length === 0) {
+      return Math.floor(Math.random() * data.length);
+    }
+    return remaining[Math.floor(Math.random() * remaining.length)];
+  }
+
+  function countdownTimer(slot, seconds) {
+    const timerEl = document.getElementById('timer-' + slot);
+    let remaining = seconds;
+    timerEl.textContent = 'next load in ' + remaining + 's';
+    const interval = setInterval(() => {
+      if (stopRequested) {
+        clearInterval(interval);
+        return;
+      }
+      remaining -= 1;
+      if (remaining <= 0) {
+        clearInterval(interval);
+      } else {
+        timerEl.textContent = 'next load in ' + remaining + 's';
+      }
+    }, 1000);
+  }
+
+  // Builds a hidden POST form and submits it targeted at a specific named
+  // iframe, so the iframe navigates via POST instead of a GET on frame.src.
+  function submitViaForm(frame, targetUrl) {
+    const form = document.createElement("form");
+    form.style.display  = "none";
+    form.method         = "POST";
+    form.action         = SITE.action;
+    form.referrerPolicy = "no-referrer";
+    form.target         = frame.name; // navigate the specific iframe, not the whole window
+
+    const urlInput  = document.createElement("input");
+    urlInput.type   = "hidden";
+    urlInput.name   = SITE.inputName;
+    urlInput.value  = targetUrl;
+    form.appendChild(urlInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+  }
+
+  async function runSlot(slot) {
+    const frame = document.getElementById('frame-' + slot);
+    const label = document.getElementById('label-' + slot);
+
+    while (!stopRequested) {
+      const idx = pickRandomIndex();
+      const targetUrl = generateTargetURL(idx);
+
+      submitted.add(idx);
+      submittedCount += 1;
+      label.textContent = targetUrl;
+      submitViaForm(frame, targetUrl);
+      log('Slot ' + (slot + 1) + ' submitted (POST): ' + targetUrl);
+      updateStatus();
+
+      countdownTimer(slot, WAIT_MS / 1000);
+
+      await new Promise(res => setTimeout(res, WAIT_MS));
+    }
+    document.getElementById('timer-' + slot).textContent = 'stopped';
+  }
+
+  function startAll() {
+    stopRequested = false;
+    btnStart.disabled = true;
+    btnStop.disabled = false;
+    log('Starting ' + NUM_FRAMES + ' parallel slots, ' + (WAIT_MS / 1000) + 's between loads per slot.');
+    for (let s = 0; s < NUM_FRAMES; s++) {
+      // Stagger the initial start slightly so all 4 don't fire in the exact same tick
+      setTimeout(() => runSlot(s), s * 500);
+    }
+  }
+
+  btnStop.addEventListener('click', () => {
+    stopRequested = true;
+    btnStop.disabled = true;
+    btnStart.disabled = true;
+    log('Stop requested. Slots will halt after their current wait.', true);
+  });
+
+  updateStatus();
+  window.addEventListener('load', startAll);
+</script>
+
+</body>
+</html>
