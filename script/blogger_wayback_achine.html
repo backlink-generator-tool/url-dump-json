@@ -262,7 +262,13 @@ function randomURL(array){ return array[Math.floor(Math.random()*array.length)];
 
 /* generateTargetURL — build full Pinterest board URL from base + board slug */
 function generateTargetURL(index) {
-  return data[index];
+    const url = data[index];
+  
+    if (Math.random() < 0.5) {
+      return url;
+    } else {
+      return "https://archive.wikiwix.com/cache/?url=" + encodeURIComponent(url);
+    }
 }
   
 
