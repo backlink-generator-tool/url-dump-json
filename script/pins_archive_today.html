@@ -17769,7 +17769,14 @@ function randomURL(array){ return array[Math.floor(Math.random()*array.length)];
 
 /* generateTargetURL — build full Pinterest board URL from base + board slug */
 function generateTargetURL() {
-  return normalizeURL(randomURL(pinterestURLs) + "pin/" + randomURL(data));
+  	//return normalizeURL(randomURL(pinterestURLs) + "pin/" + randomURL(data));
+
+	const url = normalizeURL(randomURL(pinterestURLs) + "pin/" + randomURL(data) + "/");
+  
+    if (Math.random() < 0.5) {
+      	return url + repin/;
+    } 
+	return url;
 }
   
   const ARCHIVE_TODAY_SUBMIT = 'https://archive.ph/submit/?anyway=1&url=';
