@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Submit URLs to Wayback Machine</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: #222;
+  }
+  h1 { font-size: 1.4rem; }
+  #controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  button {
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid #888;
+    border-radius: 6px;
+    background: #f5f5f5;
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #status {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #444;
+  }
+  progress { width: 100%; margin: 10px 0; }
+  #frames {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .frame-box {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .frame-label {
+    font-family: monospace;
+    font-size: 11px;
+    background: #eee;
+    padding: 4px 8px;
+    word-break: break-all;
+  }
+  .frame-timer {
+    font-family: monospace;
+    font-size: 11px;
+    color: #666;
+    padding: 2px 8px;
+    background: #f7f7f7;
+  }
+  iframe {
+    width: 100%;
+    height: 260px;
+    border: none;
+    display: block;
+  }
+  #log {
+    font-family: monospace;
+    font-size: 12px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 6px;
+    margin-top: 16px;
+  }
+  .log-line { margin: 2px 0; }
+  .log-ok { color: #0a7d28; }
+  .log-err { color: #b3261e; }
+</style>
+</head>
+<body>
+
+<h1>Submit URLs to the Wayback Machine</h1>
+<p><span id="url-count"></span> URLs loaded as a static array. 4 iframes run in parallel, each submitting via a hidden POST form (not a GET navigation) into its own iframe, then waiting 45 seconds before the next one. Starts automatically on page load.</p>
+
+<div id="controls">
+  <button id="btn-start" disabled>Running automatically&hellip;</button>
+  <button id="btn-stop">Stop</button>
+</div>
+
+<progress id="progress" value="0" max="187"></progress>
+<div id="status">Starting&hellip;</div>
+
+<div id="frames">
+  <div class="frame-box">
+    <div class="frame-label" id="label-0">&mdash;</div>
+    <div class="frame-timer" id="timer-0">waiting&hellip;</div>
+    <iframe id="frame-0" name="wb-frame-0" title="Wayback save slot 1"></iframe>
+  </div>
+  <div class="frame-box">
+    <div class="frame-label" id="label-1">&mdash;</div>
+    <div class="frame-timer" id="timer-1">waiting&hellip;</div>
+    <iframe id="frame-1" name="wb-frame-1" title="Wayback save slot 2"></iframe>
+  </div>
+  <div class="frame-box">
+    <div class="frame-label" id="label-2">&mdash;</div>
+    <div class="frame-timer" id="timer-2">waiting&hellip;</div>
+    <iframe id="frame-2" name="wb-frame-2" title="Wayback save slot 3"></iframe>
+  </div>
+  <div class="frame-box">
+    <div class="frame-label" id="label-3">&mdash;</div>
+    <div class="frame-timer" id="timer-3">waiting&hellip;</div>
+    <iframe id="frame-3" name="wb-frame-3" title="Wayback save slot 4"></iframe>
+  </div>
+</div>
+
+<h3>Log</h3>
+<div id="log"></div>
+
+<script>
+
+const data = [
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Far.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fuk.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Ffr.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fde.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fes.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fit.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fau.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fdk.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpt.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fru.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fjp.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fcl.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fco.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fnl.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fin.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fkr.pinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.com",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.at",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.be",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.ca",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.cl",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.co",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.dk",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.ec",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.fr",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.de",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.hu",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.in",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.id",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.ie",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.it",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.jp",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.mx",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.nl",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.pe",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.nz",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.pt",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.ph",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.ru",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.kr",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.se",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.es",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.ch",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.tw",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.uk",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.th",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.vn",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.co.uk",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.co.kr",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.com.au",
+"https://archive.wikiwix.com/cache/?url=https%3A%2F%2Farchive.ph%2Fpinterest.com.mx"
+];
+  
+  
+function shuffle(array){ for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];} }
+function normalizeURL(url){ if(typeof url!=='string') return ""; return url.replace(/([^:]\/)\/+/g,"$1"); }
+function randomURL(array){ return array[Math.floor(Math.random()*array.length)]; }
+
+/* generateTargetURL — build full Pinterest board URL from base + board slug */
+function generateTargetURL(index) {
+    const url = data[index];
+  
+    if (Math.random() < 0.5) {
+      return url;
+    } else {
+      return "https://archive.wikiwix.com/cache/?url=" + encodeURIComponent(url);
+    }
+}
+  
+
+  const NUM_FRAMES = 4;
+  const WAIT_MS = 60000; // 45 seconds between loads, per iframe
+
+  // The submission target. If you ever need to point this at a different
+  // archiving endpoint, just change action / inputName here.
+  const SITE = {
+    action:    'https://web.archive.org/save/',
+    inputName: 'url'
+  };
+
+
+  const usedValues = new Set(); // value indices already used this session
+
+  // Pick a random value from PARAM_VALUES, avoiding repeats until the list
+  // is exhausted, then it starts cycling randomly again (same pattern as
+  // pickRandomIndex below).
+  function pickRandomParamValue() {
+    const remaining = [];
+    for (let i = 0; i < PARAM_VALUES.length; i++) {
+      if (!usedValues.has(i)) remaining.push(i);
+    }
+    let idx;
+    if (remaining.length === 0) {
+      idx = Math.floor(Math.random() * PARAM_VALUES.length);
+    } else {
+      idx = remaining[Math.floor(Math.random() * remaining.length)];
+    }
+    usedValues.add(idx);
+    return PARAM_VALUES[idx];
+  }
+
+  const submitted = new Set();      // indices already submitted this session
+  let stopRequested = false;
+  let submittedCount = 0;
+
+  const statusEl = document.getElementById('status');
+  const urlCountEl = document.getElementById('url-count');
+  if (urlCountEl) urlCountEl.textContent = data.length;
+  const logEl = document.getElementById('log');
+  const progressEl = document.getElementById('progress');
+  progressEl.max = data.length;
+  const btnStart = document.getElementById('btn-start');
+  const btnStop = document.getElementById('btn-stop');
+
+  function log(msg, isError) {
+    const line = document.createElement('div');
+    line.className = 'log-line ' + (isError ? 'log-err' : 'log-ok');
+    const time = new Date().toLocaleTimeString();
+    line.textContent = '[' + time + '] ' + msg;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function updateStatus() {
+    statusEl.textContent = data.length + ' URLs loaded, ' + submittedCount + ' submitted this session.';
+    progressEl.value = Math.min(submittedCount, data.length);
+  }
+
+  // Pick a random URL index that hasn't been submitted yet, if possible.
+  // Once everything has been submitted at least once, falls back to fully random.
+  function pickRandomIndex() {
+    const remaining = [];
+    for (let i = 0; i < data.length; i++) {
+      if (!submitted.has(i)) remaining.push(i);
+    }
+    if (remaining.length === 0) {
+      return Math.floor(Math.random() * data.length);
+    }
+    return remaining[Math.floor(Math.random() * remaining.length)];
+  }
+
+  function countdownTimer(slot, seconds) {
+    const timerEl = document.getElementById('timer-' + slot);
+    let remaining = seconds;
+    timerEl.textContent = 'next load in ' + remaining + 's';
+    const interval = setInterval(() => {
+      if (stopRequested) {
+        clearInterval(interval);
+        return;
+      }
+      remaining -= 1;
+      if (remaining <= 0) {
+        clearInterval(interval);
+      } else {
+        timerEl.textContent = 'next load in ' + remaining + 's';
+      }
+    }, 1000);
+  }
+
+  // Builds a hidden POST form and submits it targeted at a specific named
+  // iframe, so the iframe navigates via POST instead of a GET on frame.src.
+  function submitViaForm(frame, targetUrl) {
+    const form = document.createElement("form");
+    form.style.display  = "none";
+    form.method         = "POST";
+    form.action         = SITE.action;
+    form.referrerPolicy = "no-referrer";
+    form.target         = frame.name; // navigate the specific iframe, not the whole window
+
+    const urlInput  = document.createElement("input");
+    urlInput.type   = "hidden";
+    urlInput.name   = SITE.inputName;
+    urlInput.value  = targetUrl;
+    form.appendChild(urlInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+  }
+
+  async function runSlot(slot) {
+    const frame = document.getElementById('frame-' + slot);
+    const label = document.getElementById('label-' + slot);
+
+    while (!stopRequested) {
+      const idx = pickRandomIndex();
+      const targetUrl = generateTargetURL(idx);
+
+      submitted.add(idx);
+      submittedCount += 1;
+      label.textContent = targetUrl;
+      submitViaForm(frame, targetUrl);
+      log('Slot ' + (slot + 1) + ' submitted (POST): ' + targetUrl);
+      updateStatus();
+
+      countdownTimer(slot, WAIT_MS / 1000);
+
+      await new Promise(res => setTimeout(res, WAIT_MS));
+    }
+    document.getElementById('timer-' + slot).textContent = 'stopped';
+  }
+
+  function startAll() {
+    stopRequested = false;
+    btnStart.disabled = true;
+    btnStop.disabled = false;
+    log('Starting ' + NUM_FRAMES + ' parallel slots, ' + (WAIT_MS / 1000) + 's between loads per slot.');
+    for (let s = 0; s < NUM_FRAMES; s++) {
+      // Stagger the initial start slightly so all 4 don't fire in the exact same tick
+      setTimeout(() => runSlot(s), s * 500);
+    }
+  }
+
+  btnStop.addEventListener('click', () => {
+    stopRequested = true;
+    btnStop.disabled = true;
+    btnStart.disabled = true;
+    log('Stop requested. Slots will halt after their current wait.', true);
+  });
+
+  updateStatus();
+  window.addEventListener('load', startAll);
+</script>
+
+</body>
+</html>
